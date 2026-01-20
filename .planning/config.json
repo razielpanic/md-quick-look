@@ -1,0 +1,9 @@
+{
+  "project_name": "md-spotlighter",
+  "workflow": {
+    "mode": "yolo",
+    "depth": "standard",
+    "parallelization": true,
+    "commit_docs": true
+  }
+}
