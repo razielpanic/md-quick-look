@@ -1,0 +1,88 @@
+# Requirements: md-spotlighter
+
+**Defined:** 2026-01-31
+**Core Value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
+
+## v1 Requirements
+
+Requirements for initial release. Each maps to roadmap phases.
+
+### Markdown Rendering
+
+- [ ] **MDRNDR-01**: Render headings with visual hierarchy (h1-h6)
+- [ ] **MDRNDR-02**: Render bold text
+- [ ] **MDRNDR-03**: Render italic text
+- [ ] **MDRNDR-04**: Render strikethrough text
+- [ ] **MDRNDR-05**: Render unordered lists
+- [ ] **MDRNDR-06**: Render ordered lists
+- [ ] **MDRNDR-07**: Render code blocks with monospaced font
+- [ ] **MDRNDR-08**: Render blockquotes
+- [ ] **MDRNDR-09**: Render tables (GFM)
+- [ ] **MDRNDR-10**: Render links as text (no clicking)
+- [ ] **MDRNDR-11**: Display images as placeholders `[Image: filename]`
+
+### System Integration
+
+- [ ] **SYSINT-01**: Quick Look extension loads .md files from Finder
+- [ ] **SYSINT-02**: Preview renders instantly (<1 second for typical files)
+- [ ] **SYSINT-03**: Works on macOS 26+ (Tahoe and later)
+- [ ] **SYSINT-04**: Respects system appearance (light/dark mode)
+
+## v2 Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Enhanced Rendering
+
+- **ENHRNDR-01**: Syntax highlighting in code blocks
+- **ENHRNDR-02**: Render actual images (local files)
+- **ENHRNDR-03**: Display YAML front matter as formatted metadata
+- **ENHRNDR-04**: Render GFM task lists with checkboxes
+
+## Out of Scope
+
+Explicitly excluded. Documented to prevent scope creep.
+
+| Feature | Reason |
+|---------|--------|
+| macOS 14 or earlier support | Targeting latest OS only (26+), no legacy support needed |
+| Clickable links | Breaks preview-only UX; Quick Look is for viewing, not interaction |
+| HTML/CSS rendering | Security risk (XSS), complexity not needed for markdown |
+| JavaScript execution | Impossible in sandbox, not needed |
+| Remote image loading | Network delays, privacy issues, 30s timeout risk |
+| Interactive widgets | No edit capability in preview context |
+| Mermaid diagrams / MathJax | Requires JavaScript; timeout risk; high complexity |
+| Custom CSS/theming | Use system appearance defaults |
+| Other file formats | Markdown only |
+| Mobile/iPad support | macOS Quick Look extension only |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| MDRNDR-01 | TBD | Pending |
+| MDRNDR-02 | TBD | Pending |
+| MDRNDR-03 | TBD | Pending |
+| MDRNDR-04 | TBD | Pending |
+| MDRNDR-05 | TBD | Pending |
+| MDRNDR-06 | TBD | Pending |
+| MDRNDR-07 | TBD | Pending |
+| MDRNDR-08 | TBD | Pending |
+| MDRNDR-09 | TBD | Pending |
+| MDRNDR-10 | TBD | Pending |
+| MDRNDR-11 | TBD | Pending |
+| SYSINT-01 | TBD | Pending |
+| SYSINT-02 | TBD | Pending |
+| SYSINT-03 | TBD | Pending |
+| SYSINT-04 | TBD | Pending |
+
+**Coverage:**
+- v1 requirements: 15 total
+- Mapped to phases: 0 (pending roadmap creation)
+- Unmapped: 15 ⚠️
+
+---
+*Requirements defined: 2026-01-31*
+*Last updated: 2026-01-31 after initial definition*

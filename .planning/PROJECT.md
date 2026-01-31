@@ -8,6 +8,18 @@ A Quick Look extension for macOS that renders markdown files as styled previews 
 
 Instant, effortless context about markdown file content without leaving Finder or opening an editor.
 
+## Current Milestone: v1.0 - Initial Release
+
+**Goal:** Deliver a working Quick Look extension that renders markdown files with essential formatting in Finder.
+
+**Target features:**
+- All basic markdown elements (headings, text formatting, lists, code blocks, blockquotes, tables)
+- Image placeholders and text-only links
+- Instant rendering performance
+- System appearance support
+
+**See:** `.planning/REQUIREMENTS.md` for full requirements (15 total)
+
 ## Requirements
 
 ### Validated
@@ -16,25 +28,22 @@ Instant, effortless context about markdown file content without leaving Finder o
 
 ### Active
 
-- [ ] Quick Look extension loads `.md` files from Finder
-- [ ] Renders headings with visual hierarchy
-- [ ] Renders bold and italic text
-- [ ] Renders unordered and ordered lists
-- [ ] Renders code blocks with syntax highlighting
-- [ ] Links display as normal text
-- [ ] Images display as `[Image: filename]` placeholder
-- [ ] Tables display as raw markdown
-- [ ] Preview loads instantly without perceptible delay
-- [ ] Works on macOS 14+ (latest versions only)
+See `.planning/REQUIREMENTS.md` for complete v1.0 requirements.
+
+**Summary:** 15 requirements across Markdown Rendering and System Integration categories, covering all essential markdown elements, instant rendering, and macOS 26+ support.
 
 ### Out of Scope
 
-- Table rendering — deferred, adds processing complexity without value for quick scans
-- Image rendering — expensive for quick preview use case, placeholder sufficient
+- Syntax highlighting (deferred to v2)
+- Actual image rendering (deferred to v2) — placeholders only in v1
+- YAML front matter display (deferred to v2)
+- Clickable links — preview-only UX
+- HTML/CSS/JavaScript rendering — security risk
+- Remote image loading — network delays, privacy issues
 - Custom CSS/theming — use system appearance defaults
 - Other file formats — markdown only
 - Mobile/iPad — macOS Quick Look extension only
-- Older macOS versions — targeting newest versions only
+- macOS 25 or earlier — targeting macOS 26+ only
 
 ## Context
 
@@ -49,17 +58,19 @@ Instant, effortless context about markdown file content without leaving Finder o
 ## Constraints
 
 - **Tech stack**: Swift, macOS Quick Look extension API — no alternatives
-- **macOS support**: Latest versions only (14+), no legacy support required
-- **Performance**: Instant rendering — no processing delays acceptable
+- **macOS support**: macOS 26+ (Tahoe) only, no legacy support
+- **Performance**: Instant rendering (<1 second) — no processing delays acceptable
 - **Scope**: Minimal feature set for speed of creation and deployment
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Minimal rendering (no tables/images) | Fast deployment, can add later if needed | — Pending |
+| Include tables in v1, defer images | Tables are text-based (low complexity), images require sandbox workarounds | — Pending |
+| macOS 26+ only (Tahoe) | Target latest OS, avoid legacy API complexity | — Pending |
 | macOS-only Quick Look extension | True system integration vs. standalone app | — Pending |
 | GitHub + eventual App Store | Community-first with commercial consideration | — Pending |
+| No syntax highlighting in v1 | Keep v1 simple and fast, defer to v2 | — Pending |
 
 ---
-*Last updated: 2025-01-19 after initialization*
+*Last updated: 2026-01-31 after v1.0 milestone definition*
