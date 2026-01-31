@@ -5,34 +5,58 @@
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** Milestone v1.0 - Initial Release
+**Current focus:** Phase 1 - Extension Foundation
 
 ## Current Position
 
-Phase: Not started (defining roadmap)
-Plan: —
-Status: Creating roadmap
+Phase: 1 of 4 (Extension Foundation)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
 Progress: [░░░░░░░░░░] 0%
 
-Last activity: 2026-01-31 — Milestone v1.0 started, requirements defined
+Last activity: 2026-01-31 — Roadmap created for v1.0
 
-## Recent Decisions
+## Performance Metrics
 
-- macOS 26+ (Tahoe) only — no legacy OS support
-- Include table rendering in v1 — text-based, low complexity
-- Defer syntax highlighting to v2 — keep v1 simple and fast
-- Image placeholders only in v1 — defer actual rendering to v2
+**Velocity:**
+- Total plans completed: 0
+- Average duration: -
+- Total execution time: 0 hours
 
-## Pending Todos
+**By Phase:**
 
-(None)
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
 
-## Blockers/Concerns
+**Recent Trend:**
+- Last 5 plans: None yet
+- Trend: Baseline
 
-(None)
+*Updated after each plan completion*
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- macOS 26+ (Tahoe) only: Target latest OS, avoid legacy API complexity
+- macOS-only Quick Look extension: True system integration vs. standalone app
+- No syntax highlighting in v1: Keep v1 simple and fast, defer to v2
+- Include tables in v1, defer images: Tables are text-based (low complexity), images require sandbox workarounds
+
+### Pending Todos
+
+None yet.
+
+### Blockers/Concerns
+
+None yet.
 
 ## Session Continuity
 
 Last session: 2026-01-31
-Stopped at: Requirements defined, ready for roadmap creation
-Resume file: —
+Stopped at: Roadmap creation complete
+Resume file: None

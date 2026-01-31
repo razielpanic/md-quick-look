@@ -62,27 +62,27 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MDRNDR-01 | TBD | Pending |
-| MDRNDR-02 | TBD | Pending |
-| MDRNDR-03 | TBD | Pending |
-| MDRNDR-04 | TBD | Pending |
-| MDRNDR-05 | TBD | Pending |
-| MDRNDR-06 | TBD | Pending |
-| MDRNDR-07 | TBD | Pending |
-| MDRNDR-08 | TBD | Pending |
-| MDRNDR-09 | TBD | Pending |
-| MDRNDR-10 | TBD | Pending |
-| MDRNDR-11 | TBD | Pending |
-| SYSINT-01 | TBD | Pending |
-| SYSINT-02 | TBD | Pending |
-| SYSINT-03 | TBD | Pending |
-| SYSINT-04 | TBD | Pending |
+| MDRNDR-01 | Phase 2 | Pending |
+| MDRNDR-02 | Phase 2 | Pending |
+| MDRNDR-03 | Phase 2 | Pending |
+| MDRNDR-04 | Phase 2 | Pending |
+| MDRNDR-05 | Phase 2 | Pending |
+| MDRNDR-06 | Phase 2 | Pending |
+| MDRNDR-07 | Phase 2 | Pending |
+| MDRNDR-08 | Phase 2 | Pending |
+| MDRNDR-09 | Phase 3 | Pending |
+| MDRNDR-10 | Phase 2 | Pending |
+| MDRNDR-11 | Phase 2 | Pending |
+| SYSINT-01 | Phase 1 | Pending |
+| SYSINT-02 | Phase 4 | Pending |
+| SYSINT-03 | Phase 1 | Pending |
+| SYSINT-04 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 15 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 15 ⚠️
+- Mapped to phases: 15
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-31*
-*Last updated: 2026-01-31 after initial definition*
+*Last updated: 2026-01-31 after roadmap creation*
