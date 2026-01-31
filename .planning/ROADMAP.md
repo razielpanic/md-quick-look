@@ -28,10 +28,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Quick Look extension launches and displays markdown content (even if basic/unstyled)
   3. Extension works on macOS 26 (Tahoe) and later versions
   4. Extension appears in System Settings as installed Quick Look plugin
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 01-01-PLAN.md — Create Xcode project with host app and Quick Look extension, implement PreviewViewController
+- [ ] 01-02-PLAN.md — Create build automation (Makefile) and verify extension works in Finder
 
 ### Phase 2: Core Markdown Rendering
 **Goal**: Render all essential markdown elements with proper formatting
@@ -86,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Extension Foundation | 0/TBD | Not started | - |
+| 1. Extension Foundation | 0/2 | Ready to execute | - |
 | 2. Core Markdown Rendering | 0/TBD | Not started | - |
 | 3. Tables & Advanced Elements | 0/TBD | Not started | - |
 | 4. Performance & Polish | 0/TBD | Not started | - |
