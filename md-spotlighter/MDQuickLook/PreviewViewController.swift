@@ -31,26 +31,37 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             let styledContent = renderer.render(markdown: markdownContent)
             os_log("MarkdownRenderer completed styling", log: .quicklook, type: .info)
 
-            // Create NSTextView to display the attributed string
+            // Create scroll view
             let scrollView = NSScrollView(frame: view.bounds)
             scrollView.autoresizingMask = [.width, .height]
             scrollView.hasVerticalScroller = true
             scrollView.hasHorizontalScroller = false
             scrollView.borderType = .noBorder
 
-            let textView = NSTextView(frame: scrollView.bounds)
+            // Create custom text stack for blockquote border rendering
+            let textStorage = NSTextStorage()
+            let layoutManager = MarkdownLayoutManager()  // Custom layout manager
+            let textContainer = NSTextContainer(containerSize: NSSize(
+                width: scrollView.contentSize.width - 40,  // Account for insets
+                height: CGFloat.greatestFiniteMagnitude
+            ))
+            textContainer.widthTracksTextView = true
+
+            // Wire text components together
+            layoutManager.addTextContainer(textContainer)
+            textStorage.addLayoutManager(layoutManager)
+
+            // Create text view with custom container
+            let textView = NSTextView(frame: scrollView.bounds, textContainer: textContainer)
             textView.autoresizingMask = [.width]
             textView.isEditable = false
             textView.isSelectable = true
-            textView.backgroundColor = .white
+            textView.backgroundColor = .textBackgroundColor  // Semantic color for Dark Mode
             textView.textContainerInset = NSSize(width: 20, height: 20)
 
-            // Apply styled content from renderer
-            textView.textStorage?.setAttributedString(styledContent)
-
-            // Configure text container for word wrapping
-            textView.textContainer?.containerSize = NSSize(width: scrollView.contentSize.width - 40, height: CGFloat.greatestFiniteMagnitude)
-            textView.textContainer?.widthTracksTextView = true
+            // Apply styled content to text storage
+            textStorage.setAttributedString(styledContent)
+            os_log("Custom text stack configured with MarkdownLayoutManager", log: .quicklook, type: .debug)
 
             scrollView.documentView = textView
             view.addSubview(scrollView)

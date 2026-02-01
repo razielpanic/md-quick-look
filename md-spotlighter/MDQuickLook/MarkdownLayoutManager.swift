@@ -5,6 +5,11 @@ extension OSLog {
     static let layoutManager = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "layoutManager")
 }
 
+/// Custom NSAttributedString.Key for marking blockquote ranges
+extension NSAttributedString.Key {
+    static let blockquoteMarker = NSAttributedString.Key("com.razielpanic.blockquoteMarker")
+}
+
 /// Custom layout manager for drawing blockquote decorations
 class MarkdownLayoutManager: NSLayoutManager {
 
@@ -20,18 +25,10 @@ class MarkdownLayoutManager: NSLayoutManager {
         // Find blockquote ranges and draw vertical bars
         let charRange = characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
 
-        textStorage.enumerateAttribute(.presentationIntent,
+        textStorage.enumerateAttribute(.blockquoteMarker,
                                       in: charRange,
                                       options: []) { value, range, _ in
-            guard let intent = value as? PresentationIntent else { return }
-
-            // Check if this is a blockquote
-            let isBlockquote = intent.components.contains { component in
-                if case .blockQuote = component.kind { return true }
-                return false
-            }
-
-            guard isBlockquote else { return }
+            guard value != nil else { return }
 
             // Get glyph range for this character range
             let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)

@@ -198,5 +198,8 @@ class MarkdownRenderer {
         paragraphStyle.paragraphSpacingBefore = 8
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+
+        // Add blockquote marker for MarkdownLayoutManager to draw border
+        nsAttributedString.addAttribute(.blockquoteMarker, value: true, range: range)
     }
 }

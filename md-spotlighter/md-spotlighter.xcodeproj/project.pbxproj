@@ -10,6 +10,7 @@
 		2A1A1A1A1A1A1A1A1A1A1A1A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1A /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1B /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */; };
+		3A1A1A1A1A1A1A1A1A1A1A1D /* MarkdownLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */; };
 		4A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6A1A1A1A1A1A1A1A1A1A1A1A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1B1B1B1B1B1B1B1B1B1B1B /* Markdown */; };
 /* End PBXBuildFile section */
@@ -46,6 +47,7 @@
 		3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MDQuickLook.entitlements; sourceTree = "<group>"; };
+		3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownLayoutManager.swift; sourceTree = "<group>"; };
 		5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MDQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -100,6 +102,7 @@
 			children = (
 				3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */,
 				3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */,
+				3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */,
 				3B1B1B1B1B1B1B1B1B1B1B1D /* Info.plist */,
 				3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */,
 			);
@@ -220,6 +223,7 @@
 			files = (
 				3A1A1A1A1A1A1A1A1A1A1A1A /* PreviewViewController.swift in Sources */,
 				3A1A1A1A1A1A1A1A1A1A1A1B /* MarkdownRenderer.swift in Sources */,
+				3A1A1A1A1A1A1A1A1A1A1A1D /* MarkdownLayoutManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
