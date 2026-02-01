@@ -57,10 +57,13 @@ class MarkdownRenderer {
         let nsAttributedString = NSMutableAttributedString(withNewlines)
 
         // Apply block-level styles by examining PresentationIntent
-        applyBlockStyles(from: attributedString, to: nsAttributedString)
+        applyBlockStyles(from: withNewlines, to: nsAttributedString)
+
+        // Insert list prefixes (bullets and numbers)
+        insertListPrefixes(from: withNewlines, to: nsAttributedString)
 
         // Apply inline styles
-        applyInlineStyles(from: attributedString, to: nsAttributedString)
+        applyInlineStyles(from: withNewlines, to: nsAttributedString)
 
         // Apply link styling
         applyLinkStyles(to: nsAttributedString)
@@ -119,6 +122,78 @@ class MarkdownRenderer {
         }
 
         return result
+    }
+
+    // MARK: - List Prefix Insertion
+
+    /// Inserts visual prefixes (bullets or numbers) for list items
+    /// - Parameters:
+    ///   - attributedString: The source AttributedString with PresentationIntent
+    ///   - nsAttributedString: The target NSMutableAttributedString to modify
+    private func insertListPrefixes(from attributedString: AttributedString, to nsAttributedString: NSMutableAttributedString) {
+        // Collect list item information
+        struct ListItemInfo {
+            let range: NSRange
+            let prefix: String
+        }
+
+        var listItems: [ListItemInfo] = []
+
+        // Scan for list items
+        for run in attributedString.runs {
+            guard let intent = run.presentationIntent else { continue }
+
+            // Check if this run contains a list item
+            var isOrderedList = false
+            var isUnorderedList = false
+            var ordinal: Int?
+
+            for component in intent.components {
+                switch component.kind {
+                case .orderedList:
+                    isOrderedList = true
+                case .unorderedList:
+                    isUnorderedList = true
+                case .listItem(ordinal: let itemOrdinal):
+                    ordinal = itemOrdinal
+                default:
+                    break
+                }
+            }
+
+            // If we found a list item, determine the prefix
+            if let ordinal = ordinal {
+                let nsRange = NSRange(run.range, in: attributedString)
+                let prefix: String
+
+                if isOrderedList {
+                    prefix = "\(ordinal). "
+                } else if isUnorderedList {
+                    prefix = "• "
+                } else {
+                    // Fallback to bullet for ambiguous cases
+                    prefix = "• "
+                }
+
+                listItems.append(ListItemInfo(range: nsRange, prefix: prefix))
+                os_log("MarkdownRenderer: Found list item (ordinal: %d, ordered: %d, prefix: %{public}s)",
+                       log: .renderer, type: .debug, ordinal, isOrderedList ? 1 : 0, prefix)
+            }
+        }
+
+        // Insert prefixes in reverse order to maintain indices
+        for item in listItems.reversed() {
+            let prefixString = NSAttributedString(
+                string: item.prefix,
+                attributes: [
+                    .font: NSFont.systemFont(ofSize: bodyFontSize),
+                    .foregroundColor: NSColor.textColor
+                ]
+            )
+
+            nsAttributedString.insert(prefixString, at: item.range.location)
+            os_log("MarkdownRenderer: Inserted list prefix at location %d", log: .renderer, type: .debug, item.range.location)
+        }
     }
 
     // MARK: - Style Application
