@@ -91,6 +91,7 @@ class MarkdownRenderer {
         var result = attributedString
         var insertionOffsets: [AttributedString.Index] = []
         var previousBlockComponent: PresentationIntent.Kind?
+        var previousBlockIdentity: Int?
         var previousRunEndedWithNewline = false
         var isFirstRun = true
 
@@ -106,6 +107,7 @@ class MarkdownRenderer {
                     insertionOffsets.append(run.range.lowerBound)
                 }
                 previousBlockComponent = .paragraph
+                previousBlockIdentity = nil
                 previousRunEndedWithNewline = runEndsWithNewline
                 isFirstRun = false
                 continue
@@ -113,13 +115,24 @@ class MarkdownRenderer {
 
             // Get the top-level block component (first component in the stack)
             let currentBlockComponent = intent.components.first?.kind
+            let currentBlockIdentity = intent.components.first?.identity
 
             // Check if we're transitioning to a new block
-            if !isFirstRun && currentBlockComponent != previousBlockComponent && !previousRunEndedWithNewline {
-                insertionOffsets.append(run.range.lowerBound)
+            // Insert newline if:
+            // 1. Block component type changed, OR
+            // 2. Block identity changed (different paragraph/block instance), OR
+            // 3. Transitioning from intent to no-intent or vice versa
+            if !isFirstRun && !previousRunEndedWithNewline {
+                let differentComponent = currentBlockComponent != previousBlockComponent
+                let differentIdentity = currentBlockIdentity != previousBlockIdentity
+
+                if differentComponent || differentIdentity {
+                    insertionOffsets.append(run.range.lowerBound)
+                }
             }
 
             previousBlockComponent = currentBlockComponent
+            previousBlockIdentity = currentBlockIdentity
             previousRunEndedWithNewline = runEndsWithNewline
             isFirstRun = false
         }
