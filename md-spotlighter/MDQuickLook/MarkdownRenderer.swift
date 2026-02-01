@@ -157,10 +157,14 @@ class MarkdownRenderer {
                 }
             }
 
-            // If this run needs a newline, append it at the end of the run
+            // If this run needs a newline, check if it already ends with one
             if needsNewline {
-                let runEndIndex = run.range.upperBound
-                insertionPositions.append(runEndIndex)
+                // Check if run already ends with newline
+                let runText = String(attributedString[run.range].characters)
+                if !runText.hasSuffix("\n") {
+                    let runEndIndex = run.range.upperBound
+                    insertionPositions.append(runEndIndex)
+                }
             }
         }
 
@@ -429,8 +433,10 @@ class MarkdownRenderer {
             // Extract filename from URL/path
             let filename = (url as NSString).lastPathComponent
 
-            // Create placeholder text with special marker
-            let placeholder = "<<IMAGE:\(filename)>>"
+            // Create placeholder text with special marker that won't be modified by AttributedString
+            // Using underscores instead of angle brackets because AttributedString(markdown:)
+            // appears to consume one angle bracket on each side
+            let placeholder = "__IMAGE_PLACEHOLDER__\(filename)__END__"
 
             // Replace the full image markdown with placeholder
             result = (result as NSString).replacingCharacters(in: match.range, with: placeholder) as String
@@ -463,10 +469,13 @@ class MarkdownRenderer {
         let text = nsAttributedString.string as NSString
 
         // Find placeholder markers inserted during preprocessing
-        let pattern = "<<IMAGE:([^>]+)>>"
+        // Using underscores pattern to match the preprocessing marker that won't be modified by AttributedString
+        let pattern = "__IMAGE_PLACEHOLDER__(.+?)__END__"
         guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return }
 
         let matches = regex.matches(in: text as String, options: [], range: fullRange)
+
+        os_log("MarkdownRenderer: Found %d image markers to replace", log: .renderer, type: .info, matches.count)
 
         // Process in reverse to maintain indices
         for match in matches.reversed() {
@@ -485,6 +494,9 @@ class MarkdownRenderer {
             // Remove link attribute from the replacement range (prevents blue link styling)
             let newRange = NSRange(location: matchRange.location, length: placeholder.length)
             nsAttributedString.removeAttribute(.link, range: newRange)
+
+            // Explicitly apply gray color to ensure it's not overridden
+            nsAttributedString.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: newRange)
 
             os_log("MarkdownRenderer: Applied image placeholder for %{public}s", log: .renderer, type: .debug, filename)
         }
