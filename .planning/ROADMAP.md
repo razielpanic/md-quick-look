@@ -49,15 +49,18 @@ Plans:
   8. User sees blockquotes with visual differentiation (indentation or border)
   9. User sees links rendered as text (not clickable)
   10. User sees images rendered as placeholders showing `[Image: filename]`
-**Plans**: 6 plans (3 original + 3 gap closure)
+**Plans**: 9 plans (3 original + 6 gap closure)
 
 Plans:
 - [x] 02-01-PLAN.md — Create MarkdownRenderer with heading hierarchy and inline formatting
 - [x] 02-02-PLAN.md — Add code blocks, blockquotes with border, and list styling
 - [x] 02-03-PLAN.md — Add link styling, image placeholders, and visual verification
-- [ ] 02-04-PLAN.md — (Gap closure) Fix list rendering and intra-block line breaks
-- [ ] 02-05-PLAN.md — (Gap closure) Fix image placeholder formatting and combined inline styles
-- [ ] 02-06-PLAN.md — (Gap closure) Fix code block background alignment and minor line breaks
+- [x] 02-04-PLAN.md — (Gap closure 1) Fix list rendering and intra-block line breaks
+- [x] 02-05-PLAN.md — (Gap closure 1) Fix image placeholder formatting and combined inline styles
+- [x] 02-06-PLAN.md — (Gap closure 1) Fix code block background alignment and minor line breaks
+- [ ] 02-07-PLAN.md — (Gap closure 2) Fix image placeholder marker replacement (BLOCKER)
+- [ ] 02-08-PLAN.md — (Gap closure 2) Fix LayoutManager background/border gaps
+- [ ] 02-09-PLAN.md — (Gap closure 2) Fix list spacing and document newlines
 
 ### Phase 3: Tables & Advanced Elements
 **Goal**: Render GitHub-flavored markdown tables
@@ -93,6 +96,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Extension Foundation | 2/2 | Complete | 2026-02-01 |
-| 2. Core Markdown Rendering | 3/6 | Gap closure | 2026-02-01 |
+| 2. Core Markdown Rendering | 6/9 | Gap closure 2 | 2026-02-01 |
 | 3. Tables & Advanced Elements | 0/TBD | Not started | - |
 | 4. Performance & Polish | 0/TBD | Not started | - |
