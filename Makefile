@@ -22,6 +22,11 @@ install: build
 	cp -R "$(BUILD_DIR)/Build/Products/Release/$(APP_NAME)" "$(INSTALL_DIR)/"
 	@echo "Extension installed to $(INSTALL_DIR)/$(APP_NAME)"
 	@echo "Note: Quick Look extension is embedded at Contents/PlugIns/MDQuickLook.appex"
+	@echo "Registering extension with pluginkit..."
+	@open "$(INSTALL_DIR)/$(APP_NAME)" 2>/dev/null || true
+	@sleep 2
+	@killall md-spotlighter 2>/dev/null || true
+	@echo "Extension registered successfully"
 
 # Reload Quick Look system
 reload:

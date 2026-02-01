@@ -27,7 +27,6 @@
 			<key>QLSupportedContentTypes</key>
 			<array>
 				<string>net.daringfireball.markdown</string>
-				<string>public.plain-text</string>
 			</array>
 			<key>QLIsDataBasedPreview</key>
 			<false/>
