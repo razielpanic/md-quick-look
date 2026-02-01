@@ -1,18 +1,59 @@
 import Cocoa
 import Quartz
 import os.log
+import Foundation
+import WebKit
 
 extension OSLog {
     private static var subsystem = "com.razielpanic.md-spotlighter"
     static let quicklook = OSLog(subsystem: subsystem, category: "quicklook")
 }
 
-class PreviewProvider: QLPreviewProvider {
-    func providePreview(for request: QLFilePreviewRequest) async throws -> QLPreviewReply {
-        os_log("Extension loaded for file: %@", log: .quicklook, type: .info, request.fileURL.path)
+extension String {
+    func appending(to url: URL, encoding: String.Encoding = .utf8) throws {
+        let fileManager = FileManager.default
+        if !fileManager.fileExists(atPath: url.path) {
+            try self.write(to: url, atomically: true, encoding: encoding)
+        } else {
+            let fileHandle = try FileHandle(forWritingTo: url)
+            fileHandle.seekToEndOfFile()
+            if let data = self.data(using: encoding) {
+                fileHandle.write(data)
+            }
+            try fileHandle.close()
+        }
+    }
+}
 
-        // Load markdown content
-        let content = try String(contentsOf: request.fileURL, encoding: .utf8)
+class PreviewViewController: NSViewController, QLPreviewingController {
+    let debugLog = "/tmp/md-spotlighter-debug.log"
+    var webView: WKWebView!
+
+    override func loadView() {
+        let debugLog = "/tmp/md-spotlighter-debug.log"
+        try? "\n[INIT] PreviewViewController loadView called\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+
+        webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
+        webView.autoresizingMask = [.width, .height]
+        self.view = webView
+    }
+
+    func preparePreviewOfFile(at url: URL) throws {
+        let timestamp = Date().description
+        let logMessage = "\n[\(timestamp)] preparePreviewOfFile called for: \(url.path)\n"
+        try? logMessage.appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+
+        os_log("Extension loaded for file: %@", log: .quicklook, type: .info, url.path)
+
+        // Load markdown content with error handling
+        let content: String
+        do {
+            content = try String(contentsOf: url, encoding: .utf8)
+            try? "Content length: \(content.count) bytes\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+        } catch {
+            try? "ERROR reading file: \(error.localizedDescription)\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+            throw error
+        }
 
         // Create styled HTML with proper markdown rendering
         let html = """
@@ -84,12 +125,12 @@ class PreviewProvider: QLPreviewProvider {
         </html>
         """
 
+        try? "HTML generated: \(html.count) bytes\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
         os_log("Rendering complete", log: .quicklook, type: .info)
 
-        // Return QLPreviewReply with HTML data
-        return QLPreviewReply(dataOfContentType: .html, contentSize: .zero) { _ in
-            return html.data(using: .utf8)!
-        }
+        // Load HTML into WebView
+        webView.loadHTMLString(html, baseURL: nil)
+        try? "WebView loaded HTML\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
     }
 
     private func renderMarkdownToHTML(_ markdown: String) -> String {
