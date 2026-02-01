@@ -4,7 +4,7 @@
 PROJECT_DIR = md-spotlighter
 SCHEME = md-spotlighter
 BUILD_DIR = build
-INSTALL_DIR = $(HOME)/Library/QuickLook
+INSTALL_DIR = $(HOME)/Applications
 APP_NAME = md-spotlighter.app
 
 # Build the Xcode project
@@ -15,12 +15,13 @@ build:
 		-derivedDataPath $(BUILD_DIR) \
 		build
 
-# Install the app to QuickLook directory
+# Install the app to Applications directory
 install: build
+	mkdir -p "$(INSTALL_DIR)"
 	rm -rf "$(INSTALL_DIR)/$(APP_NAME)"
 	cp -R "$(BUILD_DIR)/Build/Products/Release/$(APP_NAME)" "$(INSTALL_DIR)/"
 	@echo "Extension installed to $(INSTALL_DIR)/$(APP_NAME)"
-	@echo "Note: Extension is embedded at Contents/Library/QuickLook/"
+	@echo "Note: Quick Look extension is embedded at Contents/PlugIns/MDQuickLook.appex"
 
 # Reload Quick Look system
 reload:

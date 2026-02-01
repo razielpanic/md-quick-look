@@ -45,6 +45,7 @@
 		3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1C /* PreviewViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PreviewViewController.xib; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MDQuickLook.entitlements; sourceTree = "<group>"; };
 		5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MDQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -100,6 +101,7 @@
 				3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */,
 				3B1B1B1B1B1B1B1B1B1B1B1C /* PreviewViewController.xib */,
 				3B1B1B1B1B1B1B1B1B1B1B1D /* Info.plist */,
+				3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */,
 			);
 			path = MDQuickLook;
 			sourceTree = "<group>";
@@ -403,7 +405,7 @@
 		9A1A1A1A1A1A1A1A1A1A1A1E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = MDQuickLook/MDQuickLook.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -430,7 +432,7 @@
 		9A1A1A1A1A1A1A1A1A1A1A1F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "";
+				CODE_SIGN_ENTITLEMENTS = MDQuickLook/MDQuickLook.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
