@@ -25,9 +25,10 @@ extension String {
     }
 }
 
-class PreviewViewController: NSViewController, QLPreviewingController {
+class PreviewViewController: NSViewController, QLPreviewingController, WKNavigationDelegate {
     let debugLog = "/tmp/md-spotlighter-debug.log"
     var webView: WKWebView!
+    var completionHandler: ((Error?) -> Void)?
 
     override func loadView() {
         let debugLog = "/tmp/md-spotlighter-debug.log"
@@ -35,6 +36,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
 
         webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
         webView.autoresizingMask = [.width, .height]
+        webView.navigationDelegate = self
         self.view = webView
     }
 
@@ -141,14 +143,39 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             return
         }
 
+        // Store completion handler to call after WebView finishes loading
+        self.completionHandler = handler
+
         // Load HTML into WebView
         os_log("Loading HTML into WebView...", log: .quicklook, type: .debug)
         webView.loadHTMLString(html, baseURL: nil)
-        try? "WebView loaded HTML\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+        try? "WebView started loading HTML\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
 
-        // Signal completion
-        os_log("Quick Look preview complete", log: .quicklook, type: .info)
-        handler(nil)
+        // Completion handler will be called in webView(_:didFinish:) delegate method
+    }
+
+    // MARK: - WKNavigationDelegate
+
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        os_log("WebView finished loading", log: .quicklook, type: .info)
+        try? "WebView finished loading\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+
+        // Now that content is rendered, signal completion to Quick Look
+        if let handler = completionHandler {
+            os_log("Quick Look preview complete", log: .quicklook, type: .info)
+            handler(nil)
+            completionHandler = nil
+        }
+    }
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        os_log("WebView failed to load: %@", log: .quicklook, type: .error, error.localizedDescription)
+        try? "WebView failed: \(error.localizedDescription)\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+
+        if let handler = completionHandler {
+            handler(error)
+            completionHandler = nil
+        }
     }
 
     private func renderMarkdownToHTML(_ markdown: String) -> String {
