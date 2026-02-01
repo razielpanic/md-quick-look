@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
-Last activity: 2026-02-01 — Completed 02-02-PLAN.md (Block element styling)
+Last activity: 2026-02-01 — Completed 02-03-PLAN.md (Links and Image Placeholders)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 13 min
-- Total execution time: 0.93 hours
+- Total plans completed: 5
+- Average duration: 11 min
+- Total execution time: 0.95 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 2/4 | 8 min | 4 min |
+| 2. Core Markdown Rendering | 3/4 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3min), 01-02 (45min), 02-01 (4min), 02-02 (4min)
-- Trend: Phase 2 plans very fast - clean architecture from Phase 1 paying off
+- Last 5 plans: 01-02 (45min), 02-01 (4min), 02-02 (4min), 02-03 (1min)
+- Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
 
@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Default paragraph spacing (8pt) for all text | Ensures visual separation between paragraphs; element-specific styles can override | 02-03 | 2026-02-01 |
+| SF Symbol with explicit bounds for image placeholders | NSTextAttachment needs bounds to display; y=-3 centers with baseline | 02-03 | 2026-02-01 |
+| Blockquote border at x=4-8, text at x=20 | Prevents border from intersecting with text content | 02-03 | 2026-02-01 |
 | Custom attributes for PresentationIntent bridging | PresentationIntent doesn't bridge to NSAttributedString; use custom attributes like .blockquoteMarker | 02-02 | 2026-02-01 |
 | Inline code lighter background than code blocks | Visual distinction: quaternarySystemFill vs secondarySystemFill | 02-02 | 2026-02-01 |
 | Code blocks wrap (no horizontal scroll) | Simpler implementation, more common in Quick Look | 02-02 | 2026-02-01 |
@@ -78,9 +81,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed 02-02-PLAN.md execution (Block element styling)
+Stopped at: Completed 02-03-PLAN.md execution (Links and Image Placeholders)
 Resume file: None
-Next: Plan 02-03 - Links and Image Placeholders
+Next: Plan 02-04 - Table Rendering
 
 Config (if exists):
 {
