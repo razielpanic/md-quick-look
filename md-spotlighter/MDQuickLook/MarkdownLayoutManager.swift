@@ -31,20 +31,29 @@ class MarkdownLayoutManager: NSLayoutManager {
                                       options: []) { value, range, _ in
             guard value != nil else { return }
 
-            // Get glyph range for this character range
             let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
 
-            // Get bounding rect for these glyphs
-            let boundingRect = self.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+            // Track the union of all line rects to create continuous background
+            var unionRect = NSRect.null
 
-            // Draw vertical bar on left (GitHub-style)
-            // Bar positioned before the text indentation (headIndent is 20, so bar at 4-8)
+            // Enumerate each line fragment in this range
+            self.enumerateLineFragments(forGlyphRange: glyphRange) { lineRect, usedRect, container, lineGlyphRange, stop in
+                if unionRect.isNull {
+                    unionRect = lineRect
+                } else {
+                    unionRect = unionRect.union(lineRect)
+                }
+            }
+
+            guard !unionRect.isNull else { return }
+
+            // Draw continuous vertical bar
             let barWidth: CGFloat = 4
-            let barX = origin.x + 4  // Position before text indentation
+            let barX = origin.x + 4
             let barRect = NSRect(x: barX,
-                               y: origin.y + boundingRect.minY,
-                               width: barWidth,
-                               height: boundingRect.height)
+                                y: origin.y + unionRect.minY,
+                                width: barWidth,
+                                height: unionRect.height)
 
             // Use semantic color that adapts to appearance
             NSColor.systemBlue.withAlphaComponent(0.4).setFill()
@@ -52,7 +61,7 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             os_log("MarkdownLayoutManager: Drew blockquote border at y=%f height=%f",
                    log: .layoutManager, type: .debug,
-                   origin.y + boundingRect.minY, boundingRect.height)
+                   origin.y + unionRect.minY, unionRect.height)
         }
 
         // Find code block ranges and draw uniform backgrounds
@@ -61,24 +70,34 @@ class MarkdownLayoutManager: NSLayoutManager {
                                       options: []) { value, range, _ in
             guard value != nil else { return }
 
-            // Get glyph range for this character range
             let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
 
-            // Get bounding rect for these glyphs
-            let boundingRect = self.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+            // Track the union of all line rects to create continuous background
+            var unionRect = NSRect.null
 
-            // Draw uniform background across container width (minus margins)
+            // Enumerate each line fragment in this range
+            self.enumerateLineFragments(forGlyphRange: glyphRange) { lineRect, usedRect, container, lineGlyphRange, stop in
+                if unionRect.isNull {
+                    unionRect = lineRect
+                } else {
+                    unionRect = unionRect.union(lineRect)
+                }
+            }
+
+            guard !unionRect.isNull else { return }
+
+            // Draw single unified background
             let bgRect = NSRect(x: origin.x + 8,
-                               y: origin.y + boundingRect.minY,
+                               y: origin.y + unionRect.minY,
                                width: textContainer.containerSize.width - 16,
-                               height: boundingRect.height)
+                               height: unionRect.height)
 
             NSColor.secondarySystemFill.setFill()
             bgRect.fill()
 
             os_log("MarkdownLayoutManager: Drew code block background at y=%f height=%f",
                    log: .layoutManager, type: .debug,
-                   origin.y + boundingRect.minY, boundingRect.height)
+                   origin.y + unionRect.minY, unionRect.height)
         }
     }
 }
