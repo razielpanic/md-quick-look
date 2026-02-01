@@ -347,8 +347,8 @@ class MarkdownRenderer {
         let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
         nsAttributedString.addAttribute(.font, value: font, range: range)
 
-        // Apply background color (adapts to Dark Mode)
-        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.secondarySystemFill, range: range)
+        // Add marker for LayoutManager to draw uniform background
+        nsAttributedString.addAttribute(.codeBlockMarker, value: true, range: range)
 
         // Create paragraph style with indentation and spacing
         let paragraphStyle = NSMutableParagraphStyle()

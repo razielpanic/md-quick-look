@@ -5,9 +5,10 @@ extension OSLog {
     static let layoutManager = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "layoutManager")
 }
 
-/// Custom NSAttributedString.Key for marking blockquote ranges
+/// Custom NSAttributedString.Key for marking blockquote ranges and code blocks
 extension NSAttributedString.Key {
     static let blockquoteMarker = NSAttributedString.Key("com.razielpanic.blockquoteMarker")
+    static let codeBlockMarker = NSAttributedString.Key("com.razielpanic.codeBlockMarker")
 }
 
 /// Custom layout manager for drawing blockquote decorations
@@ -50,6 +51,32 @@ class MarkdownLayoutManager: NSLayoutManager {
             barRect.fill()
 
             os_log("MarkdownLayoutManager: Drew blockquote border at y=%f height=%f",
+                   log: .layoutManager, type: .debug,
+                   origin.y + boundingRect.minY, boundingRect.height)
+        }
+
+        // Find code block ranges and draw uniform backgrounds
+        textStorage.enumerateAttribute(.codeBlockMarker,
+                                      in: charRange,
+                                      options: []) { value, range, _ in
+            guard value != nil else { return }
+
+            // Get glyph range for this character range
+            let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+
+            // Get bounding rect for these glyphs
+            let boundingRect = self.boundingRect(forGlyphRange: glyphRange, in: textContainer)
+
+            // Draw uniform background across container width (minus margins)
+            let bgRect = NSRect(x: origin.x + 8,
+                               y: origin.y + boundingRect.minY,
+                               width: textContainer.containerSize.width - 16,
+                               height: boundingRect.height)
+
+            NSColor.secondarySystemFill.setFill()
+            bgRect.fill()
+
+            os_log("MarkdownLayoutManager: Drew code block background at y=%f height=%f",
                    log: .layoutManager, type: .debug,
                    origin.y + boundingRect.minY, boundingRect.height)
         }
