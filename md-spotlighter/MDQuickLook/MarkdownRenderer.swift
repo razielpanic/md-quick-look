@@ -91,17 +91,22 @@ class MarkdownRenderer {
         var result = attributedString
         var insertionOffsets: [AttributedString.Index] = []
         var previousBlockComponent: PresentationIntent.Kind?
+        var previousRunEndedWithNewline = false
         var isFirstRun = true
 
         // Collect insertion points in forward pass
         for run in attributedString.runs {
+            let runText = String(attributedString[run.range].characters)
+            let runEndsWithNewline = runText.hasSuffix("\n")
+
             guard let intent = run.presentationIntent else {
                 // No intent means this is regular paragraph text
-                // Treat it as a paragraph block
-                if !isFirstRun && previousBlockComponent != nil {
+                // Insert newline if transitioning from a block element
+                if !isFirstRun && previousBlockComponent != nil && !previousRunEndedWithNewline {
                     insertionOffsets.append(run.range.lowerBound)
                 }
                 previousBlockComponent = .paragraph
+                previousRunEndedWithNewline = runEndsWithNewline
                 isFirstRun = false
                 continue
             }
@@ -110,11 +115,12 @@ class MarkdownRenderer {
             let currentBlockComponent = intent.components.first?.kind
 
             // Check if we're transitioning to a new block
-            if !isFirstRun && currentBlockComponent != previousBlockComponent {
+            if !isFirstRun && currentBlockComponent != previousBlockComponent && !previousRunEndedWithNewline {
                 insertionOffsets.append(run.range.lowerBound)
             }
 
             previousBlockComponent = currentBlockComponent
+            previousRunEndedWithNewline = runEndsWithNewline
             isFirstRun = false
         }
 
