@@ -50,8 +50,11 @@ class MarkdownRenderer {
 
         os_log("MarkdownRenderer: Parsed successfully, converting to NSAttributedString", log: .renderer, type: .debug)
 
+        // Insert newlines at block boundaries before conversion
+        let withNewlines = insertBlockBoundaryNewlines(in: attributedString)
+
         // Convert to NSMutableAttributedString
-        let nsAttributedString = NSMutableAttributedString(attributedString)
+        let nsAttributedString = NSMutableAttributedString(withNewlines)
 
         // Apply block-level styles by examining PresentationIntent
         applyBlockStyles(from: attributedString, to: nsAttributedString)
@@ -71,6 +74,51 @@ class MarkdownRenderer {
         os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, nsAttributedString.length)
 
         return nsAttributedString
+    }
+
+    // MARK: - Block Boundary Processing
+
+    /// Inserts newlines at block boundaries in AttributedString
+    /// - Parameter attributedString: The AttributedString to process
+    /// - Returns: AttributedString with newlines inserted at block boundaries
+    private func insertBlockBoundaryNewlines(in attributedString: AttributedString) -> AttributedString {
+        var result = attributedString
+        var insertionOffsets: [AttributedString.Index] = []
+        var previousBlockComponent: PresentationIntent.Kind?
+        var isFirstRun = true
+
+        // Collect insertion points in forward pass
+        for run in attributedString.runs {
+            guard let intent = run.presentationIntent else {
+                // No intent means this is regular paragraph text
+                // Treat it as a paragraph block
+                if !isFirstRun && previousBlockComponent != nil {
+                    insertionOffsets.append(run.range.lowerBound)
+                }
+                previousBlockComponent = .paragraph
+                isFirstRun = false
+                continue
+            }
+
+            // Get the top-level block component (first component in the stack)
+            let currentBlockComponent = intent.components.first?.kind
+
+            // Check if we're transitioning to a new block
+            if !isFirstRun && currentBlockComponent != previousBlockComponent {
+                insertionOffsets.append(run.range.lowerBound)
+            }
+
+            previousBlockComponent = currentBlockComponent
+            isFirstRun = false
+        }
+
+        // Insert newlines in reverse order to maintain indices
+        for insertPosition in insertionOffsets.reversed() {
+            result.insert(AttributedString("\n"), at: insertPosition)
+            os_log("MarkdownRenderer: Inserted newline at block boundary", log: .renderer, type: .debug)
+        }
+
+        return result
     }
 
     // MARK: - Style Application
