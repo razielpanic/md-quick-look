@@ -14,7 +14,7 @@ Plan: 3 of 3 in current phase
 Status: Phase complete
 Progress: [█████░░░░░] 50%
 
-Last activity: 2026-02-01 — Completed Phase 2 (Core Markdown Rendering)
+Last activity: 2026-02-01 — Completed Phase 2 (Core Markdown Rendering) + Quick fix 001 (block newline rendering)
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Track PresentationIntent.Kind for block boundaries | AttributedString strips inter-block newlines; detect boundaries by comparing component kinds | Quick-001 | 2026-02-01 |
 | Default paragraph spacing (8pt) for all text | Ensures visual separation between paragraphs; element-specific styles can override | 02-03 | 2026-02-01 |
 | SF Symbol with explicit bounds for image placeholders | NSTextAttachment needs bounds to display; y=-3 centers with baseline | 02-03 | 2026-02-01 |
 | Blockquote border at x=4-8, text at x=20 | Prevents border from intersecting with text content | 02-03 | 2026-02-01 |
@@ -81,9 +82,12 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed Phase 2 (Core Markdown Rendering) - all 10 must-haves verified
+Stopped at: Completed quick task 001 (fix newline rendering at block boundaries)
 Resume file: None
 Next: Plan Phase 3 (Tables & Advanced Elements)
+
+**Quick fixes applied:**
+- 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
 
 Config (if exists):
 {
