@@ -37,8 +37,9 @@ class MarkdownLayoutManager: NSLayoutManager {
             let boundingRect = self.boundingRect(forGlyphRange: glyphRange, in: textContainer)
 
             // Draw vertical bar on left (GitHub-style)
+            // Bar positioned before the text indentation (headIndent is 20, so bar at 4-8)
             let barWidth: CGFloat = 4
-            let barX = origin.x + 8  // Fixed position from left edge
+            let barX = origin.x + 4  // Position before text indentation
             let barRect = NSRect(x: barX,
                                y: origin.y + boundingRect.minY,
                                width: barWidth,
