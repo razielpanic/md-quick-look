@@ -76,6 +76,9 @@ class PreviewProvider: QLPreviewProvider {
             </style>
         </head>
         <body>
+        <div style="background: #e3f2fd; padding: 10px; margin-bottom: 20px; border-left: 4px solid #2196F3; font-weight: bold;">
+            ✓ Rendered by md-spotlighter Quick Look Extension
+        </div>
         \(renderMarkdownToHTML(content))
         </body>
         </html>

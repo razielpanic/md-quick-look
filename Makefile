@@ -38,6 +38,7 @@ reload:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf "$(INSTALL_DIR)/$(APP_NAME)"
+	rm -rf "$(HOME)/Applications/$(APP_NAME)"
 	@echo "Build artifacts and installed extension removed."
 
 # Test with sample file
