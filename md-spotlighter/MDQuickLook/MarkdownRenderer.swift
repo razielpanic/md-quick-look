@@ -40,83 +40,163 @@ class MarkdownRenderer {
         os_log("MarkdownRenderer: Starting render, input length: %d", log: .renderer, type: .info, markdown.count)
 
         // Parse markdown using native AttributedString
-        guard var attributedString = try? AttributedString(markdown: markdown) else {
+        guard let attributedString = try? AttributedString(markdown: markdown) else {
             os_log("MarkdownRenderer: Failed to parse markdown", log: .renderer, type: .error)
             return NSAttributedString(string: markdown)
         }
 
-        os_log("MarkdownRenderer: Parsed successfully, applying styles", log: .renderer, type: .debug)
+        os_log("MarkdownRenderer: Parsed successfully, converting to NSAttributedString", log: .renderer, type: .debug)
 
-        // Apply styling based on PresentationIntent
-        applyStyles(to: &attributedString)
+        // Convert to NSMutableAttributedString
+        let nsAttributedString = NSMutableAttributedString(attributedString)
 
-        // Convert to NSAttributedString
-        let result = NSAttributedString(attributedString)
-        os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, result.length)
+        // Apply block-level styles by examining PresentationIntent
+        applyBlockStyles(from: attributedString, to: nsAttributedString)
 
-        return result
+        // Apply inline styles
+        applyInlineStyles(from: attributedString, to: nsAttributedString)
+
+        // Set base styling
+        applyBaseStyles(to: nsAttributedString)
+
+        os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, nsAttributedString.length)
+
+        return nsAttributedString
     }
 
     // MARK: - Style Application
 
-    private func applyStyles(to attributedString: inout AttributedString) {
-        // Process runs in reverse order to handle nested elements correctly
-        for run in attributedString.runs.reversed() {
-            let range = run.range
+    private func applyBaseStyles(to nsAttributedString: NSMutableAttributedString) {
+        let fullRange = NSRange(location: 0, length: nsAttributedString.length)
 
-            // Check for block-level presentation intent (headings)
-            if let intent = run.presentationIntent {
-                applyBlockStyles(to: &attributedString, range: range, intent: intent)
-            }
+        // Set base text color
+        nsAttributedString.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
 
-            // Ensure base font is set for all text
-            if attributedString[range].font == nil {
-                attributedString[range].font = NSFont.systemFont(ofSize: bodyFontSize)
-            }
-
-            // Ensure text color is set
-            if attributedString[range].foregroundColor == nil {
-                attributedString[range].foregroundColor = NSColor.textColor
+        // Ensure all text has at least the base font (if not overridden by headings)
+        nsAttributedString.enumerateAttribute(.font, in: fullRange, options: []) { value, range, _ in
+            if value == nil {
+                nsAttributedString.addAttribute(.font, value: NSFont.systemFont(ofSize: bodyFontSize), range: range)
             }
         }
     }
 
-    private func applyBlockStyles(to attributedString: inout AttributedString, range: Range<AttributedString.Index>, intent: AttributeScopes.FoundationAttributes.PresentationIntentAttribute.Value) {
-        // Iterate through intent components to find heading levels
-        for component in intent.components {
-            switch component.kind {
-            case .header(let level):
-                applyHeadingStyle(to: &attributedString, range: range, level: level)
-                os_log("MarkdownRenderer: Applied h%d style", log: .renderer, type: .debug, level)
-            default:
-                break
+    private func applyBlockStyles(from attributedString: AttributedString, to nsAttributedString: NSMutableAttributedString) {
+        // Iterate through runs to find block-level elements via PresentationIntent
+        for run in attributedString.runs {
+            guard let intent = run.presentationIntent else { continue }
+
+            // Convert AttributedString range to NSRange
+            let nsRange = NSRange(run.range, in: attributedString)
+
+            // Check components for different block types
+            for component in intent.components {
+                switch component.kind {
+                case .header(let level):
+                    applyHeadingAttributes(to: nsAttributedString, range: nsRange, level: level)
+                    os_log("MarkdownRenderer: Applied h%d style", log: .renderer, type: .debug, level)
+
+                case .codeBlock(languageHint: _):
+                    applyCodeBlockAttributes(to: nsAttributedString, range: nsRange)
+                    os_log("MarkdownRenderer: Applied code block style", log: .renderer, type: .debug)
+
+                case .listItem(ordinal: let ordinal):
+                    applyListItemAttributes(to: nsAttributedString, range: nsRange, ordinal: ordinal)
+                    os_log("MarkdownRenderer: Applied list item style (ordinal: %d)", log: .renderer, type: .debug, ordinal)
+
+                case .blockQuote:
+                    applyBlockQuoteAttributes(to: nsAttributedString, range: nsRange)
+                    os_log("MarkdownRenderer: Applied blockquote style", log: .renderer, type: .debug)
+
+                default:
+                    break
+                }
             }
         }
     }
 
-    private func applyHeadingStyle(to attributedString: inout AttributedString, range: Range<AttributedString.Index>, level: Int) {
+    private func applyInlineStyles(from attributedString: AttributedString, to nsAttributedString: NSMutableAttributedString) {
+        // Iterate through runs to find inline formatting
+        for run in attributedString.runs {
+            guard let inlineIntent = run.inlinePresentationIntent else { continue }
+
+            let nsRange = NSRange(run.range, in: attributedString)
+
+            // Check for inline code
+            if inlineIntent.contains(.code) {
+                applyInlineCodeAttributes(to: nsAttributedString, range: nsRange)
+                os_log("MarkdownRenderer: Applied inline code style", log: .renderer, type: .debug)
+            }
+        }
+    }
+
+    private func applyHeadingAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange, level: Int) {
         guard let fontSize = headingSizes[level],
               let spacing = headingSpacing[level] else {
             os_log("MarkdownRenderer: Unknown heading level %d", log: .renderer, type: .error, level)
             return
         }
 
-        // Create bold font for heading
+        // Apply bold font at heading size
         let font = NSFont.boldSystemFont(ofSize: fontSize)
-        attributedString[range].font = font
+        nsAttributedString.addAttribute(.font, value: font, range: range)
 
         // Create paragraph style with spacing
-        var paragraphStyle = NSMutableParagraphStyle()
+        let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.paragraphSpacingBefore = spacing
         paragraphStyle.paragraphSpacing = spacing
 
-        // Copy existing paragraph style settings if any
-        if let existingStyle = attributedString[range].paragraphStyle as? NSParagraphStyle {
-            paragraphStyle = existingStyle.mutableCopy() as! NSMutableParagraphStyle
-            paragraphStyle.paragraphSpacingBefore = spacing
-            paragraphStyle.paragraphSpacing = spacing
-        }
+        nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+    }
 
-        attributedString[range].paragraphStyle = paragraphStyle
+    private func applyCodeBlockAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
+        // Apply monospace font (SF Mono)
+        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+        nsAttributedString.addAttribute(.font, value: font, range: range)
+
+        // Apply background color (adapts to Dark Mode)
+        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.secondarySystemFill, range: range)
+
+        // Create paragraph style with indentation and spacing
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.headIndent = 10
+        paragraphStyle.firstLineHeadIndent = 10
+        paragraphStyle.paragraphSpacing = 8
+        paragraphStyle.paragraphSpacingBefore = 8
+
+        nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+    }
+
+    private func applyInlineCodeAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
+        // Apply monospace font (SF Mono)
+        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+        nsAttributedString.addAttribute(.font, value: font, range: range)
+
+        // Apply lighter background than code blocks
+        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.quaternarySystemFill, range: range)
+    }
+
+    private func applyListItemAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange, ordinal: Int) {
+        // Create paragraph style with indentation for lists
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = 20  // Indent for bullet/number
+        paragraphStyle.headIndent = 30           // Indent for wrapped text
+        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
+        paragraphStyle.paragraphSpacing = 4
+
+        nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
+    }
+
+    private func applyBlockQuoteAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
+        // Apply subtle background
+        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.quaternarySystemFill, range: range)
+
+        // Create paragraph style with indentation
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.headIndent = 20
+        paragraphStyle.firstLineHeadIndent = 20
+        paragraphStyle.paragraphSpacing = 8
+        paragraphStyle.paragraphSpacingBefore = 8
+
+        nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
     }
 }
