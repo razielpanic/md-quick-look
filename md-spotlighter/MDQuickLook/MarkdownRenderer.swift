@@ -81,10 +81,21 @@ class MarkdownRenderer {
         // Set base text color
         nsAttributedString.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
 
-        // Ensure all text has at least the base font (if not overridden by headings)
+        // Create default paragraph style with spacing
+        let defaultParagraphStyle = NSMutableParagraphStyle()
+        defaultParagraphStyle.paragraphSpacing = 8  // Add spacing between paragraphs
+
+        // Ensure all text has at least the base font and paragraph spacing
         nsAttributedString.enumerateAttribute(.font, in: fullRange, options: []) { value, range, _ in
             if value == nil {
                 nsAttributedString.addAttribute(.font, value: NSFont.systemFont(ofSize: bodyFontSize), range: range)
+            }
+        }
+
+        // Set default paragraph spacing for all text (can be overridden by specific elements)
+        nsAttributedString.enumerateAttribute(.paragraphStyle, in: fullRange, options: []) { value, range, _ in
+            if value == nil {
+                nsAttributedString.addAttribute(.paragraphStyle, value: defaultParagraphStyle, range: range)
             }
         }
     }
@@ -302,7 +313,13 @@ class MarkdownRenderer {
         let attachment = NSTextAttachment()
         if let image = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image") {
             let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
-            attachment.image = image.withSymbolConfiguration(config)
+            let configuredImage = image.withSymbolConfiguration(config)
+            attachment.image = configuredImage
+
+            // Set explicit bounds for the attachment to ensure it displays
+            // Vertically center the icon with the text baseline
+            let iconSize: CGFloat = 14
+            attachment.bounds = CGRect(x: 0, y: -3, width: iconSize, height: iconSize)
         }
 
         // Add the icon
