@@ -38,7 +38,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         self.view = webView
     }
 
-    func preparePreviewOfFile(at url: URL) throws {
+    func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
         let timestamp = Date().description
         let logMessage = "\n[\(timestamp)] preparePreviewOfFile called for: \(url.path)\n"
         try? logMessage.appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
@@ -52,7 +52,8 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             try? "Content length: \(content.count) bytes\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
         } catch {
             try? "ERROR reading file: \(error.localizedDescription)\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
-            throw error
+            handler(error)
+            return
         }
 
         // Create styled HTML with proper markdown rendering
@@ -131,6 +132,9 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         // Load HTML into WebView
         webView.loadHTMLString(html, baseURL: nil)
         try? "WebView loaded HTML\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
+
+        // Signal completion
+        handler(nil)
     }
 
     private func renderMarkdownToHTML(_ markdown: String) -> String {
