@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 1 of 4 (Extension Foundation)
-Plan: 1 of 2 in current phase
-Status: In progress
-Progress: [█░░░░░░░░░] 10%
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Progress: [██░░░░░░░░] 20%
 
-Last activity: 2026-01-31 — Completed 01-01-PLAN.md (Extension foundation)
+Last activity: 2026-02-01 — Completed 01-02-PLAN.md (Build automation and Finder verification)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 3 min
-- Total execution time: 0.05 hours
+- Total plans completed: 2
+- Average duration: 24 min
+- Total execution time: 0.80 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Extension Foundation | 1/2 | 3 min | 3 min |
+| 1. Extension Foundation | 2/2 | 48 min | 24 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (3min)
-- Trend: Baseline (first plan)
+- Last 5 plans: 01-01 (3min), 01-02 (45min)
+- Trend: 01-02 longer due to debugging complex Quick Look issues (expected for first working implementation)
 
 *Updated after each plan completion*
 
@@ -44,6 +44,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Use AttributedString(markdown:) instead of WKWebView | Synchronous rendering, simpler code, instant display | 01-02 | 2026-02-01 |
+| Install to /Applications instead of ~/Library/QuickLook | Required for proper pluginkit extension registration | 01-02 | 2026-02-01 |
+| Use "open app then kill" for registration | Triggers pluginkit discovery automatically | 01-02 | 2026-02-01 |
 | Use AttributedString(markdown:) for rendering | Native macOS 12+ support, simpler than AST traversal | 01-01 | 2026-01-31 |
 | Combine Task 1+2 implementation | Avoid non-compilable intermediate state | 01-01 | 2026-01-31 |
 | OSLog for debug logging | Standard macOS subsystem logging pattern | 01-01 | 2026-01-31 |
@@ -62,11 +65,12 @@ None yet.
 
 | Issue | Impact | Phase | Resolution |
 |-------|--------|-------|------------|
-| xcode-select points to Command Line Tools | Cannot verify build in 01-01 | 01-01 | Deferred build verification to 01-02 |
+| xcode-select points to Command Line Tools | Cannot verify build in 01-01 | 01-01 | RESOLVED: Built successfully in 01-02 |
+| Heading sizes not differentiated | All text same size in preview | 01-02 | Deferred to Phase 2 (enhancement) |
 
 ## Session Continuity
 
-Last session: 2026-01-31
-Stopped at: Completed 01-01-PLAN.md execution
+Last session: 2026-02-01
+Stopped at: Completed 01-02-PLAN.md execution (Phase 1 complete)
 Resume file: None
-Next: Execute 01-02-PLAN.md (Build automation and Finder verification)
+Next: Plan Phase 2 - Rendering Engine (enhance markdown styling: heading sizes, tables, code blocks)
