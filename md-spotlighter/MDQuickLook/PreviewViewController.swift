@@ -1,5 +1,5 @@
 import Cocoa
-import QuickLookUI
+import Quartz
 import os.log
 
 extension OSLog {
@@ -7,49 +7,46 @@ extension OSLog {
     static let quicklook = OSLog(subsystem: subsystem, category: "quicklook")
 }
 
-class PreviewViewController: NSViewController, QLPreviewingController {
+class PreviewProvider: QLPreviewProvider {
+    func providePreview(for request: QLFilePreviewRequest) async throws -> QLPreviewReply {
+        os_log("Extension loaded for file: %@", log: .quicklook, type: .info, request.fileURL.path)
 
-    override var nibName: NSNib.Name? {
-        return NSNib.Name("PreviewViewController")
-    }
+        // Load markdown content
+        let content = try String(contentsOf: request.fileURL, encoding: .utf8)
 
-    override func loadView() {
-        self.view = NSView()
-        self.view.autoresizingMask = [.width, .height]
-    }
+        // Parse and render to AttributedString (macOS 12+ native markdown support)
+        let attributedString = try AttributedString(markdown: content)
 
-    func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
-        os_log("Extension loaded for file: %@", log: .quicklook, type: .info, url.path)
+        let reply = QLPreviewReply(dataOfContentType: .html, contentSize: CGSize(width: 800, height: 600)) { (replyToUpdate: QLPreviewReply) in
+            // Create HTML from attributed string
+            let nsAttributedString = NSAttributedString(attributedString)
+            let documentAttributes: [NSAttributedString.DocumentAttributeKey: Any] = [
+                .documentType: NSAttributedString.DocumentType.html
+            ]
 
-        do {
-            // Load markdown content
-            let content = try String(contentsOf: url, encoding: .utf8)
+            if let htmlData = try? nsAttributedString.data(from: NSRange(location: 0, length: nsAttributedString.length),
+                                                            documentAttributes: documentAttributes) {
+                return htmlData
+            }
 
-            // Parse and render to AttributedString (macOS 12+ native markdown support)
-            let attributedString = try AttributedString(markdown: content)
-
-            // Create NSTextView for display
-            let textView = NSTextView(frame: self.view.bounds)
-            textView.autoresizingMask = [.width, .height]
-            textView.isEditable = false
-            textView.isSelectable = true
-            textView.textStorage?.setAttributedString(NSAttributedString(attributedString))
-
-            self.view.addSubview(textView)
-
-            os_log("Rendering complete", log: .quicklook, type: .info)
-            handler(nil)
-        } catch {
-            os_log("Error rendering markdown: %@", log: .quicklook, type: .error, error.localizedDescription)
-
-            // Show error message in view instead of crashing
-            let errorView = NSTextView(frame: self.view.bounds)
-            errorView.autoresizingMask = [.width, .height]
-            errorView.isEditable = false
-            errorView.string = "Error loading markdown file:\n\(error.localizedDescription)"
-            self.view.addSubview(errorView)
-
-            handler(error)
+            // Fallback: plain text
+            let html = """
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 20px; }
+                </style>
+            </head>
+            <body>
+                <pre>\(content.replacingOccurrences(of: "<", with: "&lt;").replacingOccurrences(of: ">", with: "&gt;"))</pre>
+            </body>
+            </html>
+            """
+            return html.data(using: .utf8)!
         }
+
+        os_log("Rendering complete", log: .quicklook, type: .info)
+        return reply
     }
 }

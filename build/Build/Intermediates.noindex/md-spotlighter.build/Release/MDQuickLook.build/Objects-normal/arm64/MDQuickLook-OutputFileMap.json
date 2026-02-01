@@ -1,0 +1,16 @@
+{
+  "" : {
+    "const-values" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.swiftconstvalues",
+    "dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.d",
+    "diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.dia",
+    "emit-module-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-emit-module.dia",
+    "pch" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.swiftdeps"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/md-spotlighter/MDQuickLook/PreviewViewController.swift" : {
+    "index-unit-output-path" : "/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/PreviewViewController.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/PreviewViewController.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/md-spotlighter.build/Release/MDQuickLook.build/Objects-normal/arm64/PreviewViewController.o"
+  }
+}
