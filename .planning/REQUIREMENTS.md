@@ -62,17 +62,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MDRNDR-01 | Phase 2 | Pending |
-| MDRNDR-02 | Phase 2 | Pending |
-| MDRNDR-03 | Phase 2 | Pending |
-| MDRNDR-04 | Phase 2 | Pending |
-| MDRNDR-05 | Phase 2 | Pending |
-| MDRNDR-06 | Phase 2 | Pending |
-| MDRNDR-07 | Phase 2 | Pending |
-| MDRNDR-08 | Phase 2 | Pending |
+| MDRNDR-01 | Phase 2 | Complete |
+| MDRNDR-02 | Phase 2 | Complete |
+| MDRNDR-03 | Phase 2 | Complete |
+| MDRNDR-04 | Phase 2 | Complete |
+| MDRNDR-05 | Phase 2 | Complete |
+| MDRNDR-06 | Phase 2 | Complete |
+| MDRNDR-07 | Phase 2 | Complete |
+| MDRNDR-08 | Phase 2 | Complete |
 | MDRNDR-09 | Phase 3 | Pending |
-| MDRNDR-10 | Phase 2 | Pending |
-| MDRNDR-11 | Phase 2 | Pending |
+| MDRNDR-10 | Phase 2 | Complete |
+| MDRNDR-11 | Phase 2 | Complete |
 | SYSINT-01 | Phase 1 | Complete |
 | SYSINT-02 | Phase 4 | Pending |
 | SYSINT-03 | Phase 1 | Complete |
