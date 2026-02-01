@@ -51,7 +51,10 @@ class MarkdownRenderer {
         os_log("MarkdownRenderer: Parsed successfully, converting to NSAttributedString", log: .renderer, type: .debug)
 
         // Insert newlines at block boundaries before conversion
-        let withNewlines = insertBlockBoundaryNewlines(in: attributedString)
+        var withNewlines = insertBlockBoundaryNewlines(in: attributedString)
+
+        // Insert newlines within blocks (for list items and blockquote lines)
+        withNewlines = ensureIntraBlockNewlines(in: withNewlines)
 
         // Convert to NSMutableAttributedString
         let nsAttributedString = NSMutableAttributedString(withNewlines)
@@ -119,6 +122,46 @@ class MarkdownRenderer {
         for insertPosition in insertionOffsets.reversed() {
             result.insert(AttributedString("\n"), at: insertPosition)
             os_log("MarkdownRenderer: Inserted newline at block boundary", log: .renderer, type: .debug)
+        }
+
+        return result
+    }
+
+    /// Ensures list items and blockquote lines end with newlines for proper separation
+    /// - Parameter attributedString: The AttributedString to process
+    /// - Returns: AttributedString with newlines added at the end of list items and blockquote lines
+    private func ensureIntraBlockNewlines(in attributedString: AttributedString) -> AttributedString {
+        var result = attributedString
+        var insertionPositions: [AttributedString.Index] = []
+
+        // Collect positions where newlines need to be inserted
+        for run in attributedString.runs {
+            guard let intent = run.presentationIntent else { continue }
+
+            // Check if this run contains a list item or blockquote
+            var needsNewline = false
+            for component in intent.components {
+                switch component.kind {
+                case .listItem(ordinal: _):
+                    needsNewline = true
+                case .blockQuote:
+                    needsNewline = true
+                default:
+                    break
+                }
+            }
+
+            // If this run needs a newline, append it at the end of the run
+            if needsNewline {
+                let runEndIndex = run.range.upperBound
+                insertionPositions.append(runEndIndex)
+            }
+        }
+
+        // Insert newlines in reverse order to maintain indices
+        for insertPosition in insertionPositions.reversed() {
+            result.insert(AttributedString("\n"), at: insertPosition)
+            os_log("MarkdownRenderer: Inserted intra-block newline", log: .renderer, type: .debug)
         }
 
         return result
@@ -269,6 +312,14 @@ class MarkdownRenderer {
                 applyInlineCodeAttributes(to: nsAttributedString, range: nsRange)
                 os_log("MarkdownRenderer: Applied inline code style", log: .renderer, type: .debug)
             }
+
+            // Check for strikethrough
+            if inlineIntent.contains(.strikethrough) {
+                nsAttributedString.addAttribute(.strikethroughStyle,
+                                               value: NSUnderlineStyle.single.rawValue,
+                                               range: nsRange)
+                os_log("MarkdownRenderer: Applied strikethrough style", log: .renderer, type: .debug)
+            }
         }
     }
 
@@ -415,7 +466,7 @@ class MarkdownRenderer {
         for match in matches.reversed() {
             guard match.numberOfRanges >= 2 else { continue }
 
-            let fullRange = match.range
+            let matchRange = match.range
             let filenameRange = match.range(at: 1)
             let filename = text.substring(with: filenameRange)
 
@@ -423,7 +474,11 @@ class MarkdownRenderer {
             let placeholder = createImagePlaceholder(filename: filename)
 
             // Replace the marker text with styled placeholder
-            nsAttributedString.replaceCharacters(in: fullRange, with: placeholder)
+            nsAttributedString.replaceCharacters(in: matchRange, with: placeholder)
+
+            // Remove link attribute from the replacement range (prevents blue link styling)
+            let newRange = NSRange(location: matchRange.location, length: placeholder.length)
+            nsAttributedString.removeAttribute(.link, range: newRange)
 
             os_log("MarkdownRenderer: Applied image placeholder for %{public}s", log: .renderer, type: .debug, filename)
         }
@@ -434,16 +489,8 @@ class MarkdownRenderer {
 
         // Create SF Symbol attachment
         let attachment = NSTextAttachment()
-        if let image = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image") {
-            let config = NSImage.SymbolConfiguration(pointSize: 14, weight: .regular)
-            let configuredImage = image.withSymbolConfiguration(config)
-            attachment.image = configuredImage
-
-            // Set explicit bounds for the attachment to ensure it displays
-            // Vertically center the icon with the text baseline
-            let iconSize: CGFloat = 14
-            attachment.bounds = CGRect(x: 0, y: -3, width: iconSize, height: iconSize)
-        }
+        attachment.image = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image")
+        attachment.bounds = CGRect(x: 0, y: -4, width: 16, height: 16)
 
         // Add the icon
         result.append(NSAttributedString(attachment: attachment))
