@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 4 of 6 in current phase (gap closure)
+Plan: 5 of 6 in current phase (gap closure)
 Status: In progress
-Progress: [█████░░░░░] 50%
+Progress: [█████░░░░░] 56%
 
-Last activity: 2026-02-01 — Completed 02-04 (list rendering and intra-block line breaks)
+Last activity: 2026-02-01 — Completed 02-05 (image placeholders and strikethrough)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 9 min
-- Total execution time: 0.98 hours
+- Total plans completed: 7
+- Average duration: 8 min
+- Total execution time: 1.04 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 4/6 | 12 min | 3 min |
+| 2. Core Markdown Rendering | 5/6 | 17 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (4min), 02-02 (4min), 02-03 (1min), 02-04 (3min)
+- Last 5 plans: 02-02 (4min), 02-03 (1min), 02-04 (3min), 02-05 (5min)
 - Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Set attachment.image before bounds | AppKit requires NSTextAttachment.image to be set before bounds for proper rendering | 02-05 | 2026-02-01 |
+| Remove .link attribute from image placeholders | Image placeholders were inheriting link styling (blue color), explicit removal prevents this | 02-05 | 2026-02-01 |
+| Use .strikethroughStyle attribute for strikethrough | AttributedString parses ~~text~~ but NSAttributedString requires explicit .strikethroughStyle attribute | 02-05 | 2026-02-01 |
 | Detect list type from PresentationIntent component stack | PresentationIntent includes both .listItem and parent components (.orderedList/.unorderedList); examine full stack to determine type | 02-04 | 2026-02-01 |
 | Add intra-block newlines in AttributedString | AttributedString provides run boundaries with PresentationIntent; adding newlines before NSAttributedString conversion ensures proper structure | 02-04 | 2026-02-01 |
 | Insert list prefixes in NSAttributedString after block styling | Avoid manipulation of AttributedString with PresentationIntent; NSAttributedString manipulation is simpler and more direct | 02-04 | 2026-02-01 |
@@ -85,9 +88,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed 02-04 (list rendering and intra-block line breaks)
+Stopped at: Completed 02-05 (image placeholders and strikethrough)
 Resume file: None
-Next: Continue Phase 2 gap closure (02-05: horizontal rules, 02-06: nested lists)
+Next: Continue Phase 2 gap closure (02-06: horizontal rules and nested lists)
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
