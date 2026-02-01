@@ -49,10 +49,12 @@ Plans:
   8. User sees blockquotes with visual differentiation (indentation or border)
   9. User sees links rendered as text (not clickable)
   10. User sees images rendered as placeholders showing `[Image: filename]`
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] TBD
+- [ ] 02-01-PLAN.md — Create MarkdownRenderer with heading hierarchy and inline formatting
+- [ ] 02-02-PLAN.md — Add code blocks, blockquotes with border, and list styling
+- [ ] 02-03-PLAN.md — Add link styling, image placeholders, and visual verification
 
 ### Phase 3: Tables & Advanced Elements
 **Goal**: Render GitHub-flavored markdown tables
@@ -83,11 +85,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Extension Foundation | 2/2 | ✓ Complete | 2026-02-01 |
-| 2. Core Markdown Rendering | 0/TBD | Not started | - |
+| 1. Extension Foundation | 2/2 | Complete | 2026-02-01 |
+| 2. Core Markdown Rendering | 0/3 | Not started | - |
 | 3. Tables & Advanced Elements | 0/TBD | Not started | - |
 | 4. Performance & Polish | 0/TBD | Not started | - |
