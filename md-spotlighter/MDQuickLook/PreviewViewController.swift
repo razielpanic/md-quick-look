@@ -26,9 +26,10 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             os_log("File read successfully, length: %d bytes", log: .quicklook, type: .info, markdownContent.count)
             os_log("First 100 chars: %@", log: .quicklook, type: .debug, String(markdownContent.prefix(100)))
 
-            // Convert markdown to AttributedString using native macOS support
-            let attributedString = try AttributedString(markdown: markdownContent)
-            os_log("AttributedString created successfully", log: .quicklook, type: .info)
+            // Render markdown with custom MarkdownRenderer
+            let renderer = MarkdownRenderer()
+            let styledContent = renderer.render(markdown: markdownContent)
+            os_log("MarkdownRenderer completed styling", log: .quicklook, type: .info)
 
             // Create NSTextView to display the attributed string
             let scrollView = NSScrollView(frame: view.bounds)
@@ -44,8 +45,8 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             textView.backgroundColor = .white
             textView.textContainerInset = NSSize(width: 20, height: 20)
 
-            // Apply styled AttributedString
-            textView.textStorage?.setAttributedString(NSAttributedString(attributedString))
+            // Apply styled content from renderer
+            textView.textStorage?.setAttributedString(styledContent)
 
             // Configure text container for word wrapping
             textView.textContainer?.containerSize = NSSize(width: scrollView.contentSize.width - 40, height: CGFloat.greatestFiniteMagnitude)
