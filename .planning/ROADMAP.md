@@ -12,7 +12,7 @@ Deliver a working Quick Look extension for macOS that renders markdown files wit
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Extension Foundation** - Quick Look extension loads markdown files on macOS 26+
+- [x] **Phase 1: Extension Foundation** - Quick Look extension loads markdown files on macOS 26+
 - [ ] **Phase 2: Core Markdown Rendering** - Render essential markdown elements (headings, formatting, lists, code, blockquotes, links, images)
 - [ ] **Phase 3: Tables & Advanced Elements** - Render GitHub-flavored markdown tables
 - [ ] **Phase 4: Performance & Polish** - Instant rendering and system appearance support
@@ -31,8 +31,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Create Xcode project with host app and Quick Look extension, implement PreviewViewController
-- [ ] 01-02-PLAN.md — Create build automation (Makefile) and verify extension works in Finder
+- [x] 01-01-PLAN.md — Create Xcode project with host app and Quick Look extension, implement PreviewViewController
+- [x] 01-02-PLAN.md — Create build automation (Makefile) and verify extension works in Finder
 
 ### Phase 2: Core Markdown Rendering
 **Goal**: Render all essential markdown elements with proper formatting
@@ -87,7 +87,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Extension Foundation | 0/2 | Ready to execute | - |
+| 1. Extension Foundation | 2/2 | ✓ Complete | 2026-02-01 |
 | 2. Core Markdown Rendering | 0/TBD | Not started | - |
 | 3. Tables & Advanced Elements | 0/TBD | Not started | - |
 | 4. Performance & Polish | 0/TBD | Not started | - |
