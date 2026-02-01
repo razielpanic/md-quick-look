@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 6 of 6 in current phase (gap closure)
-Status: Phase complete - ready for Phase 3
-Progress: [██████░░░░] 63%
+Plan: 7 of 7 in current phase (gap closure)
+Status: Gap closure in progress
+Progress: [██████░░░░] 64%
 
-Last activity: 2026-02-01 — Completed 02-06 (code block backgrounds and line breaks)
+Last activity: 2026-02-01 — Completed 02-08 (LayoutManager background gaps)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: 7 min
-- Total execution time: 1.07 hours
+- Total plans completed: 9
+- Average duration: 6 min
+- Total execution time: 1.08 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 6/6 | 19 min | 3 min |
+| 2. Core Markdown Rendering | 7/7 | 20 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-03 (1min), 02-04 (3min), 02-05 (5min), 02-06 (2min)
+- Last 5 plans: 02-04 (3min), 02-05 (5min), 02-06 (2min), 02-08 (1min)
 - Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Use enumerateLineFragments instead of boundingRect | Eliminates per-line gaps by unioning all line rects before drawing | 02-08 | 2026-02-01 |
 | Track previous run newline status | Prevents double-newlines while ensuring proper paragraph separation | 02-06 | 2026-02-01 |
 | Use LayoutManager custom drawing for code block backgrounds | Achieves uniform appearance instead of per-line jagging from inline backgroundColor | 02-06 | 2026-02-01 |
 | Set attachment.image before bounds | AppKit requires NSTextAttachment.image to be set before bounds for proper rendering | 02-05 | 2026-02-01 |
@@ -90,9 +91,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed 02-06 (code block backgrounds and line breaks) - Phase 2 complete
+Stopped at: Completed 02-08 (LayoutManager background gaps) - Gap closure in progress
 Resume file: None
-Next: Plan Phase 3 (Tables & Advanced Elements)
+Next: Continue gap closure or proceed to Phase 3
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
