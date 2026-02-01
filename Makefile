@@ -4,7 +4,7 @@
 PROJECT_DIR = md-spotlighter
 SCHEME = md-spotlighter
 BUILD_DIR = build
-INSTALL_DIR = $(HOME)/Applications
+INSTALL_DIR = $(HOME)/Library/QuickLook
 APP_NAME = md-spotlighter.app
 
 # Build the Xcode project
