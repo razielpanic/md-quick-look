@@ -43,14 +43,19 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         let logMessage = "\n[\(timestamp)] preparePreviewOfFile called for: \(url.path)\n"
         try? logMessage.appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
 
+        os_log("=== MD Spotlighter Quick Look Extension ===", log: .quicklook, type: .info)
         os_log("Extension loaded for file: %@", log: .quicklook, type: .info, url.path)
+        os_log("File exists: %@", log: .quicklook, type: .debug, FileManager.default.fileExists(atPath: url.path) ? "YES" : "NO")
 
         // Load markdown content with error handling
         let content: String
         do {
             content = try String(contentsOf: url, encoding: .utf8)
+            os_log("File read successfully, length: %d bytes", log: .quicklook, type: .info, content.count)
+            os_log("First 100 chars: %@", log: .quicklook, type: .debug, String(content.prefix(100)))
             try? "Content length: \(content.count) bytes\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
         } catch {
+            os_log("ERROR reading file: %@", log: .quicklook, type: .error, error.localizedDescription)
             try? "ERROR reading file: \(error.localizedDescription)\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
             handler(error)
             return
@@ -127,13 +132,22 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         """
 
         try? "HTML generated: \(html.count) bytes\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
-        os_log("Rendering complete", log: .quicklook, type: .info)
+        os_log("Rendering complete, HTML length: %d", log: .quicklook, type: .info, html.count)
+
+        // Ensure webView is ready
+        if webView == nil {
+            os_log("ERROR: webView is nil!", log: .quicklook, type: .error)
+            handler(NSError(domain: "MDQuickLook", code: 1, userInfo: [NSLocalizedDescriptionKey: "WebView not initialized"]))
+            return
+        }
 
         // Load HTML into WebView
+        os_log("Loading HTML into WebView...", log: .quicklook, type: .debug)
         webView.loadHTMLString(html, baseURL: nil)
         try? "WebView loaded HTML\n".appending(to: URL(fileURLWithPath: debugLog), encoding: .utf8)
 
         // Signal completion
+        os_log("Quick Look preview complete", log: .quicklook, type: .info)
         handler(nil)
     }
 
@@ -141,31 +155,30 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         // Basic markdown-to-HTML conversion
         var html = markdown
 
-        // Escape HTML entities first
-        html = html.replacingOccurrences(of: "&", with: "&amp;")
-        html = html.replacingOccurrences(of: "<", with: "&lt;")
-        html = html.replacingOccurrences(of: ">", with: "&gt;")
+        os_log("Rendering markdown, length: %d", log: .quicklook, type: .debug, markdown.count)
 
-        // Headers (must be done before bold/italic to avoid conflicts)
+        // Headers (must be done FIRST, before any escaping)
         html = html.replacingOccurrences(of: #"(?m)^### (.+)$"#, with: "<h3>$1</h3>", options: .regularExpression)
         html = html.replacingOccurrences(of: #"(?m)^## (.+)$"#, with: "<h2>$1</h2>", options: .regularExpression)
         html = html.replacingOccurrences(of: #"(?m)^# (.+)$"#, with: "<h1>$1</h1>", options: .regularExpression)
 
+        // Inline code (before bold/italic to avoid conflicts)
+        html = html.replacingOccurrences(of: #"`([^`]+)`"#, with: "<code>$1</code>", options: .regularExpression)
+
         // Bold and italic
         html = html.replacingOccurrences(of: #"\*\*(.+?)\*\*"#, with: "<strong>$1</strong>", options: .regularExpression)
         html = html.replacingOccurrences(of: #"\*(.+?)\*"#, with: "<em>$1</em>", options: .regularExpression)
-
-        // Inline code
-        html = html.replacingOccurrences(of: #"`(.+?)`"#, with: "<code>$1</code>", options: .regularExpression)
 
         // Paragraphs (double newline = paragraph break)
         let paragraphs = html.components(separatedBy: "\n\n")
         html = paragraphs.map { para in
             let trimmed = para.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmed.isEmpty { return "" }
-            if trimmed.hasPrefix("<h") || trimmed.hasPrefix("<pre") { return trimmed }
+            if trimmed.hasPrefix("<h") { return trimmed }
             return "<p>\(trimmed.replacingOccurrences(of: "\n", with: "<br>"))</p>"
         }.joined(separator: "\n")
+
+        os_log("Rendered HTML length: %d", log: .quicklook, type: .debug, html.count)
 
         return html
     }
