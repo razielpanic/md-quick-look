@@ -481,10 +481,18 @@ class MarkdownRenderer {
         let fullRange = NSRange(location: 0, length: nsAttributedString.length)
         let text = nsAttributedString.string as NSString
 
+        // Log first 500 chars for debugging
+        let previewText = text.substring(to: min(500, text.length))
+        os_log("MarkdownRenderer: Searching for image markers in text of length %d", log: .renderer, type: .info, nsAttributedString.length)
+        os_log("MarkdownRenderer: First 500 chars: %{public}@", log: .renderer, type: .debug, previewText)
+
         // Find placeholder markers inserted during preprocessing
         // Using underscores pattern to match the preprocessing marker that won't be modified by AttributedString
         let pattern = "__IMAGE_PLACEHOLDER__(.+?)__END__"
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else { return }
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            os_log("MarkdownRenderer: Failed to create regex for image markers", log: .renderer, type: .error)
+            return
+        }
 
         let matches = regex.matches(in: text as String, options: [], range: fullRange)
 
@@ -497,6 +505,10 @@ class MarkdownRenderer {
             let matchRange = match.range
             let filenameRange = match.range(at: 1)
             let filename = text.substring(with: filenameRange)
+
+            // Log what we found
+            let matchedText = text.substring(with: matchRange)
+            os_log("MarkdownRenderer: Found image marker: %{public}@", log: .renderer, type: .info, matchedText)
 
             // Create image placeholder with SF Symbol
             let placeholder = createImagePlaceholder(filename: filename)
@@ -511,8 +523,10 @@ class MarkdownRenderer {
             // Explicitly apply gray color to ensure it's not overridden
             nsAttributedString.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: newRange)
 
-            os_log("MarkdownRenderer: Applied image placeholder for %{public}s", log: .renderer, type: .debug, filename)
+            os_log("MarkdownRenderer: Replaced image marker with placeholder for %{public}s", log: .renderer, type: .info, filename)
         }
+
+        os_log("MarkdownRenderer: Completed image placeholder replacement - replaced %d markers", log: .renderer, type: .info, matches.count)
     }
 
     private func createImagePlaceholder(filename: String) -> NSAttributedString {
