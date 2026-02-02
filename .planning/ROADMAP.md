@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Extension Foundation** - Quick Look extension loads markdown files on macOS 26+
 - [x] **Phase 2: Core Markdown Rendering** - Render essential markdown elements (headings, formatting, lists, code, blockquotes, links, images)
-- [ ] **Phase 3: Tables & Advanced Elements** - Render GitHub-flavored markdown tables
+- [x] **Phase 3: Tables & Advanced Elements** - Render GitHub-flavored markdown tables
 - [ ] **Phase 4: Performance & Polish** - Instant rendering and system appearance support
 
 ## Phase Details
@@ -86,8 +86,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01-PLAN.md — Create TableExtractor and TableRenderer infrastructure
-- [ ] 03-02-PLAN.md — Integrate hybrid rendering in MarkdownRenderer with visual verification
+- [x] 03-01-PLAN.md — Create TableExtractor and TableRenderer infrastructure
+- [x] 03-02-PLAN.md — Integrate hybrid rendering in MarkdownRenderer with visual verification
 
 ### Phase 4: Performance & Polish
 **Goal**: Instant rendering performance and system appearance integration
@@ -111,5 +111,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 |-------|----------------|--------|-----------|
 | 1. Extension Foundation | 2/2 | Complete | 2026-02-01 |
 | 2. Core Markdown Rendering | 22/22 | Complete | 2026-02-02 |
-| 3. Tables & Advanced Elements | 0/2 | Not started | - |
+| 3. Tables & Advanced Elements | 2/2 | Complete | 2026-02-02 |
 | 4. Performance & Polish | 0/TBD | Not started | - |

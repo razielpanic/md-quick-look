@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-01-31)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** Phase 2 verified and complete - ready for Phase 3
+**Current focus:** Phase 3 verified and complete - ready for Phase 4
 
 ## Current Position
 
 Phase: 3 of 4 (Tables & Advanced Elements)
 Plan: 2 of 2 in current phase
-Status: Phase complete - GFM tables fully integrated
-Progress: [██████░░░░] 60%
+Status: Phase 3 VERIFIED COMPLETE - GFM tables fully integrated and tested
+Progress: [███████░░░] 75%
 
-Last activity: 2026-02-02 — Completed 03-02-PLAN.md
+Last activity: 2026-02-02 — Completed Phase 3 verification (human testing passed)
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Increase header separator from 1pt to 2pt border width | 1pt border was not visible in rendered tables; 2pt with explicit edge parameter provides clear visual distinction | 03 | 2026-02-02 |
 | Use ellipsis truncation (.byTruncatingTail) not wrapping for table overflow | Combined with content-based widths, keeps tables compact while handling long content gracefully | 03-02 | 2026-02-02 |
 | Measure actual text widths using NSAttributedString.size() for content-based column sizing | Provides accurate rendered size including font metrics; add padding + breathing room + constraints for final widths | 03-02 | 2026-02-02 |
 | Set explicit column widths with constraints (min 60pt, max 300pt per column, max 800pt total) | Content-based sizing with bounds prevents both tiny columns and unwieldy wide tables | 03-02 | 2026-02-02 |

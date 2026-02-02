@@ -17,7 +17,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **MDRNDR-06**: Render ordered lists
 - [x] **MDRNDR-07**: Render code blocks with monospaced font
 - [x] **MDRNDR-08**: Render blockquotes
-- [ ] **MDRNDR-09**: Render tables (GFM)
+- [x] **MDRNDR-09**: Render tables (GFM)
 - [x] **MDRNDR-10**: Render links as text (no clicking)
 - [x] **MDRNDR-11**: Display images as placeholders `[Image: filename]`
 
@@ -70,7 +70,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MDRNDR-06 | Phase 2 | Complete |
 | MDRNDR-07 | Phase 2 | Complete |
 | MDRNDR-08 | Phase 2 | Complete |
-| MDRNDR-09 | Phase 3 | Pending |
+| MDRNDR-09 | Phase 3 | Complete |
 | MDRNDR-10 | Phase 2 | Complete |
 | MDRNDR-11 | Phase 2 | Complete |
 | SYSINT-01 | Phase 1 | Complete |
