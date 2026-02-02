@@ -1,12 +1,12 @@
 ---
-status: complete
+status: diagnosed
 phase: 02-core-markdown-rendering
 source:
   - 02-01-SUMMARY.md
   - 02-02-SUMMARY.md
   - 02-03-SUMMARY.md
 started: 2026-02-01T23:00:00Z
-updated: 2026-02-01T23:15:00Z
+updated: 2026-02-01T23:20:00Z
 ---
 
 ## Current Test
@@ -90,17 +90,29 @@ skipped: 0
   reason: "User reported: fail. background is darker than code blocks, first two lines are rendered as one line"
   severity: major
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Two issues: (1) Background color likely visual perception issue - code uses quaternarySystemFill (lighter) vs secondarySystemFill (darker) correctly. (2) Line breaks: Markdown soft breaks collapse into single paragraph per CommonMark spec - AttributedString parser converts soft breaks to spaces"
+  artifacts:
+    - path: "md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift"
+      issue: "Line 96: Blockquote background uses quaternarySystemFill (correct)"
+    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+      issue: "Lines 176-221: ensureIntraBlockNewlines() identity tracking working correctly"
+    - path: "samples/comprehensive.md"
+      issue: "Lines 55-56: Test markdown uses soft breaks (no trailing spaces)"
+  missing:
+    - "Pre-process markdown to convert blockquote soft breaks to hard breaks (add two trailing spaces)"
+    - "Visual testing to confirm background color perception issue"
+  debug_session: ".planning/debug/blockquote-background-and-spacing.md"
 
 - truth: "Lines within blockquote paragraph render on separate lines (e.g., lines 1-2 of 3-line blockquote should be on separate lines)"
   status: failed
   reason: "User reported: fail. first 2 lines of the 3 line blockquote are rendered together on one line"
   severity: major
   test: 14
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "AttributedString markdown parser follows CommonMark spec - soft breaks (single newlines) are converted to spaces within paragraphs. The blockquote lines create 3 runs (text + space + text) with same paragraph identity, so ensureIntraBlockNewlines() correctly does not insert newlines"
+  artifacts:
+    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+      issue: "Lines 176-221: ensureIntraBlockNewlines() only handles paragraph boundaries (identity changes), has no mechanism for soft breaks within paragraphs"
+  missing:
+    - "Pre-process markdown input to convert soft breaks in blockquotes to hard breaks"
+    - "Use regex to detect blockquote lines (pattern '>\\n>') and insert two trailing spaces ('>  \\n>')"
+  debug_session: ".planning/debug/blockquote-line-rendering.md"
