@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 21 of 21 in current phase (gap closure)
+Plan: 22 of 22 in current phase (gap closure)
 Status: Phase 2 COMPLETE - All gaps closed
-Progress: [████████░░] 88%
+Progress: [████████░░] 89%
 
-Last activity: 2026-02-02 — Completed 02-21 (duplicate list prefix fix - Gap #29 closed)
+Last activity: 2026-02-02 — Completed 02-22 (blockquote soft break preprocessing - Gap #28 closed)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
+- Total plans completed: 22
 - Average duration: 4 min
-- Total execution time: 1.44 hours
+- Total execution time: 1.47 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 19/19 | 56 min | 3 min |
+| 2. Core Markdown Rendering | 20/20 | 58 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-17 (3min), 02-18 (1min), 02-19 (1min), 02-20 (1min), 02-21 (1min)
-- Trend: Phase 2 complete with consistent 1-3 min execution - strong foundation + clear patterns enable rapid gap closure
+- Last 5 plans: 02-18 (1min), 02-19 (1min), 02-20 (1min), 02-21 (1min), 02-22 (2min)
+- Trend: Phase 2 complete with consistent 1-2 min execution - strong foundation + clear patterns enable rapid gap closure
 
 *Updated after each plan completion*
 
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Convert blockquote soft breaks to hard breaks in preprocessing stage | AttributedString(markdown:) is CommonMark-compliant and converts soft breaks to spaces; adding two trailing spaces before newlines within blockquotes converts to hard breaks, preserving line separation | 02-22 | 2026-02-02 |
 | Apply ordinal tracking pattern to insertListPrefixes | All runs of the same list item have the same ordinal; only the first run (when ordinal changes) should get a prefix to prevent duplicates for items with inline formatting | 02-21 | 2026-02-02 |
 | Track blockquote identity in ensureIntraBlockNewlines | Same identity tracking pattern as list ordinal tracking; only insert newline when blockquote identity changes (paragraph boundary), skip for runs within same paragraph | 02-20 | 2026-02-01 |
 | Remove list item handling from ensureIntraBlockNewlines | Both insertBlockBoundaryNewlines and ensureIntraBlockNewlines were adding newlines at list item boundaries causing double newlines; simplified to single responsibility pattern | 02-19 | 2026-02-02 |
@@ -109,7 +110,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 02-21 (duplicate list prefix fix - Gap #29 closed)
+Stopped at: Completed 02-22 (blockquote soft break preprocessing - Gap #28 closed)
 Resume file: None
 Next: Phase 2 COMPLETE - All gaps closed - Ready for Phase 3 planning
 
