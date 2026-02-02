@@ -171,6 +171,9 @@ class MarkdownRenderer {
                 if !beforeMarkdown.isEmpty {
                     let beforeContent = renderNonTableSegment(beforeMarkdown)
                     result.append(beforeContent)
+
+                    // Ensure proper block separation before table
+                    ensureBlockSeparation(in: result)
                 }
             }
 
@@ -187,6 +190,9 @@ class MarkdownRenderer {
             let afterLines = lines[(currentLine - 1)..<lines.count]
             let afterMarkdown = afterLines.joined(separator: "\n")
             if !afterMarkdown.isEmpty {
+                // Ensure proper block separation after table
+                ensureBlockSeparation(in: result)
+
                 let afterContent = renderNonTableSegment(afterMarkdown)
                 result.append(afterContent)
             }
@@ -246,6 +252,27 @@ class MarkdownRenderer {
         }
 
         return result
+    }
+
+    /// Ensures proper block separation by adding newlines if needed
+    /// - Parameter attributedString: The attributed string to check/modify
+    private func ensureBlockSeparation(in attributedString: NSMutableAttributedString) {
+        // Check if the string ends with proper block separation (newlines)
+        guard attributedString.length > 0 else { return }
+
+        let lastCharacters = attributedString.string.suffix(2)
+
+        // If doesn't end with \n\n, add necessary newlines
+        if lastCharacters.hasSuffix("\n\n") {
+            // Already has proper separation
+            return
+        } else if lastCharacters.hasSuffix("\n") {
+            // Has one newline, add one more
+            attributedString.append(NSAttributedString(string: "\n"))
+        } else {
+            // No newlines, add two
+            attributedString.append(NSAttributedString(string: "\n\n"))
+        }
     }
 
     /// Renders a non-table segment using standard AttributedString pipeline
