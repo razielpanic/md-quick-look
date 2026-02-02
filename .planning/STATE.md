@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 3 of 4 (Tables & Advanced Elements)
-Plan: 1 of 2 in current phase
-Status: In progress - Table infrastructure complete
-Progress: [█████▓░░░░] 52%
+Plan: 2 of 2 in current phase
+Status: Phase complete - GFM tables fully integrated
+Progress: [██████░░░░] 60%
 
-Last activity: 2026-02-02 — Completed 03-01-PLAN.md
+Last activity: 2026-02-02 — Completed 03-02-PLAN.md
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23
-- Average duration: 3.9 min
-- Total execution time: 1.48 hours
+- Total plans completed: 24
+- Average duration: 5.4 min
+- Total execution time: 2.48 hours
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Last activity: 2026-02-02 — Completed 03-01-PLAN.md
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
 | 2. Core Markdown Rendering | 22/22 | 60 min | 2.7 min |
-| 3. Tables & Advanced Elements | 1/2 | 1 min | 1 min |
+| 3. Tables & Advanced Elements | 2/2 | 61 min | 30.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-19 (1min), 02-20 (1min), 02-21 (1min), 02-22 (2min), 03-01 (1min)
-- Trend: Phase 3 started - strong foundation from Phase 2 enables rapid table infrastructure implementation
+- Last 5 plans: 02-20 (1min), 02-21 (1min), 02-22 (2min), 03-01 (1min), 03-02 (60min)
+- Trend: Phase 3 complete - table rendering required significant iteration for content-based sizing refinement
 
 *Updated after each plan completion*
 
@@ -46,6 +46,11 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Use ellipsis truncation (.byTruncatingTail) not wrapping for table overflow | Combined with content-based widths, keeps tables compact while handling long content gracefully | 03-02 | 2026-02-02 |
+| Measure actual text widths using NSAttributedString.size() for content-based column sizing | Provides accurate rendered size including font metrics; add padding + breathing room + constraints for final widths | 03-02 | 2026-02-02 |
+| Set explicit column widths with constraints (min 60pt, max 300pt per column, max 800pt total) | Content-based sizing with bounds prevents both tiny columns and unwieldy wide tables | 03-02 | 2026-02-02 |
+| Use ensureBlockSeparation() helper for table/content spacing | Checks for proper block separation (\\n\\n) and adds missing newlines to ensure correct spacing | 03-02 | 2026-02-02 |
+| Remove empty cell background, use subtle middot only | Gray background was too prominent; middot with quaternaryLabelColor provides subtle presence indicator | 03-02 | 2026-02-02 |
 | NSTextTableBlock default vertical alignment used for table cells | NSTextTableBlock.verticalAlignment defaults to .middle (centered), satisfies phase decision without explicit override | 03-01 | 2026-02-02 |
 | Middot indicator with gray color and subtle background for empty cells | Makes empty table cells visible without prominent decoration, uses tertiaryLabelColor with quaternaryLabelColor background at 0.2 alpha | 03-01 | 2026-02-02 |
 | 6pt padding on all cell edges for table cells | Balances table density with readability, provides consistent spacing on all edges | 03-01 | 2026-02-02 |
@@ -115,9 +120,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-01-PLAN.md
+Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
 Resume file: None
-Next: Plan 03-02 (integrate tables into MarkdownRenderer)
+Next: Phase 3 verification, then Phase 4 (Performance & Polish)
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
