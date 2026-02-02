@@ -30,17 +30,17 @@ class TableRenderer {
             return result
         }
 
-        // Create NSTextTable with percentage-based width for side margins
+        // Create NSTextTable with content-based sizing
         let nsTable = NSTextTable()
         nsTable.numberOfColumns = columnCount
         nsTable.collapsesBorders = true
         nsTable.hidesEmptyCells = false
+        nsTable.layoutAlgorithm = .automaticLayoutAlgorithm
 
-        // Set table width to 75% of container width to prevent edge-to-edge display
-        // This provides breathing room on both sides without truncating content
-        nsTable.setContentWidth(75.0, type: .percentageValueType)
+        // No explicit table width - let table size naturally based on content
+        // Small tables stay compact, wide tables expand as needed
 
-        os_log("TableRenderer: Rendering table with %d columns at 75%% width", log: .tableRenderer, type: .debug, columnCount)
+        os_log("TableRenderer: Rendering table with %d columns (content-based sizing)", log: .tableRenderer, type: .debug, columnCount)
 
         // Render header row (row 0)
         for (colIndex, headerContent) in table.headerCells.enumerated() {
@@ -124,8 +124,9 @@ class TableRenderer {
             paragraphStyle.alignment = .right
         }
 
-        // Truncate long content with ellipsis for quick scanning
-        paragraphStyle.lineBreakMode = .byTruncatingTail
+        // Allow content to wrap naturally instead of truncating
+        // This lets cells expand to fit content while maintaining readability
+        paragraphStyle.lineBreakMode = .byWordWrapping
 
         // Handle empty cells: show middot indicator with subtle color, no background
         let displayText: String
