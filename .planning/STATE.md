@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 
 ## Current Position
 
-Phase: 3 of 4 (Tables & Advanced Elements)
-Plan: 2 of 2 in current phase
-Status: Phase 3 VERIFIED COMPLETE - GFM tables fully integrated and tested
-Progress: [███████░░░] 75%
+Phase: 4 of 4 (Performance & Polish)
+Plan: 1 of 2 in current phase
+Status: In progress - file size truncation complete
+Progress: [████████░░] 80%
 
-Last activity: 2026-02-02 — Completed Phase 3 verification (human testing passed)
+Last activity: 2026-02-02 — Completed 04-01-PLAN.md (file size truncation)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24
-- Average duration: 5.4 min
-- Total execution time: 2.48 hours
+- Total plans completed: 25
+- Average duration: 5.3 min
+- Total execution time: 2.5 hours
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Last activity: 2026-02-02 — Completed Phase 3 verification (human testing pass
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
 | 2. Core Markdown Rendering | 22/22 | 60 min | 2.7 min |
 | 3. Tables & Advanced Elements | 2/2 | 61 min | 30.5 min |
+| 4. Performance & Polish | 1/2 | 1 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-20 (1min), 02-21 (1min), 02-22 (2min), 03-01 (1min), 03-02 (60min)
-- Trend: Phase 3 complete - table rendering required significant iteration for content-based sizing refinement
+- Last 5 plans: 02-21 (1min), 02-22 (2min), 03-01 (1min), 03-02 (60min), 04-01 (1min)
+- Trend: Performance optimizations straightforward with existing architecture
 
 *Updated after each plan completion*
 
@@ -46,6 +47,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| 500KB truncation threshold for large files | Supports large documentation files while guaranteeing <1s render time; typical markdown is 10-50KB so 500KB covers most real-world docs | 04-01 | 2026-02-02 |
+| Use FileHandle for partial file reading | Efficient - reads only needed bytes without loading entire file into memory; critical for multi-megabyte files | 04-01 | 2026-02-02 |
+| Truncation message at end with markdown separator | User sees available content first, then clear notice; separator (---) renders as horizontal rule for visual distinction | 04-01 | 2026-02-02 |
 | Increase header separator from 1pt to 2pt border width | 1pt border was not visible in rendered tables; 2pt with explicit edge parameter provides clear visual distinction | 03 | 2026-02-02 |
 | Use ellipsis truncation (.byTruncatingTail) not wrapping for table overflow | Combined with content-based widths, keeps tables compact while handling long content gracefully | 03-02 | 2026-02-02 |
 | Measure actual text widths using NSAttributedString.size() for content-based column sizing | Provides accurate rendered size including font metrics; add padding + breathing room + constraints for final widths | 03-02 | 2026-02-02 |
@@ -121,9 +125,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 03-02-PLAN.md (Phase 3 complete)
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
-Next: Phase 3 verification, then Phase 4 (Performance & Polish)
+Next: 04-02-PLAN.md (Dark mode appearance integration)
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
