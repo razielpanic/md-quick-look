@@ -146,37 +146,68 @@ class MarkdownRenderer {
         return result
     }
 
-    /// Ensures list items and blockquote lines end with newlines for proper separation
+    /// Ensures list items end with newlines for proper separation
     /// - Parameter attributedString: The AttributedString to process
-    /// - Returns: AttributedString with newlines added at the end of list items and blockquote lines
+    /// - Returns: AttributedString with newlines added at the end of list items
     private func ensureIntraBlockNewlines(in attributedString: AttributedString) -> AttributedString {
         var result = attributedString
         var insertionPositions: [AttributedString.Index] = []
 
+        // Collect all runs in array for peeking
+        let allRuns = Array(attributedString.runs)
+
         // Collect positions where newlines need to be inserted
-        for run in attributedString.runs {
+        for (index, run) in allRuns.enumerated() {
             guard let intent = run.presentationIntent else { continue }
 
             // Check if this run contains a list item or blockquote
-            var needsNewline = false
+            var isListItem = false
+            var isBlockquote = false
+
             for component in intent.components {
                 switch component.kind {
                 case .listItem(ordinal: _):
-                    needsNewline = true
+                    isListItem = true
                 case .blockQuote:
-                    needsNewline = true
+                    isBlockquote = true
                 default:
                     break
                 }
             }
 
-            // If this run needs a newline, check if it already ends with one
-            if needsNewline {
-                // Check if run already ends with newline
+            // For list items, always add newline if missing
+            if isListItem {
                 let runText = String(attributedString[run.range].characters)
                 if !runText.hasSuffix("\n") {
                     let runEndIndex = run.range.upperBound
                     insertionPositions.append(runEndIndex)
+                }
+            }
+
+            // For blockquotes, only add newline if NOT followed by another blockquote
+            // (let block boundary logic handle blockquote separation)
+            if isBlockquote {
+                // Check if next run is also a blockquote
+                let isLastBlockquoteRun: Bool
+                if index + 1 < allRuns.count {
+                    let nextRun = allRuns[index + 1]
+                    if let nextIntent = nextRun.presentationIntent {
+                        let nextIsBlockquote = nextIntent.components.contains { $0.kind == .blockQuote }
+                        isLastBlockquoteRun = !nextIsBlockquote
+                    } else {
+                        isLastBlockquoteRun = true
+                    }
+                } else {
+                    isLastBlockquoteRun = true
+                }
+
+                // Only add newline if this is the last blockquote run
+                if isLastBlockquoteRun {
+                    let runText = String(attributedString[run.range].characters)
+                    if !runText.hasSuffix("\n") {
+                        let runEndIndex = run.range.upperBound
+                        insertionPositions.append(runEndIndex)
+                    }
                 }
             }
         }
@@ -398,14 +429,15 @@ class MarkdownRenderer {
         paragraphStyle.firstLineHeadIndent = 20  // Indent for bullet/number
         paragraphStyle.headIndent = 30           // Indent for wrapped text
         paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
-        paragraphStyle.paragraphSpacing = 4
+        // Use minimal spacing for list items - newlines provide separation
+        paragraphStyle.paragraphSpacing = 0
+        paragraphStyle.lineSpacing = 2  // Small spacing for wrapped lines within item
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
     }
 
     private func applyBlockQuoteAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
-        // Apply subtle background
-        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.quaternarySystemFill, range: range)
+        // Background is now drawn by LayoutManager for uniform appearance
 
         // Create paragraph style with indentation
         let paragraphStyle = NSMutableParagraphStyle()
@@ -416,7 +448,7 @@ class MarkdownRenderer {
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
 
-        // Add blockquote marker for MarkdownLayoutManager to draw border
+        // Add blockquote marker for MarkdownLayoutManager to draw border and background
         nsAttributedString.addAttribute(.blockquoteMarker, value: true, range: range)
     }
 
