@@ -202,7 +202,7 @@ class TableRenderer {
             foregroundColor = NSColor.quaternaryLabelColor  // Lighter/more subtle
         } else {
             displayText = content
-            foregroundColor = NSColor.textColor
+            foregroundColor = NSColor.labelColor
         }
 
         // Build attributes
