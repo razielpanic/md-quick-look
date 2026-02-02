@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 18 of 18 in current phase (gap closure)
+Plan: 19 of 19 in current phase (gap closure)
 Status: Phase 2 COMPLETE - All gaps closed
-Progress: [████████░░] 85%
+Progress: [████████░░] 86%
 
-Last activity: 2026-02-01 — Completed 02-18 (inline formatting split fix - Gap #26 closed)
+Last activity: 2026-02-02 — Completed 02-19 (list spacing fix - Gap #27 closed)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 4 min
-- Total execution time: 1.41 hours
+- Total execution time: 1.42 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 16/16 | 53 min | 3 min |
+| 2. Core Markdown Rendering | 17/17 | 54 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-14 (1min), 02-15 (1min), 02-16 (1min), 02-17 (3min), 02-18 (1min)
+- Last 5 plans: 02-15 (1min), 02-16 (1min), 02-17 (3min), 02-18 (1min), 02-19 (1min)
 - Trend: Phase 2 complete with consistent 1-3 min execution - strong foundation + clear patterns enable rapid gap closure
 
 *Updated after each plan completion*
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Remove list item handling from ensureIntraBlockNewlines | Both insertBlockBoundaryNewlines and ensureIntraBlockNewlines were adding newlines at list item boundaries causing double newlines; simplified to single responsibility pattern | 02-19 | 2026-02-02 |
 | Apply ordinal tracking pattern to ensureIntraBlockNewlines | Same ordinal tracking pattern from insertBlockBoundaryNewlines prevents inline formatting splits by only adding newlines when next run has different ordinal | 02-18 | 2026-02-01 |
 | Recognize duplicate implementation between plans | Plan 02-17 required same fix as plan 02-14; verified existing implementation meets requirements instead of reimplementing | 02-17 | 2026-02-02 |
 | Use plain text [Image: filename] placeholders instead of markers | Marker-based approach failed because AttributedString modified/split markers; plain text survives parsing intact and is styled via pattern matching afterward | 02-13 | 2026-02-01 |
@@ -105,10 +106,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-01
-Stopped at: Completed 02-18 (inline formatting split fix - Gap #26 closed)
+Last session: 2026-02-02
+Stopped at: Completed 02-19 (list spacing fix - Gap #27 closed)
 Resume file: None
-Next: Phase 2 COMPLETE - All 10 UAT tests pass - Ready for Phase 3 planning
+Next: Phase 2 COMPLETE - All gaps closed - Ready for Phase 3 planning
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
