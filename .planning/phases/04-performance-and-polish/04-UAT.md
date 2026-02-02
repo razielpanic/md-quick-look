@@ -6,7 +6,7 @@ source:
   - 04-02-SUMMARY.md
   - 04-VERIFICATION.md
 started: 2026-02-02T16:00:00Z
-updated: 2026-02-02T19:15:00Z
+updated: 2026-02-02T19:30:00Z
 ---
 
 ## Current Test
@@ -43,17 +43,17 @@ skipped: 0
 
 ## Gaps
 
-- truth: "Large files (>500KB) show truncation message at bottom with file size"
+- truth: "Large files (>500KB) are truncated before rendering"
   status: failed
-  reason: "User reported: i just see the placeholder text with no way to tell if it's truncated"
+  reason: "User reported: i just see the placeholder text with no way to tell if it's truncated. User clarified: display didn't truncate"
   severity: major
   test: 2
-  root_cause: "Truncation message is plain text after horizontal rule and lacks visual distinction. Message format '\n\n---\n\nContent truncated (file is X MB)' blends in with repeated Lorem ipsum text, making it difficult to identify as a truncation indicator."
+  root_cause: "Extension in /Applications not reinstalled after Plan 04-01 implementation. Installed binary timestamp: Feb 2 02:51. Build binary with truncation logic timestamp: Feb 2 10:30. Quick Look is using outdated extension without truncation code."
   artifacts:
-    - path: "md-spotlighter/MDQuickLook/PreviewViewController.swift"
-      issue: "Lines 52-53: Truncation message uses plain text without visual emphasis"
-      line: 53
+    - path: "/Applications/md-spotlighter.app/Contents/PlugIns/MDQuickLook.appex"
+      issue: "Outdated binary - missing truncation logic from commit 1f496a6"
+      timestamp: "2026-02-02T02:51:00Z"
   missing:
-    - "Visual distinction for truncation message (bold text, emoji/icon, or different styling)"
-    - "More prominent separator or formatting to make message stand out from content"
+    - "Run 'make install' to update installed extension"
+    - "Restart Quick Look daemon (qlmanage -r)"
   debug_session: ""

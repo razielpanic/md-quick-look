@@ -281,6 +281,9 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
+@import AppKit;
+@import CoreFoundation;
+@import Foundation;
 @import QuickLookUI;
 #endif
 
@@ -304,9 +307,23 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 
 #if defined(__OBJC__)
 
-SWIFT_CLASS("_TtC11MDQuickLook15PreviewProvider")
-@interface PreviewProvider : QLPreviewProvider
+@class NSCoder;
+/// Custom layout manager for drawing blockquote decorations
+SWIFT_CLASS("_TtC11MDQuickLook21MarkdownLayoutManager")
+@interface MarkdownLayoutManager : NSLayoutManager
+- (void)drawBackgroundForGlyphRange:(NSRange)glyphsToShow atPoint:(CGPoint)origin;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class NSURL;
+@class NSBundle;
+SWIFT_CLASS("_TtC11MDQuickLook21PreviewViewController")
+@interface PreviewViewController : NSViewController <QLPreviewingController>
+- (void)loadView;
+- (void)preparePreviewOfFileAtURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSError * _Nullable))handler;
+- (nonnull instancetype)initWithNibName:(NSNibName _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
 
 #endif

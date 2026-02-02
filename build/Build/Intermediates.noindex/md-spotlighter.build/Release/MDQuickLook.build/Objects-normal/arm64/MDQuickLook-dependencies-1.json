@@ -81,6 +81,11 @@
   },
   {
     "isFramework" : false,
+    "moduleName" : "Markdown",
+    "modulePath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/Build\/Products\/Release\/Markdown.swiftmodule\/arm64-apple-macos.swiftmodule"
+  },
+  {
+    "isFramework" : false,
     "moduleName" : "Metal",
     "modulePath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/swift\/macosx\/prebuilt-modules\/26.2\/Metal.swiftmodule\/arm64e-apple-macos.swiftmodule"
   },
@@ -204,6 +209,13 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ApplicationServices"
+  },
+  {
+    "clangModuleMapPath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/SourcePackages\/checkouts\/swift-markdown\/Sources\/CAtomic\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/CAtomic-33BP7IAT3CV6122JZ82K8PCRB.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "CAtomic"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/MacOSX.platform\/Developer\/SDKs\/MacOSX.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
@@ -575,6 +587,20 @@
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_SwiftConcurrencyShims"
+  },
+  {
+    "clangModuleMapPath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/SourcePackages\/checkouts\/swift-cmark\/src\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/cmark_gfm-1R6JVXU4NTNUAKUKZO132IMBT.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "cmark_gfm"
+  },
+  {
+    "clangModuleMapPath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/SourcePackages\/checkouts\/swift-cmark\/extensions\/include\/module.modulemap",
+    "clangModulePath" : "\/Users\/razielpanic\/Projects\/md-spotlighter\/build\/Build\/Intermediates.noindex\/SwiftExplicitPrecompiledModules\/cmark_gfm_extensions-1T0ZMCJSOS7HLBMP4VQEQ5FK.pcm",
+    "isBridgingHeaderDependency" : false,
+    "isFramework" : false,
+    "moduleName" : "cmark_gfm_extensions"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/MacOSX.platform\/Developer\/SDKs\/MacOSX.sdk\/usr\/include\/launch.modulemap",

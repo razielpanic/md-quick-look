@@ -53,7 +53,7 @@
 			<key>QLSupportedContentTypes</key>
 			<array>
 				<string>net.daringfireball.markdown</string>
-				<string>public.plain-text</string>
+				<string>public.markdown</string>
 			</array>
 			<key>QLSupportsSearchableItems</key>
 			<false/>
@@ -61,7 +61,7 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.quicklook.preview</string>
 		<key>NSExtensionPrincipalClass</key>
-		<string>MDQuickLook.PreviewProvider</string>
+		<string>MDQuickLook.PreviewViewController</string>
 	</dict>
 </dict>
 </plist>
