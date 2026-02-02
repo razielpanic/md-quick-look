@@ -24,9 +24,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### System Integration
 
 - [x] **SYSINT-01**: Quick Look extension loads .md files from Finder
-- [ ] **SYSINT-02**: Preview renders instantly (<1 second for typical files)
+- [x] **SYSINT-02**: Preview renders instantly (<1 second for typical files)
 - [x] **SYSINT-03**: Works on macOS 26+ (Tahoe and later)
-- [ ] **SYSINT-04**: Respects system appearance (light/dark mode)
+- [x] **SYSINT-04**: Respects system appearance (light/dark mode)
 
 ## v2 Requirements
 
@@ -74,9 +74,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MDRNDR-10 | Phase 2 | Complete |
 | MDRNDR-11 | Phase 2 | Complete |
 | SYSINT-01 | Phase 1 | Complete |
-| SYSINT-02 | Phase 4 | Pending |
+| SYSINT-02 | Phase 4 | Complete |
 | SYSINT-03 | Phase 1 | Complete |
-| SYSINT-04 | Phase 4 | Pending |
+| SYSINT-04 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 15 total
@@ -85,4 +85,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-01-31*
-*Last updated: 2026-01-31 after roadmap creation*
+*Last updated: 2026-02-02 after Phase 4 completion*
