@@ -36,8 +36,8 @@ class TableRenderer {
         nsTable.collapsesBorders = true
         nsTable.hidesEmptyCells = false
 
-        // Configure table width constraint: 90% of container width
-        nsTable.setContentWidth(90.0, type: .percentageValueType)
+        // Let table size to content naturally (no fixed width constraint)
+        // NSTextTable will fit content width automatically
 
         os_log("TableRenderer: Rendering table with %d columns", log: .tableRenderer, type: .debug, columnCount)
 
