@@ -171,8 +171,8 @@ class TableRenderer {
 
         // Header separator: bottom border on header cells only
         if isHeader {
-            block.setWidth(1.0, type: .absoluteValueType, for: .border, edge: .maxY)
-            block.setBorderColor(NSColor.separatorColor)
+            block.setWidth(2.0, type: .absoluteValueType, for: .border, edge: .maxY)
+            block.setBorderColor(NSColor.separatorColor, for: .maxY)
         }
 
         // Create paragraph style with text block
