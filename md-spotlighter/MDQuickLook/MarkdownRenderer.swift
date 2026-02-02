@@ -472,8 +472,8 @@ class MarkdownRenderer {
     // MARK: - Image Preprocessing
 
     private func preprocessImages(in markdown: String) -> String {
-        // Replace ![alt](url) with plain text "[Image: filename]"
-        // This plain text survives AttributedString parsing intact
+        // Replace ![alt](url) with marker that survives AttributedString parsing
+        // Use alphanumeric-only markers to avoid markdown interpretation
         let pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return markdown }
 
@@ -487,8 +487,8 @@ class MarkdownRenderer {
             let url = nsString.substring(with: urlRange)
             let filename = (url as NSString).lastPathComponent
 
-            // Plain text placeholder - will be styled later
-            let placeholder = "[Image: \(filename)]"
+            // Use marker without special markdown characters
+            let placeholder = "IMAGEPLACEHOLDERSTART\(filename)IMAGEPLACEHOLDEREND"
             result = (result as NSString).replacingCharacters(in: match.range, with: placeholder) as String
         }
 
@@ -515,15 +515,20 @@ class MarkdownRenderer {
     // MARK: - Image Placeholder Styling
 
     private func applyImagePlaceholderStyles(to nsAttributedString: NSMutableAttributedString) {
-        // Find [Image: filename] patterns and style them
-        let pattern = "\\[Image: ([^\\]]+)\\]"
+        // Find IMAGEPLACEHOLDERSTART...IMAGEPLACEHOLDEREND patterns and style them
+        let pattern = "IMAGEPLACEHOLDERSTART(.+?)IMAGEPLACEHOLDEREND"
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
 
         let fullRange = NSRange(location: 0, length: nsAttributedString.length)
         let matches = regex.matches(in: nsAttributedString.string, options: [], range: fullRange)
 
         for match in matches.reversed() {
-            guard match.range.location != NSNotFound else { continue }
+            guard match.range.location != NSNotFound,
+                  match.numberOfRanges >= 2 else { continue }
+
+            // Extract filename from capture group
+            let filenameRange = match.range(at: 1)
+            let filename = (nsAttributedString.string as NSString).substring(with: filenameRange)
 
             // Create SF Symbol attachment for photo icon
             let attachment = NSTextAttachment()
@@ -532,10 +537,7 @@ class MarkdownRenderer {
                 attachment.image = symbolImage.withSymbolConfiguration(config)
             }
 
-            // Get the full placeholder text "[Image: filename]"
-            let placeholderText = (nsAttributedString.string as NSString).substring(with: match.range)
-
-            // Create styled replacement: icon + space + text
+            // Create styled replacement: icon + space + [Image: filename]
             let styledString = NSMutableAttributedString()
 
             // Add icon
@@ -543,15 +545,18 @@ class MarkdownRenderer {
             styledString.append(iconString)
             styledString.append(NSAttributedString(string: " "))
 
-            // Add placeholder text in gray
+            // Add placeholder text in gray with [Image: filename] format
+            let placeholderText = "[Image: \(filename)]"
             let textAttributes: [NSAttributedString.Key: Any] = [
                 .font: NSFont.systemFont(ofSize: bodyFontSize),
                 .foregroundColor: NSColor.secondaryLabelColor
             ]
             styledString.append(NSAttributedString(string: placeholderText, attributes: textAttributes))
 
-            // Replace in the attributed string
+            // Replace the marker in the attributed string
             nsAttributedString.replaceCharacters(in: match.range, with: styledString)
+
+            os_log("MarkdownRenderer: Replaced image placeholder for %{public}s", log: .renderer, type: .debug, filename)
         }
     }
 }
