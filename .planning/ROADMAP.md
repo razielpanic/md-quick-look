@@ -49,7 +49,7 @@ Plans:
   8. User sees blockquotes with visual differentiation (indentation or border)
   9. User sees links rendered as text (not clickable)
   10. User sees images rendered as placeholders showing `[Image: filename]`
-**Plans**: 15 plans (3 original + 12 gap closure)
+**Plans**: 17 plans (3 original + 14 gap closure)
 
 Plans:
 - [x] 02-01-PLAN.md — Create MarkdownRenderer with heading hierarchy and inline formatting
@@ -64,9 +64,11 @@ Plans:
 - [x] 02-10-PLAN.md — (Gap closure 3) Enable Quick Look scrolling + verify image placeholders
 - [x] 02-11-PLAN.md — (Gap closure 3) Fix blockquote border/background/spacing issues
 - [x] 02-12-PLAN.md — (Gap closure 3) Fix list excessive spacing and inline formatting continuity
-- [ ] 02-13-PLAN.md — (Gap closure 4) Fix image placeholder rendering (BLOCKER regression)
-- [ ] 02-14-PLAN.md — (Gap closure 4) Fix list huge gaps (BLOCKER regression)
-- [ ] 02-15-PLAN.md — (Gap closure 4) Fix blockquote missing newline (MINOR)
+- [x] 02-13-PLAN.md — (Gap closure 4) Fix image placeholder rendering (BLOCKER regression)
+- [x] 02-14-PLAN.md — (Gap closure 4) Fix list huge gaps (BLOCKER regression)
+- [x] 02-15-PLAN.md — (Gap closure 4) Fix blockquote missing newline (MINOR)
+- [ ] 02-16-PLAN.md — (Gap closure 5) Fix image placeholder markers - use alphanumeric markers
+- [ ] 02-17-PLAN.md — (Gap closure 5) Fix list spacing - add paragraphStyle to prefix insertion
 
 ### Phase 3: Tables & Advanced Elements
 **Goal**: Render GitHub-flavored markdown tables
@@ -102,6 +104,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Extension Foundation | 2/2 | Complete | 2026-02-01 |
-| 2. Core Markdown Rendering | 12/15 | Gap closure round 4 in progress | 2026-02-01 |
+| 2. Core Markdown Rendering | 15/17 | Gap closure round 5 in progress | 2026-02-01 |
 | 3. Tables & Advanced Elements | 0/TBD | Not started | - |
 | 4. Performance & Polish | 0/TBD | Not started | - |
