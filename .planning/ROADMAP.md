@@ -94,13 +94,14 @@ Plans:
 **Depends on**: Phase 3
 **Requirements**: SYSINT-02, SYSINT-04
 **Success Criteria** (what must be TRUE):
-  1. User sees preview render in less than 1 second for typical markdown files (10-50KB)
+  1. User sees preview render in less than 1 second for typical markdown files (10-500KB)
   2. User sees preview respect macOS system appearance (light mode shows light preview, dark mode shows dark preview)
   3. User does not experience Finder UI freezing or delays when triggering Quick Look
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] TBD
+- [ ] 04-01-PLAN.md — File size truncation for large files (>500KB) with user-friendly message
+- [ ] 04-02-PLAN.md — System color adoption for automatic dark mode support
 
 ## Progress
 
@@ -112,4 +113,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4
 | 1. Extension Foundation | 2/2 | Complete | 2026-02-01 |
 | 2. Core Markdown Rendering | 22/22 | Complete | 2026-02-02 |
 | 3. Tables & Advanced Elements | 2/2 | Complete | 2026-02-02 |
-| 4. Performance & Polish | 0/TBD | Not started | - |
+| 4. Performance & Polish | 0/2 | Not started | - |
