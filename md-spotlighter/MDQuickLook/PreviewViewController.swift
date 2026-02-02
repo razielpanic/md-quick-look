@@ -46,6 +46,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                 height: CGFloat.greatestFiniteMagnitude
             ))
             textContainer.widthTracksTextView = true
+            textContainer.heightTracksTextView = false  // Allow infinite height for scrolling
 
             // Wire text components together
             layoutManager.addTextContainer(textContainer)
@@ -59,12 +60,26 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             textView.backgroundColor = .textBackgroundColor  // Semantic color for Dark Mode
             textView.textContainerInset = NSSize(width: 20, height: 20)
 
+            // Configure text view for vertical scrolling
+            textView.isVerticallyResizable = true
+            textView.isHorizontallyResizable = false
+            textView.minSize = NSSize(width: 0, height: 0)
+            textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+
             // Apply styled content to text storage
             textStorage.setAttributedString(styledContent)
             os_log("Custom text stack configured with MarkdownLayoutManager", log: .quicklook, type: .debug)
 
             scrollView.documentView = textView
             view.addSubview(scrollView)
+
+            // Force layout to establish proper content height for scrolling
+            layoutManager.ensureLayout(forCharacterRange: NSRange(location: 0, length: textStorage.length))
+
+            // Log scroll configuration for debugging
+            os_log("ScrollView configured - contentSize: %@", log: .quicklook, type: .debug, NSStringFromSize(scrollView.contentSize))
+            os_log("TextView frame after layout: %@", log: .quicklook, type: .debug, NSStringFromRect(textView.frame))
+            os_log("TextView content height: %.2f", log: .quicklook, type: .info, textView.frame.height)
 
             os_log("Quick Look preview complete - AttributedString rendered", log: .quicklook, type: .info)
 
