@@ -40,7 +40,7 @@ class MarkdownRenderer {
         os_log("MarkdownRenderer: Starting render, input length: %d", log: .renderer, type: .info, markdown.count)
 
         // Pre-process markdown to handle images (convert to placeholders)
-        let preprocessedMarkdown = preprocessImages(in: markdown)
+        let preprocessedMarkdown = preprocessBlockquoteSoftBreaks(in: preprocessImages(in: markdown))
 
         // Parse markdown using native AttributedString
         guard let attributedString = try? AttributedString(markdown: preprocessedMarkdown) else {
@@ -490,6 +490,32 @@ class MarkdownRenderer {
             result = (result as NSString).replacingCharacters(in: match.range, with: placeholder) as String
         }
 
+        return result
+    }
+
+    // MARK: - Blockquote Soft Break Preprocessing
+
+    private func preprocessBlockquoteSoftBreaks(in markdown: String) -> String {
+        // Convert soft breaks (single newlines) to hard breaks (double spaces before newline) within blockquotes
+        // This preserves line separation in multi-line blockquotes since AttributedString(markdown:)
+        // converts soft breaks to spaces in CommonMark-compliant fashion
+        // Pattern: (>[^\n]*)\n(>) - captures blockquote line content followed by newline and next blockquote marker
+        // Replacement: $1  \n$2 - adds two trailing spaces before newline (hard break in CommonMark)
+        let pattern = "(>[^\\n]*)\\n(>)"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return markdown }
+
+        let nsString = markdown as NSString
+        let fullRange = NSRange(location: 0, length: nsString.length)
+
+        // Replace all occurrences with hard break version
+        let result = regex.stringByReplacingMatches(
+            in: markdown,
+            options: [],
+            range: fullRange,
+            withTemplate: "$1  \n$2"
+        )
+
+        os_log("MarkdownRenderer: Preprocessed blockquote soft breaks", log: .renderer, type: .debug)
         return result
     }
 
