@@ -21,8 +21,44 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         os_log("File exists: %@", log: .quicklook, type: .debug, FileManager.default.fileExists(atPath: url.path) ? "YES" : "NO")
 
         do {
-            // Load markdown content
-            let markdownContent = try String(contentsOf: url, encoding: .utf8)
+            // Check file size before reading
+            let attrs = try FileManager.default.attributesOfItem(atPath: url.path)
+            guard let fileSize = attrs[.size] as? UInt64 else {
+                os_log("ERROR: Cannot determine file size", log: .quicklook, type: .error)
+                handler(NSError(domain: "MDSpotlighter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot determine file size"]))
+                return
+            }
+
+            os_log("File size: %lld bytes", log: .quicklook, type: .info, fileSize)
+
+            // Define truncation threshold - 500KB supports large docs while ensuring <1s render
+            let maxSize: UInt64 = 500_000
+
+            // Load markdown content with truncation if needed
+            let markdownContent: String
+            if fileSize > maxSize {
+                // File is large - read only first 500KB
+                guard let fileHandle = FileHandle(forReadingAtPath: url.path) else {
+                    os_log("ERROR: Cannot open file for reading", log: .quicklook, type: .error)
+                    handler(NSError(domain: "MDSpotlighter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot open file for reading"]))
+                    return
+                }
+                defer { try? fileHandle.close() }
+
+                let data = fileHandle.readData(ofLength: Int(maxSize))
+                var truncated = String(data: data, encoding: .utf8) ?? ""
+
+                // Add user-friendly truncation message at bottom
+                let sizeStr = ByteCountFormatter.string(fromByteCount: Int64(fileSize), countStyle: .file)
+                truncated.append("\n\n---\n\nContent truncated (file is \(sizeStr))")
+                markdownContent = truncated
+
+                os_log("Truncated large file: %@ (%lld bytes, showing first 500KB)", log: .quicklook, type: .info, url.lastPathComponent, fileSize)
+            } else {
+                // File is typical size - read fully
+                markdownContent = try String(contentsOf: url, encoding: .utf8)
+            }
+
             os_log("File read successfully, length: %d bytes", log: .quicklook, type: .info, markdownContent.count)
             os_log("First 100 chars: %@", log: .quicklook, type: .debug, String(markdownContent.prefix(100)))
 
