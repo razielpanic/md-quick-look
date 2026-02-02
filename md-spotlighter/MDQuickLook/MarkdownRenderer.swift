@@ -302,13 +302,22 @@ class MarkdownRenderer {
             }
         }
 
+        // Create list paragraph style (same as in applyListItemAttributes)
+        let listParagraphStyle = NSMutableParagraphStyle()
+        listParagraphStyle.firstLineHeadIndent = 20
+        listParagraphStyle.headIndent = 30
+        listParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
+        listParagraphStyle.paragraphSpacing = 0  // CRITICAL: zero spacing to prevent gaps
+        listParagraphStyle.lineSpacing = 2
+
         // Insert prefixes in reverse order to maintain indices
         for item in listItems.reversed() {
             let prefixString = NSAttributedString(
                 string: item.prefix,
                 attributes: [
                     .font: NSFont.systemFont(ofSize: bodyFontSize),
-                    .foregroundColor: NSColor.textColor
+                    .foregroundColor: NSColor.textColor,
+                    .paragraphStyle: listParagraphStyle  // Apply list paragraph style to prevent gaps
                 ]
             )
 
@@ -479,35 +488,23 @@ class MarkdownRenderer {
     // MARK: - Image Preprocessing
 
     private func preprocessImages(in markdown: String) -> String {
-        // Replace markdown image syntax ![alt](url) with placeholder text
-        // Pattern matches: ![any text](any url)
+        // Replace ![alt](url) with plain text "[Image: filename]"
+        // This plain text survives AttributedString parsing intact
         let pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
-            return markdown
-        }
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return markdown }
 
         let nsString = markdown as NSString
         let matches = regex.matches(in: markdown, options: [], range: NSRange(location: 0, length: nsString.length))
 
         var result = markdown
-        // Process in reverse to maintain string indices
         for match in matches.reversed() {
             guard match.numberOfRanges >= 3 else { continue }
-
-            // Extract the URL/path from the image reference
             let urlRange = match.range(at: 2)
             let url = nsString.substring(with: urlRange)
-
-            // Extract filename from URL/path
             let filename = (url as NSString).lastPathComponent
 
-            // Create placeholder text with special marker that won't be modified by AttributedString
-            // Using underscores instead of angle brackets because AttributedString(markdown:)
-            // appears to consume one angle bracket on each side
-            let placeholder = "__IMAGE_PLACEHOLDER__\(filename)__END__"
-
-            // Replace the full image markdown with placeholder
+            // Plain text placeholder - will be styled later
+            let placeholder = "[Image: \(filename)]"
             result = (result as NSString).replacingCharacters(in: match.range, with: placeholder) as String
         }
 
@@ -534,77 +531,43 @@ class MarkdownRenderer {
     // MARK: - Image Placeholder Styling
 
     private func applyImagePlaceholderStyles(to nsAttributedString: NSMutableAttributedString) {
+        // Find [Image: filename] patterns and style them
+        let pattern = "\\[Image: ([^\\]]+)\\]"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
         let fullRange = NSRange(location: 0, length: nsAttributedString.length)
-        let text = nsAttributedString.string as NSString
+        let matches = regex.matches(in: nsAttributedString.string, options: [], range: fullRange)
 
-        // Log first 500 chars for debugging
-        let previewText = text.substring(to: min(500, text.length))
-        os_log("MarkdownRenderer: Searching for image markers in text of length %d", log: .renderer, type: .info, nsAttributedString.length)
-        os_log("MarkdownRenderer: First 500 chars: %{public}@", log: .renderer, type: .debug, previewText)
-
-        // Find placeholder markers inserted during preprocessing
-        // Using underscores pattern to match the preprocessing marker that won't be modified by AttributedString
-        let pattern = "__IMAGE_PLACEHOLDER__(.+?)__END__"
-        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
-            os_log("MarkdownRenderer: Failed to create regex for image markers", log: .renderer, type: .error)
-            return
-        }
-
-        let matches = regex.matches(in: text as String, options: [], range: fullRange)
-
-        os_log("MarkdownRenderer: Found %d image markers to replace", log: .renderer, type: .info, matches.count)
-
-        // Process in reverse to maintain indices
         for match in matches.reversed() {
-            guard match.numberOfRanges >= 2 else { continue }
+            guard match.range.location != NSNotFound else { continue }
 
-            let matchRange = match.range
-            let filenameRange = match.range(at: 1)
-            let filename = text.substring(with: filenameRange)
+            // Create SF Symbol attachment for photo icon
+            let attachment = NSTextAttachment()
+            if let symbolImage = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image") {
+                let config = NSImage.SymbolConfiguration(pointSize: bodyFontSize, weight: .regular)
+                attachment.image = symbolImage.withSymbolConfiguration(config)
+            }
 
-            // Log what we found
-            let matchedText = text.substring(with: matchRange)
-            os_log("MarkdownRenderer: Found image marker: %{public}@", log: .renderer, type: .info, matchedText)
+            // Get the full placeholder text "[Image: filename]"
+            let placeholderText = (nsAttributedString.string as NSString).substring(with: match.range)
 
-            // Create image placeholder with SF Symbol
-            let placeholder = createImagePlaceholder(filename: filename)
+            // Create styled replacement: icon + space + text
+            let styledString = NSMutableAttributedString()
 
-            // Replace the marker text with styled placeholder
-            nsAttributedString.replaceCharacters(in: matchRange, with: placeholder)
+            // Add icon
+            let iconString = NSAttributedString(attachment: attachment)
+            styledString.append(iconString)
+            styledString.append(NSAttributedString(string: " "))
 
-            // Remove link attribute from the replacement range (prevents blue link styling)
-            let newRange = NSRange(location: matchRange.location, length: placeholder.length)
-            nsAttributedString.removeAttribute(.link, range: newRange)
-
-            // Explicitly apply gray color to ensure it's not overridden
-            nsAttributedString.addAttribute(.foregroundColor, value: NSColor.secondaryLabelColor, range: newRange)
-
-            os_log("MarkdownRenderer: Replaced image marker with placeholder for %{public}s", log: .renderer, type: .info, filename)
-        }
-
-        os_log("MarkdownRenderer: Completed image placeholder replacement - replaced %d markers", log: .renderer, type: .info, matches.count)
-    }
-
-    private func createImagePlaceholder(filename: String) -> NSAttributedString {
-        let result = NSMutableAttributedString()
-
-        // Create SF Symbol attachment
-        let attachment = NSTextAttachment()
-        attachment.image = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image")
-        attachment.bounds = CGRect(x: 0, y: -4, width: 16, height: 16)
-
-        // Add the icon
-        result.append(NSAttributedString(attachment: attachment))
-
-        // Add the placeholder text
-        result.append(NSAttributedString(
-            string: " [Image: \(filename)]",
-            attributes: [
-                .foregroundColor: NSColor.secondaryLabelColor,
-                .font: NSFont.systemFont(ofSize: 14)
+            // Add placeholder text in gray
+            let textAttributes: [NSAttributedString.Key: Any] = [
+                .font: NSFont.systemFont(ofSize: bodyFontSize),
+                .foregroundColor: NSColor.secondaryLabelColor
             ]
-        ))
+            styledString.append(NSAttributedString(string: placeholderText, attributes: textAttributes))
 
-        return result
+            // Replace in the attributed string
+            nsAttributedString.replaceCharacters(in: match.range, with: styledString)
+        }
     }
 }
