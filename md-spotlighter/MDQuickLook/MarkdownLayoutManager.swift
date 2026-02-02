@@ -14,6 +14,34 @@ extension NSAttributedString.Key {
 /// Custom layout manager for drawing blockquote decorations
 class MarkdownLayoutManager: NSLayoutManager {
 
+    // MARK: - Helper Methods
+
+    /// Merges adjacent or overlapping ranges
+    /// - Parameter ranges: Array of NSRanges to merge
+    /// - Returns: Array of merged NSRanges
+    private func mergeAdjacentRanges(_ ranges: [NSRange]) -> [NSRange] {
+        guard !ranges.isEmpty else { return [] }
+
+        let sorted = ranges.sorted { $0.location < $1.location }
+        var merged: [NSRange] = [sorted[0]]
+
+        for range in sorted.dropFirst() {
+            let last = merged.last!
+            // If adjacent (within 2 characters for newlines) or overlapping
+            if range.location <= last.location + last.length + 2 {
+                // Extend the last range
+                let newLength = max(last.length, range.location + range.length - last.location)
+                merged[merged.count - 1] = NSRange(location: last.location, length: newLength)
+            } else {
+                merged.append(range)
+            }
+        }
+
+        return merged
+    }
+
+    // MARK: - Drawing
+
     override func drawBackground(forGlyphRange glyphsToShow: NSRange, at origin: CGPoint) {
         // Draw standard backgrounds first (code block backgrounds, etc.)
         super.drawBackground(forGlyphRange: glyphsToShow, at: origin)
@@ -26,11 +54,23 @@ class MarkdownLayoutManager: NSLayoutManager {
         // Find blockquote ranges and draw vertical bars
         let charRange = characterRange(forGlyphRange: glyphsToShow, actualGlyphRange: nil)
 
+        // Collect all blockquote ranges first
+        var allBlockquoteRanges: [NSRange] = []
         textStorage.enumerateAttribute(.blockquoteMarker,
                                       in: charRange,
                                       options: []) { value, range, _ in
             guard value != nil else { return }
+            allBlockquoteRanges.append(range)
+            os_log("MarkdownLayoutManager: Found blockquote range %d-%d",
+                   log: .layoutManager, type: .debug,
+                   range.location, range.location + range.length)
+        }
 
+        // Merge adjacent/overlapping blockquote ranges
+        let mergedRanges = mergeAdjacentRanges(allBlockquoteRanges)
+
+        // Draw for each merged range
+        for range in mergedRanges {
             let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
 
             // Track the union of all line rects to create continuous background
@@ -45,9 +85,18 @@ class MarkdownLayoutManager: NSLayoutManager {
                 }
             }
 
-            guard !unionRect.isNull else { return }
+            guard !unionRect.isNull else { continue }
 
-            // Draw continuous vertical bar
+            // Draw full-width background first (behind border)
+            let bgRect = NSRect(x: origin.x + 12,  // Start after border
+                               y: origin.y + unionRect.minY,
+                               width: textContainer.containerSize.width - 24,
+                               height: unionRect.height)
+
+            NSColor.quaternarySystemFill.setFill()
+            bgRect.fill()
+
+            // Draw continuous vertical bar on top
             let barWidth: CGFloat = 4
             let barX = origin.x + 4
             let barRect = NSRect(x: barX,
@@ -59,9 +108,9 @@ class MarkdownLayoutManager: NSLayoutManager {
             NSColor.systemBlue.withAlphaComponent(0.4).setFill()
             barRect.fill()
 
-            os_log("MarkdownLayoutManager: Drew blockquote border at y=%f height=%f",
+            os_log("MarkdownLayoutManager: Drew blockquote border at y=%f height=%f for merged range %d-%d",
                    log: .layoutManager, type: .debug,
-                   origin.y + unionRect.minY, unionRect.height)
+                   origin.y + unionRect.minY, unionRect.height, range.location, range.location + range.length)
         }
 
         // Find code block ranges and draw uniform backgrounds
