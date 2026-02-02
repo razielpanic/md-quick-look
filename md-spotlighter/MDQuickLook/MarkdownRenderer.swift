@@ -176,35 +176,45 @@ class MarkdownRenderer {
     private func ensureIntraBlockNewlines(in attributedString: AttributedString) -> AttributedString {
         var result = attributedString
         var insertionPositions: [AttributedString.Index] = []
+        var previousBlockquoteIdentity: Int?
 
         // Collect positions where newlines need to be inserted
         for run in attributedString.runs {
             guard let intent = run.presentationIntent else { continue }
 
-            // Check if this run contains a blockquote
+            // Check if this run contains a blockquote and extract its identity
             var isBlockquote = false
+            var currentBlockquoteIdentity: Int?
 
             for component in intent.components {
                 if case .blockQuote = component.kind {
                     isBlockquote = true
+                    currentBlockquoteIdentity = component.identity
                     break
                 }
             }
 
-            // For blockquotes, add newline if missing
-            // Each blockquote paragraph/line needs its own newline for proper separation
+            // For blockquotes, only add newline at paragraph boundaries (identity change)
+            // Skip for runs within the same blockquote paragraph
             if isBlockquote {
-                let runText = String(attributedString[run.range].characters)
-                if !runText.hasSuffix("\n") {
-                    insertionPositions.append(run.range.upperBound)
+                if previousBlockquoteIdentity != nil && previousBlockquoteIdentity != currentBlockquoteIdentity {
+                    let runText = String(attributedString[run.range].characters)
+                    if !runText.hasSuffix("\n") {
+                        insertionPositions.append(run.range.upperBound)
+                        os_log("MarkdownRenderer: Detected blockquote paragraph boundary (identity %d -> %d)",
+                               log: .renderer, type: .debug,
+                               previousBlockquoteIdentity ?? -1,
+                               currentBlockquoteIdentity ?? -1)
+                    }
                 }
+                previousBlockquoteIdentity = currentBlockquoteIdentity
             }
         }
 
         // Insert newlines in reverse order to maintain indices
         for insertPosition in insertionPositions.reversed() {
             result.insert(AttributedString("\n"), at: insertPosition)
-            os_log("MarkdownRenderer: Inserted intra-block newline", log: .renderer, type: .debug)
+            os_log("MarkdownRenderer: Inserted intra-block newline at paragraph boundary", log: .renderer, type: .debug)
         }
 
         return result
