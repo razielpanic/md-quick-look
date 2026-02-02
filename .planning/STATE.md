@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 9 of 9 in current phase (gap closure)
+Plan: 10 of 10 in current phase (gap closure)
 Status: Phase complete - all gap closure verified
-Progress: [██████░░░░] 69%
+Progress: [██████░░░░] 71%
 
-Last activity: 2026-02-01 — Completed 02-07 (verified image placeholder fix from 02-09)
+Last activity: 2026-02-01 — Completed 02-10 (Quick Look scrolling fix + image placeholder verification)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 5 min
-- Total execution time: 1.17 hours
+- Total plans completed: 12
+- Average duration: 4 min
+- Total execution time: 1.20 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 9/9 | 28 min | 3 min |
+| 2. Core Markdown Rendering | 10/10 | 30 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-06 (2min), 02-07 (7min), 02-08 (1min), 02-09 (1min)
+- Last 5 plans: 02-07 (7min), 02-08 (1min), 02-09 (1min), 02-10 (2min)
 - Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
@@ -45,6 +45,8 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Force layout before handler completion | Text may not be laid out before handler returns; ensureLayout establishes proper content size for scrolling | 02-10 | 2026-02-01 |
+| NSTextView vertical scrolling configuration pattern | isVerticallyResizable=true, heightTracksTextView=false, maxSize.height=greatestFiniteMagnitude enables infinite scroll height | 02-10 | 2026-02-01 |
 | Use __IMAGE_PLACEHOLDER__ marker instead of <<IMAGE:>> | AttributedString(markdown:) consumes angle brackets; underscore markers are safe from parser modification | 02-07 | 2026-02-01 |
 | Track block identity alongside kind | Different paragraphs have different identities even if same type; enables proper separation | 02-09 | 2026-02-01 |
 | Check existing newlines before insertion | Prevents double-spacing from unconditional newline additions | 02-09 | 2026-02-01 |
@@ -94,9 +96,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed 02-07 (verified image placeholder fix) - Phase 2 gap closure complete
+Stopped at: Completed 02-10 (Quick Look scrolling fix) - Phase 2 gap closure complete
 Resume file: None
-Next: Plan Phase 3 (Tables & Advanced Elements) or run UAT re-test to verify all gap closures
+Next: Run UAT round 5 to verify Gap #19 (scrolling) and Gap #14 (image placeholders) fixes, then plan Phase 3 (Tables & Advanced Elements)
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
