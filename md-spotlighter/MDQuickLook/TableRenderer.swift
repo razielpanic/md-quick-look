@@ -36,8 +36,12 @@ class TableRenderer {
         nsTable.collapsesBorders = true
         nsTable.hidesEmptyCells = false
 
-        // Let table size to content naturally (no fixed width constraint)
-        // NSTextTable will fit content width automatically
+        // Calculate content-aware column widths
+        let columnWidths = calculateColumnWidths(
+            headerCells: table.headerCells,
+            bodyRows: table.bodyRows,
+            columnCount: columnCount
+        )
 
         os_log("TableRenderer: Rendering table with %d columns", log: .tableRenderer, type: .debug, columnCount)
 
@@ -50,7 +54,8 @@ class TableRenderer {
                 column: colIndex,
                 content: headerContent,
                 isHeader: true,
-                alignment: alignment
+                alignment: alignment,
+                columnWidth: columnWidths[safe: colIndex] ?? 100.0
             )
             result.append(cellString)
         }
@@ -65,7 +70,8 @@ class TableRenderer {
                     column: colIndex,
                     content: cellContent,
                     isHeader: false,
-                    alignment: alignment
+                    alignment: alignment,
+                    columnWidth: columnWidths[safe: colIndex] ?? 100.0
                 )
                 result.append(cellString)
             }
@@ -79,13 +85,64 @@ class TableRenderer {
 
     // MARK: - Private Helpers
 
+    /// Calculates content-aware column widths based on cell content
+    /// - Parameters:
+    ///   - headerCells: Header row cells
+    ///   - bodyRows: Body row cells
+    ///   - columnCount: Total number of columns
+    /// - Returns: Array of column widths in points
+    private func calculateColumnWidths(
+        headerCells: [String],
+        bodyRows: [[String]],
+        columnCount: Int
+    ) -> [CGFloat] {
+        // Constants for width calculation
+        let characterWidth: CGFloat = 8.0  // Approximate width per character for system font
+        let cellPadding: CGFloat = 12.0     // 6pt on each side
+        let minColumnWidth: CGFloat = 60.0  // Minimum width for very short content
+        let maxColumnWidth: CGFloat = 300.0 // Maximum width to prevent extreme cases
+
+        var columnWidths: [CGFloat] = Array(repeating: minColumnWidth, count: columnCount)
+
+        // For each column, find the maximum content length
+        for columnIndex in 0..<columnCount {
+            var maxLength = 0
+
+            // Check header cell
+            if columnIndex < headerCells.count {
+                maxLength = max(maxLength, headerCells[columnIndex].count)
+            }
+
+            // Check all body row cells
+            for row in bodyRows {
+                if columnIndex < row.count {
+                    maxLength = max(maxLength, row[columnIndex].count)
+                }
+            }
+
+            // Calculate estimated width: length * characterWidth + padding
+            let estimatedWidth = CGFloat(maxLength) * characterWidth + cellPadding
+
+            // Apply min/max constraints
+            let finalWidth = min(max(estimatedWidth, minColumnWidth), maxColumnWidth)
+            columnWidths[columnIndex] = finalWidth
+
+            os_log("TableRenderer: Column %d maxLength=%d estimatedWidth=%.1f finalWidth=%.1f",
+                   log: .tableRenderer, type: .debug,
+                   columnIndex, maxLength, estimatedWidth, finalWidth)
+        }
+
+        return columnWidths
+    }
+
     private func renderCell(
         table: NSTextTable,
         row: Int,
         column: Int,
         content: String,
         isHeader: Bool,
-        alignment: Table.ColumnAlignment?
+        alignment: Table.ColumnAlignment?,
+        columnWidth: CGFloat
     ) -> NSAttributedString {
         // Create NSTextTableBlock for this cell
         let block = NSTextTableBlock(
@@ -95,6 +152,11 @@ class TableRenderer {
             startingColumn: column,
             columnSpan: 1
         )
+
+        // Set explicit column width to prevent cells from expanding to container width
+        // Note: We set width for the block's outer edge (.border) which controls the cell's overall width
+        block.setWidth(columnWidth, type: .absoluteValueType, for: .border)
+        os_log("TableRenderer: Set cell [%d,%d] width to %.1f pt", log: .tableRenderer, type: .debug, row, column, columnWidth)
 
         // Configure padding: 6pt on all edges for balanced density/readability
         for edge: NSRectEdge in [.minX, .minY, .maxX, .maxY] {
