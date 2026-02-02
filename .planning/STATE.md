@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 20 of 20 in current phase (gap closure)
+Plan: 21 of 21 in current phase (gap closure)
 Status: Phase 2 COMPLETE - All gaps closed
-Progress: [████████░░] 87%
+Progress: [████████░░] 88%
 
-Last activity: 2026-02-01 — Completed 02-20 (blockquote spacing fix - Gap #28 closed)
+Last activity: 2026-02-02 — Completed 02-21 (duplicate list prefix fix - Gap #29 closed)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 4 min
-- Total execution time: 1.43 hours
+- Total execution time: 1.44 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 18/18 | 55 min | 3 min |
+| 2. Core Markdown Rendering | 19/19 | 56 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-16 (1min), 02-17 (3min), 02-18 (1min), 02-19 (1min), 02-20 (1min)
+- Last 5 plans: 02-17 (3min), 02-18 (1min), 02-19 (1min), 02-20 (1min), 02-21 (1min)
 - Trend: Phase 2 complete with consistent 1-3 min execution - strong foundation + clear patterns enable rapid gap closure
 
 *Updated after each plan completion*
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Apply ordinal tracking pattern to insertListPrefixes | All runs of the same list item have the same ordinal; only the first run (when ordinal changes) should get a prefix to prevent duplicates for items with inline formatting | 02-21 | 2026-02-02 |
 | Track blockquote identity in ensureIntraBlockNewlines | Same identity tracking pattern as list ordinal tracking; only insert newline when blockquote identity changes (paragraph boundary), skip for runs within same paragraph | 02-20 | 2026-02-01 |
 | Remove list item handling from ensureIntraBlockNewlines | Both insertBlockBoundaryNewlines and ensureIntraBlockNewlines were adding newlines at list item boundaries causing double newlines; simplified to single responsibility pattern | 02-19 | 2026-02-02 |
 | Apply ordinal tracking pattern to ensureIntraBlockNewlines | Same ordinal tracking pattern from insertBlockBoundaryNewlines prevents inline formatting splits by only adding newlines when next run has different ordinal | 02-18 | 2026-02-01 |
@@ -107,8 +108,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-01
-Stopped at: Completed 02-20 (blockquote spacing fix - Gap #28 closed)
+Last session: 2026-02-02
+Stopped at: Completed 02-21 (duplicate list prefix fix - Gap #29 closed)
 Resume file: None
 Next: Phase 2 COMPLETE - All gaps closed - Ready for Phase 3 planning
 
