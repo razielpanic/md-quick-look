@@ -208,30 +208,14 @@ class MarkdownRenderer {
                 }
             }
 
-            // For blockquotes, only add newline if NOT followed by another blockquote
-            // (let block boundary logic handle blockquote separation)
+            // For blockquotes, add newline if missing (same as list items)
+            // Each blockquote paragraph/line needs its own newline for proper separation
+            // The block boundary logic will prevent double-newlines between different blocks
             if isBlockquote {
-                // Check if next run is also a blockquote
-                let isLastBlockquoteRun: Bool
-                if index + 1 < allRuns.count {
-                    let nextRun = allRuns[index + 1]
-                    if let nextIntent = nextRun.presentationIntent {
-                        let nextIsBlockquote = nextIntent.components.contains { $0.kind == .blockQuote }
-                        isLastBlockquoteRun = !nextIsBlockquote
-                    } else {
-                        isLastBlockquoteRun = true
-                    }
-                } else {
-                    isLastBlockquoteRun = true
-                }
-
-                // Only add newline if this is the last blockquote run
-                if isLastBlockquoteRun {
-                    let runText = String(attributedString[run.range].characters)
-                    if !runText.hasSuffix("\n") {
-                        let runEndIndex = run.range.upperBound
-                        insertionPositions.append(runEndIndex)
-                    }
+                let runText = String(attributedString[run.range].characters)
+                if !runText.hasSuffix("\n") {
+                    let runEndIndex = run.range.upperBound
+                    insertionPositions.append(runEndIndex)
                 }
             }
         }
