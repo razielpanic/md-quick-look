@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 10 of 10 in current phase (gap closure)
+Plan: 11 of 11 in current phase (gap closure)
 Status: Phase complete - all gap closure verified
-Progress: [██████░░░░] 71%
+Progress: [██████░░░░] 73%
 
-Last activity: 2026-02-01 — Completed 02-10 (Quick Look scrolling fix + image placeholder verification)
+Last activity: 2026-02-01 — Completed 02-11 (blockquote continuous border and background fix)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 4 min
-- Total execution time: 1.20 hours
+- Total execution time: 1.23 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 10/10 | 30 min | 3 min |
+| 2. Core Markdown Rendering | 11/11 | 32 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-07 (7min), 02-08 (1min), 02-09 (1min), 02-10 (2min)
+- Last 5 plans: 02-08 (1min), 02-09 (1min), 02-10 (2min), 02-11 (2min)
 - Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
@@ -45,6 +45,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Merge blockquote ranges before drawing | Multi-paragraph blockquotes have separate attribute ranges; merging adjacent ranges creates continuous border without gaps | 02-11 | 2026-02-01 |
+| Draw blockquote background in LayoutManager | Inline backgroundColor only draws behind text; LayoutManager draws full-width block background for uniform appearance | 02-11 | 2026-02-01 |
+| Peek next run for blockquote continuation | Prevents double-newlines between blockquote paragraphs by checking if next run is also blockquote | 02-11 | 2026-02-01 |
 | Force layout before handler completion | Text may not be laid out before handler returns; ensureLayout establishes proper content size for scrolling | 02-10 | 2026-02-01 |
 | NSTextView vertical scrolling configuration pattern | isVerticallyResizable=true, heightTracksTextView=false, maxSize.height=greatestFiniteMagnitude enables infinite scroll height | 02-10 | 2026-02-01 |
 | Use __IMAGE_PLACEHOLDER__ marker instead of <<IMAGE:>> | AttributedString(markdown:) consumes angle brackets; underscore markers are safe from parser modification | 02-07 | 2026-02-01 |
@@ -96,9 +99,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-01
-Stopped at: Completed 02-10 (Quick Look scrolling fix) - Phase 2 gap closure complete
+Stopped at: Completed 02-11 (blockquote continuous border and background fix) - Phase 2 gap closure complete
 Resume file: None
-Next: Run UAT round 5 to verify Gap #19 (scrolling) and Gap #14 (image placeholders) fixes, then plan Phase 3 (Tables & Advanced Elements)
+Next: Run full UAT to verify all gap closures (including Gap #16 blockquote rendering), then plan Phase 3 (Tables & Advanced Elements)
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
