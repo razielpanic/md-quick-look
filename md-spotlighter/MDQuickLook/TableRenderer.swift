@@ -30,17 +30,21 @@ class TableRenderer {
             return result
         }
 
+        // Measure actual column widths based on content
+        let columnWidths = measureColumnWidths(for: table, columnCount: columnCount)
+
         // Create NSTextTable with content-based sizing
         let nsTable = NSTextTable()
         nsTable.numberOfColumns = columnCount
         nsTable.collapsesBorders = true
         nsTable.hidesEmptyCells = false
-        nsTable.layoutAlgorithm = .automaticLayoutAlgorithm
+        nsTable.layoutAlgorithm = .fixedLayoutAlgorithm
 
-        // No explicit table width - let table size naturally based on content
-        // Small tables stay compact, wide tables expand as needed
+        // Set total table width based on measured column widths
+        let totalWidth = columnWidths.reduce(0, +)
+        nsTable.setContentWidth(totalWidth, type: .absoluteValueType)
 
-        os_log("TableRenderer: Rendering table with %d columns (content-based sizing)", log: .tableRenderer, type: .debug, columnCount)
+        os_log("TableRenderer: Rendering table with %d columns (measured widths: %@, total: %.1fpt)", log: .tableRenderer, type: .debug, columnCount, columnWidths.map { String(format: "%.1f", $0) }.joined(separator: ", "), totalWidth)
 
         // Render header row (row 0)
         for (colIndex, headerContent) in table.headerCells.enumerated() {
@@ -51,7 +55,8 @@ class TableRenderer {
                 column: colIndex,
                 content: headerContent,
                 isHeader: true,
-                alignment: alignment
+                alignment: alignment,
+                columnWidths: columnWidths
             )
             result.append(cellString)
         }
@@ -66,7 +71,8 @@ class TableRenderer {
                     column: colIndex,
                     content: cellContent,
                     isHeader: false,
-                    alignment: alignment
+                    alignment: alignment,
+                    columnWidths: columnWidths
                 )
                 result.append(cellString)
             }
@@ -80,13 +86,70 @@ class TableRenderer {
 
     // MARK: - Private Helpers
 
+    /// Measures actual rendered text widths for each column
+    /// - Parameters:
+    ///   - table: The extracted table data
+    ///   - columnCount: Number of columns in the table
+    /// - Returns: Array of column widths in points
+    private func measureColumnWidths(for table: ExtractedTable, columnCount: Int) -> [CGFloat] {
+        var columnWidths = [CGFloat](repeating: 0, count: columnCount)
+
+        let headerAttrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.boldSystemFont(ofSize: bodyFontSize)
+        ]
+        let bodyAttrs: [NSAttributedString.Key: Any] = [
+            .font: NSFont.systemFont(ofSize: bodyFontSize)
+        ]
+
+        // Measure header cells
+        for (colIndex, headerContent) in table.headerCells.enumerated() {
+            let text = headerContent.isEmpty ? "\u{00B7}" : headerContent
+            let size = (text as NSString).size(withAttributes: headerAttrs)
+            columnWidths[colIndex] = max(columnWidths[colIndex], size.width)
+        }
+
+        // Measure body cells
+        for rowCells in table.bodyRows {
+            for (colIndex, cellContent) in rowCells.enumerated() {
+                guard colIndex < columnCount else { continue }
+                let text = cellContent.isEmpty ? "\u{00B7}" : cellContent
+                let size = (text as NSString).size(withAttributes: bodyAttrs)
+                columnWidths[colIndex] = max(columnWidths[colIndex], size.width)
+            }
+        }
+
+        // Add padding (6pt each side = 12pt total) plus breathing room (20pt)
+        // Apply min/max constraints
+        let minColumnWidth: CGFloat = 60.0
+        let maxColumnWidth: CGFloat = 300.0
+
+        for i in 0..<columnCount {
+            columnWidths[i] += 12.0 + 20.0  // padding + breathing room
+            columnWidths[i] = min(max(columnWidths[i], minColumnWidth), maxColumnWidth)
+        }
+
+        // Cap total table width
+        let maxTableWidth: CGFloat = 800.0
+        let totalWidth = columnWidths.reduce(0, +)
+        if totalWidth > maxTableWidth {
+            // Scale all columns proportionally to fit
+            let scale = maxTableWidth / totalWidth
+            for i in 0..<columnCount {
+                columnWidths[i] *= scale
+            }
+        }
+
+        return columnWidths
+    }
+
     private func renderCell(
         table: NSTextTable,
         row: Int,
         column: Int,
         content: String,
         isHeader: Bool,
-        alignment: Table.ColumnAlignment?
+        alignment: Table.ColumnAlignment?,
+        columnWidths: [CGFloat]
     ) -> NSAttributedString {
         // Create NSTextTableBlock for this cell
         let block = NSTextTableBlock(
@@ -97,7 +160,9 @@ class TableRenderer {
             columnSpan: 1
         )
 
-        // No explicit column width - let NSTextTable distribute columns naturally within the 75% table width
+        // Set explicit column width based on measurements
+        let columnWidth = columnWidths[safe: column] ?? 100.0
+        block.setContentWidth(columnWidth, type: .absoluteValueType)
 
         // Configure padding: 6pt on all edges for balanced density/readability
         for edge: NSRectEdge in [.minX, .minY, .maxX, .maxY] {
@@ -124,9 +189,9 @@ class TableRenderer {
             paragraphStyle.alignment = .right
         }
 
-        // Allow content to wrap naturally instead of truncating
-        // This lets cells expand to fit content while maintaining readability
-        paragraphStyle.lineBreakMode = .byWordWrapping
+        // Use truncation with ellipsis for long content
+        // Content-based column widths prevent huge tables while ellipsis handles overflow
+        paragraphStyle.lineBreakMode = .byTruncatingTail
 
         // Handle empty cells: show middot indicator with subtle color, no background
         let displayText: String
