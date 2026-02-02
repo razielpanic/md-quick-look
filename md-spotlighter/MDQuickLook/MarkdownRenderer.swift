@@ -234,6 +234,7 @@ class MarkdownRenderer {
         }
 
         var listItems: [ListItemInfo] = []
+        var lastProcessedOrdinal: Int?
 
         // Scan for list items
         for run in attributedString.runs {
@@ -258,22 +259,28 @@ class MarkdownRenderer {
             }
 
             // If we found a list item, determine the prefix
+            // Only insert prefix for FIRST run of each list item
+            // Subsequent runs with same ordinal are inline formatting within the item
             if let ordinal = ordinal {
-                let nsRange = NSRange(run.range, in: attributedString)
-                let prefix: String
+                if ordinal != lastProcessedOrdinal {
+                    let nsRange = NSRange(run.range, in: attributedString)
+                    let prefix: String
 
-                if isOrderedList {
-                    prefix = "\(ordinal). "
-                } else if isUnorderedList {
-                    prefix = "• "
-                } else {
-                    // Fallback to bullet for ambiguous cases
-                    prefix = "• "
+                    if isOrderedList {
+                        prefix = "\(ordinal). "
+                    } else if isUnorderedList {
+                        prefix = "• "
+                    } else {
+                        // Fallback to bullet for ambiguous cases
+                        prefix = "• "
+                    }
+
+                    listItems.append(ListItemInfo(range: nsRange, prefix: prefix))
+                    lastProcessedOrdinal = ordinal
+
+                    os_log("MarkdownRenderer: Found list item (ordinal: %d, ordered: %d, prefix: %{public}s)",
+                           log: .renderer, type: .debug, ordinal, isOrderedList ? 1 : 0, prefix)
                 }
-
-                listItems.append(ListItemInfo(range: nsRange, prefix: prefix))
-                os_log("MarkdownRenderer: Found list item (ordinal: %d, ordered: %d, prefix: %{public}s)",
-                       log: .renderer, type: .debug, ordinal, isOrderedList ? 1 : 0, prefix)
             }
         }
 
