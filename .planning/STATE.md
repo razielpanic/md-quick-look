@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 2 of 4 (Core Markdown Rendering)
-Plan: 15 of 15 in current phase (gap closure)
-Status: Gap closure in progress - Gap #20 fixed, Gaps #21, #22, #23 remain
-Progress: [██████░░░░] 77%
+Plan: 16 of 16 in current phase (gap closure)
+Status: Gap closure in progress - Gaps #20, #25 fixed, Gaps #21, #22 remain
+Progress: [██████░░░░] 78%
 
-Last activity: 2026-02-02 — Completed 02-15 (blockquote newline fix)
+Last activity: 2026-02-01 — Completed 02-16 (image placeholder markers fix)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 3 min
-- Total execution time: 1.29 hours
+- Total execution time: 1.31 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
-| 2. Core Markdown Rendering | 14/14 | 36 min | 3 min |
+| 2. Core Markdown Rendering | 15/15 | 38 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-11 (2min), 02-12 (2min), 02-14 (1min), 02-15 (1min)
+- Last 5 plans: 02-12 (2min), 02-14 (1min), 02-15 (1min), 02-16 (2min)
 - Trend: Phase 2 consistently fast - solid foundation enables rapid iteration
 
 *Updated after each plan completion*
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Use IMAGEPLACEHOLDERSTART...END alphanumeric markers | AttributedString interprets brackets, underscores, and other special chars; alphanumeric-only markers survive parsing unchanged | 02-16 | 2026-02-01 |
 | Remove blockquote continuation peek-ahead logic | Peek-ahead prevented newlines within multi-paragraph blockquotes; simplified to always add newline at run end, trust block boundary detection for double-newline prevention | 02-15 | 2026-02-02 |
 | Apply list paragraph style to prefix text during insertion | When prefixes inserted without paragraph style, applyBaseStyles applies default spacing (8pt), causing gaps; applying style during insertion prevents override | 02-14 | 2026-02-01 |
 | Track list item ordinal to prevent inline formatting splits | Inline formatting creates multiple runs with same list item; comparing ordinal prevents newlines between runs | 02-12 | 2026-02-01 |
@@ -102,10 +103,10 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-02
-Stopped at: Completed 02-15 (blockquote newline fix)
+Last session: 2026-02-01
+Stopped at: Completed 02-16 (image placeholder markers fix)
 Resume file: None
-Next: Run UAT round 6 to verify blockquote fix (Gap #20), then address remaining gaps #21, #22, #23
+Next: Run UAT to verify image placeholder fix (Gap #25), blockquote fix (Gap #20), then address remaining list gaps #21, #22
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
