@@ -92,6 +92,7 @@ class MarkdownRenderer {
         var insertionOffsets: [AttributedString.Index] = []
         var previousBlockComponent: PresentationIntent.Kind?
         var previousBlockIdentity: Int?
+        var previousListItemOrdinal: Int?
         var previousRunEndedWithNewline = false
         var isFirstRun = true
 
@@ -108,6 +109,7 @@ class MarkdownRenderer {
                 }
                 previousBlockComponent = .paragraph
                 previousBlockIdentity = nil
+                previousListItemOrdinal = nil
                 previousRunEndedWithNewline = runEndsWithNewline
                 isFirstRun = false
                 continue
@@ -117,22 +119,44 @@ class MarkdownRenderer {
             let currentBlockComponent = intent.components.first?.kind
             let currentBlockIdentity = intent.components.first?.identity
 
+            // Check if this run is part of a list item and get its ordinal
+            var currentListItemOrdinal: Int?
+            for component in intent.components {
+                if case .listItem(ordinal: let ordinal) = component.kind {
+                    currentListItemOrdinal = ordinal
+                    break
+                }
+            }
+
             // Check if we're transitioning to a new block
             // Insert newline if:
             // 1. Block component type changed, OR
             // 2. Block identity changed (different paragraph/block instance), OR
-            // 3. Transitioning from intent to no-intent or vice versa
+            // 3. List item ordinal changed (different list item)
+            // BUT NOT if we're just moving between runs in the same list item (inline formatting)
             if !isFirstRun && !previousRunEndedWithNewline {
                 let differentComponent = currentBlockComponent != previousBlockComponent
                 let differentIdentity = currentBlockIdentity != previousBlockIdentity
+                let differentListItem = currentListItemOrdinal != previousListItemOrdinal
 
-                if differentComponent || differentIdentity {
-                    insertionOffsets.append(run.range.lowerBound)
+                // Only insert newline if it's truly a different block
+                // If both runs have the same list item ordinal, they're part of the same item
+                if currentListItemOrdinal != nil && previousListItemOrdinal != nil {
+                    // Both are list items - only insert if different ordinal
+                    if differentListItem {
+                        insertionOffsets.append(run.range.lowerBound)
+                    }
+                } else {
+                    // At least one is not a list item - use regular block boundary logic
+                    if differentComponent || differentIdentity {
+                        insertionOffsets.append(run.range.lowerBound)
+                    }
                 }
             }
 
             previousBlockComponent = currentBlockComponent
             previousBlockIdentity = currentBlockIdentity
+            previousListItemOrdinal = currentListItemOrdinal
             previousRunEndedWithNewline = runEndsWithNewline
             isFirstRun = false
         }
