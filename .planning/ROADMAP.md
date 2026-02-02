@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Extension Foundation** - Quick Look extension loads markdown files on macOS 26+
 - [x] **Phase 2: Core Markdown Rendering** - Render essential markdown elements (headings, formatting, lists, code, blockquotes, links, images)
 - [x] **Phase 3: Tables & Advanced Elements** - Render GitHub-flavored markdown tables
-- [ ] **Phase 4: Performance & Polish** - Instant rendering and system appearance support
+- [x] **Phase 4: Performance & Polish** - Instant rendering and system appearance support
 
 ## Phase Details
 
