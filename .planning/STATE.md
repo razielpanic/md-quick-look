@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-31)
 ## Current Position
 
 Phase: 4 of 4 (Performance & Polish)
-Plan: 1 of 2 in current phase
-Status: In progress - file size truncation complete
-Progress: [████████░░] 80%
+Plan: 2 of 2 in current phase
+Status: Phase complete - all performance and polish improvements implemented
+Progress: [██████████] 100%
 
-Last activity: 2026-02-02 — Completed 04-01-PLAN.md (file size truncation)
+Last activity: 2026-02-02 — Completed 04-02-PLAN.md (dark mode appearance integration)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25
-- Average duration: 5.3 min
-- Total execution time: 2.5 hours
+- Total plans completed: 26
+- Average duration: 5.1 min
+- Total execution time: 2.6 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Last activity: 2026-02-02 — Completed 04-01-PLAN.md (file size truncation)
 | 1. Extension Foundation | 2/2 | 48 min | 24 min |
 | 2. Core Markdown Rendering | 22/22 | 60 min | 2.7 min |
 | 3. Tables & Advanced Elements | 2/2 | 61 min | 30.5 min |
-| 4. Performance & Polish | 1/2 | 1 min | 1 min |
+| 4. Performance & Polish | 2/2 | 2 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-21 (1min), 02-22 (2min), 03-01 (1min), 03-02 (60min), 04-01 (1min)
-- Trend: Performance optimizations straightforward with existing architecture
+- Last 5 plans: 02-22 (2min), 03-01 (1min), 03-02 (60min), 04-01 (1min), 04-02 (<1min)
+- Trend: Performance optimizations very fast with existing architecture
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 
 | Decision | Rationale | Phase | Date |
 |----------|-----------|-------|------|
+| Use NSColor.secondarySystemFill for inline code backgrounds | Matches code block background for consistent styling across inline and block code; adapts to system appearance | 04-02 | 2026-02-02 |
+| Use NSColor.separatorColor for blockquote borders | Subtle separator color that adapts to system appearance automatically; replaces fixed-color border | 04-02 | 2026-02-02 |
+| Use NSColor.labelColor for all primary text | Replaces hard-coded .black with system-adaptive color that works in both light and dark mode | 04-02 | 2026-02-02 |
 | 500KB truncation threshold for large files | Supports large documentation files while guaranteeing <1s render time; typical markdown is 10-50KB so 500KB covers most real-world docs | 04-01 | 2026-02-02 |
 | Use FileHandle for partial file reading | Efficient - reads only needed bytes without loading entire file into memory; critical for multi-megabyte files | 04-01 | 2026-02-02 |
 | Truncation message at end with markdown separator | User sees available content first, then clear notice; separator (---) renders as horizontal rule for visual distinction | 04-01 | 2026-02-02 |
@@ -125,9 +128,9 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 04-01-PLAN.md
+Stopped at: Completed 04-02-PLAN.md (Phase 4 complete)
 Resume file: None
-Next: 04-02-PLAN.md (Dark mode appearance integration)
+Next: All phases complete - project ready for production
 
 **Quick fixes applied:**
 - 001: Fixed block boundary newline rendering (3min) - Blocks now properly separated in preview
