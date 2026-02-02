@@ -9,17 +9,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Markdown Rendering
 
-- [ ] **MDRNDR-01**: Render headings with visual hierarchy (h1-h6)
-- [ ] **MDRNDR-02**: Render bold text
-- [ ] **MDRNDR-03**: Render italic text
-- [ ] **MDRNDR-04**: Render strikethrough text
-- [ ] **MDRNDR-05**: Render unordered lists
-- [ ] **MDRNDR-06**: Render ordered lists
-- [ ] **MDRNDR-07**: Render code blocks with monospaced font
-- [ ] **MDRNDR-08**: Render blockquotes
+- [x] **MDRNDR-01**: Render headings with visual hierarchy (h1-h6)
+- [x] **MDRNDR-02**: Render bold text
+- [x] **MDRNDR-03**: Render italic text
+- [x] **MDRNDR-04**: Render strikethrough text
+- [x] **MDRNDR-05**: Render unordered lists
+- [x] **MDRNDR-06**: Render ordered lists
+- [x] **MDRNDR-07**: Render code blocks with monospaced font
+- [x] **MDRNDR-08**: Render blockquotes
 - [ ] **MDRNDR-09**: Render tables (GFM)
-- [ ] **MDRNDR-10**: Render links as text (no clicking)
-- [ ] **MDRNDR-11**: Display images as placeholders `[Image: filename]`
+- [x] **MDRNDR-10**: Render links as text (no clicking)
+- [x] **MDRNDR-11**: Display images as placeholders `[Image: filename]`
 
 ### System Integration
 
