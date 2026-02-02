@@ -101,46 +101,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAMING-01 | TBD | Pending |
-| NAMING-02 | TBD | Pending |
-| NAMING-03 | TBD | Pending |
-| NAMING-04 | TBD | Pending |
-| ICON-01 | TBD | Pending |
-| ICON-02 | TBD | Pending |
-| ICON-03 | TBD | Pending |
-| ICON-04 | TBD | Pending |
-| UI-01 | TBD | Pending |
-| UI-02 | TBD | Pending |
-| UI-03 | TBD | Pending |
-| UI-04 | TBD | Pending |
-| UI-05 | TBD | Pending |
-| UI-06 | TBD | Pending |
-| UI-07 | TBD | Pending |
-| SIGN-01 | TBD | Pending |
-| SIGN-02 | TBD | Pending |
-| SIGN-03 | TBD | Pending |
-| SIGN-04 | TBD | Pending |
-| SIGN-05 | TBD | Pending |
-| SIGN-06 | TBD | Pending |
-| DIST-01 | TBD | Pending |
-| DIST-02 | TBD | Pending |
-| DIST-03 | TBD | Pending |
-| DIST-04 | TBD | Pending |
-| DIST-05 | TBD | Pending |
-| DIST-06 | TBD | Pending |
-| DOCS-01 | TBD | Pending |
-| DOCS-02 | TBD | Pending |
-| DOCS-03 | TBD | Pending |
-| DOCS-04 | TBD | Pending |
-| DOCS-05 | TBD | Pending |
-| DOCS-06 | TBD | Pending |
-| DOCS-07 | TBD | Pending |
+| NAMING-01 | Phase 6 | Pending |
+| NAMING-02 | Phase 6 | Pending |
+| NAMING-03 | Phase 6 | Pending |
+| NAMING-04 | Phase 6 | Pending |
+| ICON-01 | Phase 7 | Pending |
+| ICON-02 | Phase 7 | Pending |
+| ICON-03 | Phase 7 | Pending |
+| ICON-04 | Phase 7 | Pending |
+| UI-01 | Phase 8 | Pending |
+| UI-02 | Phase 8 | Pending |
+| UI-03 | Phase 8 | Pending |
+| UI-04 | Phase 8 | Pending |
+| UI-05 | Phase 8 | Pending |
+| UI-06 | Phase 8 | Pending |
+| UI-07 | Phase 8 | Pending |
+| SIGN-01 | Phase 9 | Pending |
+| SIGN-02 | Phase 9 | Pending |
+| SIGN-03 | Phase 9 | Pending |
+| SIGN-04 | Phase 9 | Pending |
+| SIGN-05 | Phase 9 | Pending |
+| SIGN-06 | Phase 9 | Pending |
+| DIST-01 | Phase 10 | Pending |
+| DIST-02 | Phase 10 | Pending |
+| DIST-03 | Phase 10 | Pending |
+| DIST-04 | Phase 10 | Pending |
+| DIST-05 | Phase 10 | Pending |
+| DIST-06 | Phase 10 | Pending |
+| DOCS-01 | Phase 11 | Pending |
+| DOCS-02 | Phase 11 | Pending |
+| DOCS-03 | Phase 11 | Pending |
+| DOCS-04 | Phase 11 | Pending |
+| DOCS-05 | Phase 11 | Pending |
+| DOCS-06 | Phase 11 | Pending |
+| DOCS-07 | Phase 11 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 33 total
-- Mapped to phases: 0 (awaiting roadmap creation)
-- Unmapped: 33
+- v1.1 requirements: 34 total
+- Mapped to phases: 34 (100% coverage)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after v1.1 milestone start*
+*Last updated: 2026-02-02 after roadmap creation*
