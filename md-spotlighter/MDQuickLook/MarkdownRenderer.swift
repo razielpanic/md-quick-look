@@ -523,7 +523,7 @@ class MarkdownRenderer {
                 string: item.prefix,
                 attributes: [
                     .font: NSFont.systemFont(ofSize: bodyFontSize),
-                    .foregroundColor: NSColor.textColor,
+                    .foregroundColor: NSColor.labelColor,
                     .paragraphStyle: listParagraphStyle  // Apply list paragraph style to prevent gaps
                 ]
             )
@@ -539,7 +539,7 @@ class MarkdownRenderer {
         let fullRange = NSRange(location: 0, length: nsAttributedString.length)
 
         // Set base text color
-        nsAttributedString.addAttribute(.foregroundColor, value: NSColor.textColor, range: fullRange)
+        nsAttributedString.addAttribute(.foregroundColor, value: NSColor.labelColor, range: fullRange)
 
         // Create default paragraph style with spacing
         let defaultParagraphStyle = NSMutableParagraphStyle()
@@ -659,8 +659,8 @@ class MarkdownRenderer {
         let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
         nsAttributedString.addAttribute(.font, value: font, range: range)
 
-        // Apply lighter background than code blocks
-        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.quaternarySystemFill, range: range)
+        // Apply same background as code blocks for consistent styling
+        nsAttributedString.addAttribute(.backgroundColor, value: NSColor.secondarySystemFill, range: range)
     }
 
     private func applyListItemAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange, ordinal: Int) {
@@ -754,7 +754,7 @@ class MarkdownRenderer {
             guard value != nil else { return }
 
             // Style as blue and underlined, but don't make clickable
-            nsAttributedString.addAttribute(.foregroundColor, value: NSColor.systemBlue, range: range)
+            nsAttributedString.addAttribute(.foregroundColor, value: NSColor.linkColor, range: range)
             nsAttributedString.addAttribute(.underlineStyle, value: NSUnderlineStyle.single.rawValue, range: range)
 
             os_log("MarkdownRenderer: Applied link style", log: .renderer, type: .debug)
