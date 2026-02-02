@@ -1,20 +1,20 @@
-# Project State: md-spotlighter
+# Project State: MD Quick Look
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.0 shipped - ready to plan next milestone
+**Current focus:** v1.1 Public Release - preparing for GitHub launch
 
 ## Current Position
 
-Phase: v1.0 complete (5 phases, 30 plans shipped)
-Plan: All complete
-Status: ✅ Milestone v1.0 shipped
-Progress: [██████████] 100% (v1.0)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining v1.1 requirements
+Progress: [░░░░░░░░░░] 0% (v1.1)
 
-Last activity: 2026-02-02 — v1.0 milestone archived
+Last activity: 2026-02-02 — Milestone v1.1 started
 
 ## v1.0 Performance Metrics
 
@@ -46,15 +46,6 @@ v1.0 milestone archived to:
 - `.planning/milestones/v1.0-MILESTONE-AUDIT.md`
 
 See `.planning/MILESTONES.md` for milestone summary.
-
-## Next Steps
-
-**Ready for next milestone planning:**
-
-1. `/gsd:new-milestone` — Start v2.0 milestone (questioning → research → requirements → roadmap)
-2. Fresh REQUIREMENTS.md and ROADMAP.md will be created for next milestone
-
-**Note:** Use `/clear` first for fresh context window
 
 ---
 

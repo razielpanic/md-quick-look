@@ -1,4 +1,4 @@
-# md-spotlighter
+# MD Quick Look
 
 ## What This Is
 
@@ -7,6 +7,16 @@ A Quick Look extension for macOS that renders markdown files as styled previews 
 ## Core Value
 
 Instant, effortless context about markdown file content without leaving Finder or opening an editor.
+
+## Current Milestone: v1.1 - Public Release (GitHub)
+
+**Goal:** Prepare MD Quick Look for public release on GitHub with polished app experience and clear documentation for end users.
+
+**Target outcomes:**
+- Clean, consistent naming throughout (no "spotlighter" references)
+- Professional app experience when launched (about window, preferences, status, icon)
+- Clear GitHub presence with screenshots and installation instructions
+- Ready for end users to discover, download, and use
 
 ## Current State
 
@@ -20,8 +30,6 @@ Instant, effortless context about markdown file content without leaving Finder o
 - macOS 26+ (Tahoe) support
 
 **Codebase:** 14,482 lines of Swift
-
-**Next milestone:** Planning v2.0 features (syntax highlighting, actual image rendering, YAML front matter, task lists)
 
 ## Requirements
 
@@ -47,8 +55,20 @@ All v1.0 requirements shipped and validated:
 
 ### Active
 
-Next milestone features (v2.0 candidates):
+v1.1 Public Release:
 
+- [ ] Remove all "spotlighter" name references from codebase and documentation
+- [ ] Professional about window with version, credits, GitHub link
+- [ ] Preferences window (minimal/placeholder for future settings)
+- [ ] Status indicator showing extension is installed and active
+- [ ] Beautiful app icon
+- [ ] GitHub README with screenshots and installation instructions
+- [ ] Release notes and documentation for end users
+
+Future milestones (v1.2+ candidates):
+
+- [ ] Preview pane rendering optimization (narrow column view context)
+- [ ] Table rendering improvements for small spaces
 - [ ] Syntax highlighting in code blocks
 - [ ] Render actual images (local files)
 - [ ] Display YAML front matter as formatted metadata
@@ -56,9 +76,10 @@ Next milestone features (v2.0 candidates):
 
 ### Out of Scope
 
-- Syntax highlighting (deferred to v2)
-- Actual image rendering (deferred to v2) — placeholders only in v1
-- YAML front matter display (deferred to v2)
+- Preview pane optimization (deferred to v1.2 - App Store milestone)
+- Syntax highlighting (deferred to v2.0)
+- Actual image rendering (deferred to v2.0)
+- YAML front matter display (deferred to v2.0)
 - Clickable links — preview-only UX
 - HTML/CSS/JavaScript rendering — security risk
 - Remote image loading — network delays, privacy issues
@@ -69,11 +90,15 @@ Next milestone features (v2.0 candidates):
 
 ## Context
 
-**User:** Solo developer, project-managing rather than coding. Values learning checkpoints but may request full execution mode later.
+**User:** Solo developer, project-managing rather than coding. Values learning checkpoints but may request full execution mode later. First-time public release of any software.
 
 **Use Case:** Quick visual scan of 3-5 markdown files in Finder to decide which to open. Not a deep-dive tool. Disposable preview experience.
 
-**Distribution:** GitHub first (code-first sharing), eventual App Store submission considered. Pricing (free vs. paid) deferred until App Store viability is clearer.
+**Target audience:** End users (not just developers) who work with markdown files, especially with AI coding tools. Filling a gap in Finder's Quick Look coverage.
+
+**Distribution:** GitHub first (this milestone), eventual App Store submission (future milestone). Pricing deferred until App Store viability is clearer.
+
+**Positioning:** "Very Mac-assed" - feature complete, beautiful, polished, simple. Native feel, follows Apple design guidelines.
 
 **Stack Notes:** Swift + Xcode for modern macOS Quick Look extensions. User has Xcode installed, comfortable delegating technical implementation.
 
@@ -85,6 +110,7 @@ Next milestone features (v2.0 candidates):
 - **macOS support**: macOS 26+ (Tahoe) only, no legacy support
 - **Performance**: Instant rendering (<1 second) — no processing delays acceptable
 - **Scope**: Minimal feature set for speed of creation and deployment
+- **First release**: User has never released software publicly before — needs guidance on expectations and best practices
 
 ## Key Decisions
 
@@ -101,6 +127,8 @@ Next milestone features (v2.0 candidates):
 | Hybrid table rendering | Source range splitting preserves document structure | ✓ Good - Tables + markdown coexist |
 | 500KB truncation threshold | Supports large docs while guaranteeing <1s render | ✓ Good - Prevents hangs |
 | System semantic colors throughout | Automatic dark mode support | ✓ Good - Zero manual handling |
+| GitHub first, App Store later | Get feedback from early adopters before App Store polish | — Pending |
+| Defer preview pane optimization to v1.2 | Ship GitHub release faster, polish for App Store | — Pending |
 
 ---
-*Last updated: 2026-02-02 after v1.0 milestone completion*
+*Last updated: 2026-02-02 for v1.1 milestone start*
