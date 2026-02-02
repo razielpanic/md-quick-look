@@ -1,6 +1,7 @@
 import Foundation
 import AppKit
 import os.log
+import Markdown
 
 extension OSLog {
     static let renderer = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "renderer")
@@ -42,6 +43,14 @@ class MarkdownRenderer {
         // Pre-process markdown to handle images (convert to placeholders)
         let preprocessedMarkdown = preprocessBlockquoteSoftBreaks(in: preprocessImages(in: markdown))
 
+        // Check if document contains GFM tables
+        if hasGFMTables(in: preprocessedMarkdown) {
+            os_log("MarkdownRenderer: Document contains tables, using hybrid rendering", log: .renderer, type: .info)
+            return renderWithTables(markdown: preprocessedMarkdown)
+        }
+
+        os_log("MarkdownRenderer: No tables found, using standard rendering", log: .renderer, type: .info)
+
         // Parse markdown using native AttributedString
         guard let attributedString = try? AttributedString(markdown: preprocessedMarkdown) else {
             os_log("MarkdownRenderer: Failed to parse markdown", log: .renderer, type: .error)
@@ -78,6 +87,195 @@ class MarkdownRenderer {
         applyBaseStyles(to: nsAttributedString)
 
         os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, nsAttributedString.length)
+
+        return nsAttributedString
+    }
+
+    // MARK: - Table Detection and Hybrid Rendering
+
+    /// Checks if the markdown document contains GFM tables
+    /// - Parameter markdown: The markdown content to check
+    /// - Returns: True if tables are present, false otherwise
+    private func hasGFMTables(in markdown: String) -> Bool {
+        let document = Document(parsing: markdown, options: [.parseBlockDirectives])
+        var extractor = TableExtractor()
+        let tables = extractor.visit(document)
+        return !tables.isEmpty
+    }
+
+    /// Renders markdown containing tables using hybrid approach
+    /// - Parameter markdown: The markdown content with tables
+    /// - Returns: NSAttributedString with tables rendered via TableRenderer and other content via standard pipeline
+    private func renderWithTables(markdown: String) -> NSAttributedString {
+        // Parse document to extract tables
+        let document = Document(parsing: markdown, options: [.parseBlockDirectives])
+        var extractor = TableExtractor()
+        let tables = extractor.visit(document)
+
+        guard !tables.isEmpty else {
+            os_log("MarkdownRenderer: No tables found in hybrid render, falling back", log: .renderer, type: .error)
+            // Fall back to standard rendering
+            return render(markdown: markdown)
+        }
+
+        os_log("MarkdownRenderer: Found %d tables, building hybrid output", log: .renderer, type: .info, tables.count)
+
+        // Sort tables by source range to process in document order
+        let sortedTables = tables.sorted { (table1, table2) -> Bool in
+            guard let range1 = table1.sourceRange, let range2 = table2.sourceRange else {
+                return false
+            }
+            return range1.lowerBound.line < range2.lowerBound.line ||
+                   (range1.lowerBound.line == range2.lowerBound.line &&
+                    range1.lowerBound.column < range2.lowerBound.column)
+        }
+
+        // Check if source ranges are available and reliable
+        var useSourceRanges = true
+        for table in sortedTables {
+            if table.sourceRange == nil {
+                useSourceRanges = false
+                os_log("MarkdownRenderer: Source ranges not available, using placeholder approach", log: .renderer, type: .info)
+                break
+            }
+        }
+
+        if useSourceRanges {
+            return renderWithSourceRanges(markdown: markdown, tables: sortedTables)
+        } else {
+            return renderWithPlaceholders(markdown: markdown, tables: sortedTables)
+        }
+    }
+
+    /// Renders using source ranges to split document into table and non-table segments
+    /// - Parameters:
+    ///   - markdown: The markdown content
+    ///   - tables: Sorted list of extracted tables with source ranges
+    /// - Returns: NSAttributedString with hybrid rendering
+    private func renderWithSourceRanges(markdown: String, tables: [ExtractedTable]) -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        let lines = markdown.split(separator: "\n", omittingEmptySubsequences: false)
+        var currentLine = 1
+
+        let tableRenderer = TableRenderer()
+
+        for table in tables {
+            guard let sourceRange = table.sourceRange else { continue }
+
+            let tableStartLine = sourceRange.lowerBound.line
+
+            // Render markdown BEFORE this table (from currentLine to tableStartLine - 1)
+            if currentLine < tableStartLine {
+                let beforeLines = lines[(currentLine - 1)..<(tableStartLine - 1)]
+                let beforeMarkdown = beforeLines.joined(separator: "\n")
+                if !beforeMarkdown.isEmpty {
+                    let beforeContent = renderNonTableSegment(beforeMarkdown)
+                    result.append(beforeContent)
+                }
+            }
+
+            // Render the table
+            let tableContent = tableRenderer.render(table)
+            result.append(tableContent)
+
+            // Update current position to after table
+            currentLine = sourceRange.upperBound.line + 1
+        }
+
+        // Render remaining markdown AFTER last table
+        if currentLine <= lines.count {
+            let afterLines = lines[(currentLine - 1)..<lines.count]
+            let afterMarkdown = afterLines.joined(separator: "\n")
+            if !afterMarkdown.isEmpty {
+                let afterContent = renderNonTableSegment(afterMarkdown)
+                result.append(afterContent)
+            }
+        }
+
+        return result
+    }
+
+    /// Renders using placeholder substitution when source ranges are unavailable
+    /// - Parameters:
+    ///   - markdown: The markdown content
+    ///   - tables: List of extracted tables
+    /// - Returns: NSAttributedString with hybrid rendering
+    private func renderWithPlaceholders(markdown: String, tables: [ExtractedTable]) -> NSAttributedString {
+        // Replace table markdown with unique placeholders
+        var modifiedMarkdown = markdown
+        var placeholderMap: [String: ExtractedTable] = [:]
+
+        // Create a regex to match GFM table patterns
+        // Pattern: header row, separator row, and body rows
+        let tablePattern = """
+        (?:^|\\n)(\\|.+\\|)\\n(\\|[-:| ]+\\|)(?:\\n\\|.+\\|)*
+        """
+
+        guard let regex = try? NSRegularExpression(pattern: tablePattern, options: .anchorsMatchLines) else {
+            os_log("MarkdownRenderer: Failed to create table regex, falling back", log: .renderer, type: .error)
+            return NSAttributedString(string: markdown)
+        }
+
+        let nsString = modifiedMarkdown as NSString
+        let matches = regex.matches(in: modifiedMarkdown, options: [], range: NSRange(location: 0, length: nsString.length))
+
+        // Replace tables with placeholders (in reverse to maintain indices)
+        for (index, match) in matches.enumerated().reversed() {
+            let placeholder = "TABLEPLACEHOLDER\(index)TABLEPLACEHOLDER"
+            if index < tables.count {
+                placeholderMap[placeholder] = tables[index]
+            }
+            modifiedMarkdown = (modifiedMarkdown as NSString).replacingCharacters(in: match.range, with: placeholder) as String
+        }
+
+        // Render the modified markdown with placeholders
+        let renderedWithPlaceholders = renderNonTableSegment(modifiedMarkdown)
+
+        // Replace placeholders with rendered tables
+        let result = NSMutableAttributedString(attributedString: renderedWithPlaceholders)
+        let tableRenderer = TableRenderer()
+
+        for (placeholder, table) in placeholderMap {
+            let fullRange = NSRange(location: 0, length: result.length)
+            let placeholderRange = (result.string as NSString).range(of: placeholder, options: [], range: fullRange)
+
+            if placeholderRange.location != NSNotFound {
+                let renderedTable = tableRenderer.render(table)
+                result.replaceCharacters(in: placeholderRange, with: renderedTable)
+            }
+        }
+
+        return result
+    }
+
+    /// Renders a non-table segment using standard AttributedString pipeline
+    /// - Parameter segment: The markdown segment without tables
+    /// - Returns: NSAttributedString with standard styling
+    private func renderNonTableSegment(_ segment: String) -> NSAttributedString {
+        // Trim leading/trailing whitespace
+        let trimmed = segment.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return NSAttributedString(string: "")
+        }
+
+        // Parse with AttributedString
+        guard let attributedString = try? AttributedString(markdown: trimmed) else {
+            os_log("MarkdownRenderer: Failed to parse non-table segment", log: .renderer, type: .error)
+            return NSAttributedString(string: trimmed)
+        }
+
+        // Apply same processing as standard render
+        var withNewlines = insertBlockBoundaryNewlines(in: attributedString)
+        withNewlines = ensureIntraBlockNewlines(in: withNewlines)
+
+        let nsAttributedString = NSMutableAttributedString(withNewlines)
+
+        applyBlockStyles(from: withNewlines, to: nsAttributedString)
+        insertListPrefixes(from: withNewlines, to: nsAttributedString)
+        applyInlineStyles(from: withNewlines, to: nsAttributedString)
+        applyLinkStyles(to: nsAttributedString)
+        applyImagePlaceholderStyles(to: nsAttributedString)
+        applyBaseStyles(to: nsAttributedString)
 
         return nsAttributedString
     }
