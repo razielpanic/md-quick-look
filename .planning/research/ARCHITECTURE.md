@@ -1,867 +1,1020 @@
-# Quick Look Extension Architecture
+# Architecture Research: Host App UI for Quick Look Extension
 
-**Project:** md-spotlighter (macOS Markdown Quick Look Extension)
-**macOS Target:** 14+ (Sonoma and later)
-**Researched:** 2026-01-19
+**Domain:** macOS Quick Look Extension Host App UI (About, Preferences, Status)
+**Milestone:** v1.1 - Public Release (GitHub)
+**Researched:** 2026-02-02
+**Confidence:** HIGH
 
 ## Executive Summary
 
-Quick Look extensions on macOS 14+ are **system-wide app extensions** that integrate with Finder's preview system. The modern architecture (QLPreviewProvider-based) replaces the deprecated qlgenerator approach entirely in macOS Sequoia and later.
+This research focuses on adding user-facing UI to the existing MD Quick Look host app for v1.1. The extension (MDQuickLook.appex) already works and renders markdown previews. Now we need to add:
 
-For md-spotlighter, the architecture follows this model:
+1. **About window** - Shown when app launches
+2. **Preferences window** - Accessible via menu (Cmd+,)
+3. **Status indicator** - Shows extension is active
 
-1. **Host Application** - Container for the extension (required by App Store/code signing)
-2. **Quick Look Extension Bundle** - The `.appex` that handles markdown files
-3. **Rendering Engine** - Processes markdown → HTML/styled content
-4. **Optional XPC Service** - Offloads heavy rendering to separate process
-5. **Sandbox Boundary** - Strict file access controls
+**Architecture decision:** Pure SwiftUI using App scenes (Window, Settings) targeting macOS 13+. No AppKit unless absolutely necessary. This matches the "very Mac-assed" aesthetic and is appropriate for macOS 26+ target.
 
-The critical insight: **Quick Look extensions run in a highly sandboxed process** with limited file system access. This directly affects how markdown files are read and how styling is applied.
+**Key insight:** Host app and extension are **independent**. The app doesn't control the extension at runtime. It just contains it and provides user-facing UI for settings/information.
 
 ---
 
-## Extension Anatomy: Modern Architecture (macOS 14+)
+## Standard Architecture
 
-### Architecture Overview
+### System Overview
 
 ```
-┌─────────────────────────────────────────┐
-│     md-spotlighter Host Application     │
-│    (provides App Store presence)        │
-├─────────────────────────────────────────┤
-│  QLPreviewExtension.appex (Sandboxed)   │
-│  ├─ PreviewProvider.swift               │
-│  │  └─ QLPreviewProvider subclass        │
-│  ├─ Info.plist                          │
-│  │  └─ QLSupportedContentTypes = [.md]  │
-│  └─ Entitlements.plist                  │
-│     └─ com.apple.security.files...      │
-├─────────────────────────────────────────┤
-│  QLMarkdownRenderXPC.xpc (Optional)     │
-│  └─ Heavy rendering offloaded here      │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    MD Quick Look v1.1                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │         Host Application (md-spotlighter.app)         │  │
+│  │                  SwiftUI App Lifecycle                 │  │
+│  ├───────────────────────────────────────────────────────┤  │
+│  │                                                         │  │
+│  │  Scene 1: About Window (Window scene)                  │  │
+│  │  ┌─────────────────────────────────────────────────┐   │  │
+│  │  │  AboutWindow.swift (SwiftUI View)               │   │  │
+│  │  │  - App icon, version, description                │   │  │
+│  │  │  - GitHub link                                    │   │  │
+│  │  │  - Extension status indicator (optional)          │   │  │
+│  │  └─────────────────────────────────────────────────┘   │  │
+│  │                                                         │  │
+│  │  Scene 2: Settings (Settings scene)                    │  │
+│  │  ┌─────────────────────────────────────────────────┐   │  │
+│  │  │  SettingsView.swift (SwiftUI View)              │   │  │
+│  │  │  - Placeholder content for v1.1                  │   │  │
+│  │  │  - Future: theme, font size, etc.                │   │  │
+│  │  └─────────────────────────────────────────────────┘   │  │
+│  │                                                         │  │
+│  │  Optional: Extension Status Check                      │  │
+│  │  ┌─────────────────────────────────────────────────┐   │  │
+│  │  │  ExtensionStatus.swift (ObservableObject)       │   │  │
+│  │  │  - Runs: qlmanage -m                             │   │  │
+│  │  │  - Parses: looks for bundle ID in output         │   │  │
+│  │  │  - Returns: enabled/disabled/unknown             │   │  │
+│  │  └─────────────────────────────────────────────────┘   │  │
+│  │                                                         │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                          │                                   │
+│                          │ (contains)                        │
+│                          ↓                                   │
+│  ┌───────────────────────────────────────────────────────┐  │
+│  │    Quick Look Extension (MDQuickLook.appex)           │  │
+│  │    - PreviewViewController.swift (existing)            │  │
+│  │    - MarkdownRenderer.swift (existing)                 │  │
+│  │    - TableRenderer.swift (existing)                    │  │
+│  │    - MarkdownLayoutManager.swift (existing)            │  │
+│  │    [UNCHANGED - already working]                       │  │
+│  └───────────────────────────────────────────────────────┘  │
+│                                                               │
+├─────────────────────────────────────────────────────────────┤
+│                     macOS System Layer                        │
+├─────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐   │
+│  │   Finder     │  │  Quick Look  │  │ System Settings │   │
+│  │   (user)     │→ │    Server    │  │   Extensions    │   │
+│  │              │  │ (quicklookd) │  │                 │   │
+│  └──────────────┘  └──────────────┘  └─────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Two Implementation Approaches
+### Component Responsibilities
 
-#### Approach 1: Data-Based QLPreviewProvider (Recommended)
+| Component | Responsibility | Typical Implementation |
+|-----------|----------------|------------------------|
+| **App.swift** | App lifecycle, scene configuration | SwiftUI @main App struct |
+| **AboutWindow.swift** | Display app info, version, GitHub link | SwiftUI View in Window scene |
+| **SettingsView.swift** | Preferences UI (placeholder for v1.1) | SwiftUI View in Settings scene |
+| **ExtensionStatus.swift** | Check if extension is enabled | ObservableObject running qlmanage -m |
+| **MDQuickLook.appex** | Markdown preview rendering | Existing implementation (UNCHANGED) |
 
-**Modern, preferred approach for macOS 14+**
+---
 
+## Recommended Project Structure
+
+```
+md-spotlighter/
+├── md-spotlighter/                    # Host app target
+│   ├── App.swift                      # NEW: @main SwiftUI App entry
+│   ├── Views/
+│   │   ├── AboutWindow.swift          # NEW: About window content
+│   │   └── SettingsView.swift         # NEW: Settings/Preferences
+│   ├── Models/
+│   │   └── ExtensionStatus.swift      # NEW (optional): Status checker
+│   ├── Resources/
+│   │   ├── Assets.xcassets            # App icon (update)
+│   │   └── Credits.rtf                # Optional: simple About credits
+│   ├── Info.plist                     # Update: ensure regular activation policy
+│   └── main.swift                     # REMOVE: replace with App.swift
+│
+├── MDQuickLook/                       # Extension target
+│   ├── PreviewViewController.swift    # EXISTING - no changes
+│   ├── MarkdownRenderer.swift         # EXISTING - no changes
+│   ├── TableRenderer.swift            # EXISTING - no changes
+│   ├── MarkdownLayoutManager.swift    # EXISTING - no changes
+│   ├── TableExtractor.swift           # EXISTING - no changes
+│   └── Info.plist                     # EXISTING - no changes
+│
+└── Shared/ (optional)                 # Only if settings need sharing
+    └── Constants.swift                # Shared bundle IDs, app group
+```
+
+### Structure Rationale
+
+- **App.swift:** Modern SwiftUI lifecycle replaces `main.swift` with `NSApplication.shared.run()`. Declares Window and Settings scenes.
+- **Views/:** SwiftUI views separated from app logic. Easy to preview, test, and iterate.
+- **Models/:** Business logic for checking extension status. Separation of concerns.
+- **Resources/:** Assets like app icon. Credits.rtf is optional alternative to custom About window.
+- **main.swift removal:** Pure SwiftUI apps use @main on App struct, not standalone main.swift.
+- **Extension unchanged:** v1.1 doesn't modify rendering logic. UI is purely host app.
+
+---
+
+## Architectural Patterns
+
+### Pattern 1: SwiftUI App with Multiple Scenes (RECOMMENDED)
+
+**What:** Modern macOS 13+ pattern using declarative scenes. Define Window scene for About, Settings scene for Preferences.
+
+**When to use:** Always for macOS 13+ apps. Native menu integration, window management, minimal code.
+
+**Trade-offs:**
+- **Pros:** Automatic "Settings..." menu item (Cmd+,), native window behavior, less boilerplate
+- **Cons:** Requires macOS 13+ (not an issue - targeting macOS 26+)
+
+**Example:**
 ```swift
-import QuickLookUI
 import SwiftUI
 
-class PreviewProvider: QLPreviewProvider {
-    override func providePreview(for request: QLFilePreviewRequest) async throws -> QLPreviewReply {
-        // 1. Read markdown file (constrained by sandbox)
-        guard let data = try? Data(contentsOf: request.fileURL) else {
-            throw NSError(domain: "QLMarkdown", code: -1)
+@main
+struct MDQuickLookApp: App {
+    var body: some Scene {
+        // About window - shown when app launches
+        Window("About MD Quick Look", id: "about") {
+            AboutWindow()
+        }
+        .windowResizability(.contentSize)
+        .windowStyle(.hiddenTitleBar)
+        .defaultPosition(.center)
+        .commands {
+            // Replace default About menu item
+            CommandGroup(replacing: .appInfo) {
+                Button("About MD Quick Look") {
+                    NSApp.sendAction(Selector(("showAboutWindow:")), to: nil, from: nil)
+                }
+            }
         }
 
-        // 2. Parse markdown to HTML
-        let markdown = String(data: data, encoding: .utf8) ?? ""
-        let html = parseMarkdown(markdown)
-
-        // 3. Return styled HTML reply
-        let reply = QLPreviewReply(
-            dataOfContentType: .html,
-            contentSize: CGSize(width: 800, height: 600),
-            createDataUsing: { completion in
-                completion(html.data(using: .utf8))
-            }
-        )
-        return reply
+        // Settings window - automatic Cmd+, handling
+        Settings {
+            SettingsView()
+        }
     }
 }
 ```
 
-**Key characteristics:**
-- `QLPreviewProvider` is a protocol/base class you subclass
-- Implement single method: `providePreview(for:) async throws -> QLPreviewReply`
-- Receives `QLFilePreviewRequest` containing the file URL
-- Returns `QLPreviewReply` with content (HTML, PDF, drawing, or file URL)
-- **Runs in sandboxed process** with tight file access
-- Better performance: asynchronous, resource-aware
+**File location:** `md-spotlighter/App.swift`
+**Lines of code:** ~30-50
 
-**Entry point configuration in Info.plist:**
-```xml
-<key>NSExtensionPrincipalClass</key>
-<string>$(PRODUCT_MODULE_NAME).PreviewProvider</string>
-```
+### Pattern 2: Extension Status Detection via qlmanage
 
-#### Approach 2: View-Based QLPreviewingController (Deprecated)
+**What:** Run `qlmanage -m` command to check if extension is registered with Quick Look server. Parse output for bundle identifier.
 
-**Older approach, being phased out. NOT recommended for new projects.**
+**When to use:** To show accurate status in About window ("Extension active ✓" vs "Enable in System Settings").
 
-Requires:
-- `PreviewViewController` inheriting from `UIViewController` or `NSViewController`
-- Implementation of `preparePreviewOfFileAtURL:completionHandler:`
-- Storyboard-based UI (`MainInterface.storyboard`)
-- View hierarchy management
+**Trade-offs:**
+- **Pros:** Accurate real-time status, no private APIs
+- **Cons:** Requires shell command execution, parsing text output
 
-**Why not for md-spotlighter:**
-- Performance overhead from view management
-- More complex lifecycle
-- Apple is moving away from this pattern
-- Not idiomatic for system extensions
-
-### Critical Architectural Decision: Extension Lifecycle
-
-Quick Look extensions do **NOT** stay running. The lifecycle is:
-
-1. **File selected in Finder** → Quicklook panel opens
-2. **System activates extension** (launches `.appex` process)
-3. **`providePreview` called** with file URL
-4. **Response generated** (HTML, PDF, drawing, etc)
-5. **System caches result** (may reuse without calling extension)
-6. **Process terminates** after timeout (~seconds)
-
-**Implication for md-spotlighter:**
-- No persistent state across previews
-- No background processing
-- Each preview generation is independent
-- Must complete rendering **within timeout** (typically 5-10 seconds)
-- Heavy computation should be XPC-offloaded
-
----
-
-## Component Boundaries
-
-### 1. Quick Look Extension (.appex Bundle)
-
-**Location in App Bundle:**
-```
-md-spotlighter.app/
-├─ Contents/Library/Application Support/
-│  └─ QLPreviewExtension.appex/
-│     ├─ Contents/
-│     │  ├─ MacOS/QLPreviewExtension
-│     │  ├─ Resources/
-│     │  │  └─ Assets.xcassets
-│     │  ├─ Info.plist
-│     │  └─ _CodeSignature/
-│     └─ (code-signed separately)
-```
-
-**Responsibilities:**
-- Receive file URL from Quick Look coordinator
-- Validate file type (markdown extension/UTI)
-- Orchestrate markdown rendering
-- Build response object (HTML + styling)
-- Return within time limit
-
-**Access and Constraints:**
-- ✅ Can read: File being previewed (via `fileURL` parameter)
-- ✅ Can read: Bundle resources (CSS, fonts, templates)
-- ❌ Cannot read: Other user files (sandboxed)
-- ❌ Cannot execute: External processes, scripts
-- ❌ Cannot use: Network (no remote image fetching)
-
-### 2. Rendering Engine (Core Logic)
-
-**Location:** Inside `.appex` or as standalone framework
-
-**Responsibilities:**
-- Parse markdown to AST
-- Apply syntax highlighting
-- Convert to styled HTML/RTF
-- Handle special markdown features (tables, code blocks, etc)
-
-**Key Decision: Rendering Format**
-
-| Format | Rendering | Performance | Compatibility | Notes |
-|--------|-----------|-------------|---------------|-------|
-| **HTML+CSS** | WKWebView | Medium | macOS 14+ | Modern, flexible styling, some WebKit issues pre-Monterey |
-| **RTF** | NSTextView | High | macOS 10.15+ | Reliable, limited styling, no syntax highlighting |
-| **PDF** | PDFKit | Medium | All | Static output, good for printing |
-| **Drawing** | Core Graphics | High | All | Direct pixel drawing, maximum control |
-
-**Recommendation for md-spotlighter:**
-- **Primary: HTML** via WKWebView (modern, matches web markdown rendering)
-- Rationale: macOS 14+ has solid WebKit support in Quick Look
-- CSS allows instant theme switching (light/dark)
-- Syntax highlighting via CSS classes
-
-### 3. XPC Service (Optional but Recommended)
-
-**When to use XPC:**
-- ✅ Heavy markdown processing (large files, complex extensions)
-- ✅ Syntax highlighting with external libraries
-- ✅ Diagram rendering (Mermaid, PlantUML)
-- ✅ Image resizing/optimization
-- ✅ Remote resource fetching (if needed)
-
-**Why XPC improves md-spotlighter:**
-- Extension remains responsive if rendering stalls
-- Can exceed sandbox restrictions (with explicit entitlements)
-- Can cache results across preview sessions
-- Can handle failures without crashing extension
-
-**XPC Communication Pattern:**
-
+**Example:**
 ```swift
-// In extension (sandboxed)
-let connection = NSXPCConnection(serviceName: "com.example.md-spotlighter.render")
-connection.remoteObjectInterface = NSXPCInterface(with: MarkdownRenderingProtocol.self)
-connection.resume()
+import Foundation
 
-let proxy = connection.remoteObjectProxyWithErrorHandler { error in
-    // Fallback: render locally or return error
-}
+@MainActor
+class ExtensionStatus: ObservableObject {
+    @Published var isEnabled: Bool = false
+    @Published var isChecking: Bool = false
 
-// Call XPC service
-proxy.renderMarkdown(markdown) { html in
-    // Receive HTML from XPC service
-}
-```
+    private let bundleID = "com.yourdomain.md-spotlighter.MDQuickLook"
 
-**XPC Service Bundle Structure:**
-```
-QLMarkdownRenderXPC.xpc/
-├─ Contents/
-│  ├─ MacOS/QLMarkdownRenderXPC
-│  ├─ Info.plist
-│  └─ _CodeSignature/
-```
+    func check() async {
+        isChecking = true
+        defer { isChecking = false }
 
----
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/qlmanage")
+        process.arguments = ["-m"]
 
-## Data Flow: Markdown File → Styled Preview
+        let pipe = Pipe()
+        process.standardOutput = pipe
 
-### Complete Rendering Pipeline
+        do {
+            try process.run()
+            process.waitUntilExit()
 
-```
-1. FILE SELECTION
-   └─> User selects .md file in Finder
-
-2. QUICK LOOK ACTIVATION
-   └─> QuickLook framework queries system for compatible extension
-   └─> Finds md-spotlighter via QLSupportedContentTypes in Info.plist
-
-3. EXTENSION LAUNCH
-   └─> macOS launches QLPreviewExtension.appex process
-   └─> Security sandbox applied (minimal file access)
-
-4. PREVIEW REQUEST
-   └─> Quick Look coordinator calls:
-       PreviewProvider.providePreview(for: QLFilePreviewRequest)
-   └─> request.fileURL = /Users/.../document.md
-
-5. FILE READ (Sandboxed)
-   └─> Extension reads markdown file from request.fileURL
-       (This URL is security-scoped; reading works automatically)
-   └─> Convert bytes to String (UTF-8 encoded)
-
-6. PARSING (XPC or Local)
-   └─ Option A (Local): Parse markdown using cmark-gfm or similar
-   └─ Option B (XPC): Send markdown to XPC service for parsing
-
-7. RENDERING
-   └─> Parse markdown AST
-   └─> Apply theme (CSS)
-   └─> Generate HTML:
-       <html>
-         <head>
-           <style>/* theme CSS */</style>
-         </head>
-         <body>
-           <!-- rendered markdown -->
-         </body>
-       </html>
-
-8. RESPONSE CREATION
-   └─> Create QLPreviewReply with HTML content
-   └─> Specify content type: .html (UTType.html)
-   └─> Provide content size for layout
-
-9. DELIVERY
-   └─> Return QLPreviewReply to Quick Look coordinator
-
-10. DISPLAY
-    └─> Quick Look coordinator embeds HTML in WKWebView
-    └─> Result displayed in preview panel
-
-11. CLEANUP
-    └─> Extension process keeps running (may be reused)
-    └─> After timeout, process terminated
-    └─> Result cached by Quick Look (may not call extension again)
-```
-
-### Performance Checkpoints (Where Delays Occur)
-
-| Checkpoint | Typical Duration | Concern | Mitigation |
-|------------|------------------|---------|-----------|
-| Extension launch | 100-500ms | Cold start | Preload if possible |
-| File read | 10-100ms | I/O bound | Async, buffered I/O |
-| Markdown parsing | 50-500ms | Depends on file size | XPC for large files, caching |
-| HTML generation | 20-100ms | CPU bound | Template pre-compilation |
-| WKWebView render | 100-300ms | DOM parsing | Simple HTML, limit styling |
-| **Total (perceived)** | **300-1500ms** | User-facing | Must be < 2 seconds |
-
-**For instant rendering (project requirement):**
-1. Keep markdown files < 10MB (parsing takes seconds for huge files)
-2. Precompile CSS (don't inline large stylesheets)
-3. Avoid external resources (images, fonts must be bundled)
-4. Test with representative files and profile
-
----
-
-## File I/O and Permissions Model
-
-### Sandbox Constraints for Quick Look Extensions
-
-Quick Look extensions run in **macOS App Sandbox** with minimal privileges:
-
-**Default Entitlements:**
-```xml
-<!-- Enabled for all Quick Look extensions -->
-<key>com.apple.security.app-sandbox</key>
-<true/>
-
-<!-- Can read file passed by Quick Look -->
-<key>com.apple.security.files.user-selected.read-only</key>
-<true/>
-
-<!-- Limited debugging (gets disabled in production) -->
-<key>com.apple.security.get-task-allow</key>
-<true/>
-```
-
-**What this means:**
-- ✅ Can read: The file URL provided by Quick Look (security-scoped)
-- ✅ Can read: Bundle resources (CSS, fonts, templates)
-- ✅ Can write: Temporary cache in app container
-- ❌ Cannot read: Other files in user's home directory
-- ❌ Cannot read: Local images referenced in markdown (without special entitlement)
-- ❌ Cannot execute: shell scripts, external processes
-- ❌ Cannot make: network requests
-
-### Handling Image Embedding
-
-**Problem:** Markdown often references local images: `![alt](/path/to/image.png)`
-
-**Solutions:**
-
-**Option 1: Disable embedded images (simplest)**
-- Parse markdown but strip image tags
-- Show `[Image: filename.png]` as placeholder
-- Avoids permission issues entirely
-
-**Option 2: Add Read-Only Entitlement (requires user grant)**
-```xml
-<key>com.apple.security.files.all</key>
-<string>read-only</string>
-```
-- ❌ Requires full-disk read access
-- ❌ Triggers security warnings
-- ❌ May be rejected by App Store for some categories
-
-**Option 3: XPC Service with Different Entitlements**
-- Extension stays sandboxed (minimal entitlements)
-- XPC service gets broader file access (configured separately)
-- XPC fetches images, returns data to extension
-- ✅ More secure, better UX
-
-**Recommendation for md-spotlighter:**
-- Start with Option 1 (no image embedding)
-- If users request images: implement Option 3 (XPC-based image loading)
-- Only resort to Option 2 if other options exhausted
-
----
-
-## Rendering Pipeline Architecture
-
-### HTML-Based Rendering (Recommended)
-
-**Flow:**
-```
-Markdown Text
-    ↓
-[Parse to AST]
-    ↓ (using cmark-gfm or similar)
-[Syntax Highlight Code Blocks]
-    ↓
-[Apply Theme CSS]
-    ↓
-[Generate HTML]
-    ↓
-[Wrap with head/style tags]
-    ↓
-QLPreviewReply.init(dataOfContentType: .html, ...)
-    ↓
-Quick Look displays in WKWebView
-```
-
-**Implementation Example:**
-
-```swift
-import QuickLookUI
-
-class PreviewProvider: QLPreviewProvider {
-    override func providePreview(for request: QLFilePreviewRequest) async throws -> QLPreviewReply {
-        guard let markdown = try? String(contentsOf: request.fileURL, encoding: .utf8) else {
-            throw RenderError.cantReadFile
-        }
-
-        // Parse and render to HTML
-        let html = MarkdownRenderer.render(markdown)
-
-        return QLPreviewReply(
-            dataOfContentType: .html,
-            contentSize: CGSize(width: 800, height: 600),
-            createDataUsing: { completion in
-                completion(html.data(using: .utf8)!)
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8) {
+                // Look for bundle identifier in qlmanage output
+                isEnabled = output.contains(bundleID)
+            } else {
+                isEnabled = false
             }
-        )
+        } catch {
+            isEnabled = false
+        }
     }
 }
 ```
 
-### CSS Theme Injection
+**File location:** `md-spotlighter/Models/ExtensionStatus.swift`
+**Lines of code:** ~40-60
 
-**Pattern:**
-```html
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-/* Light theme CSS (changes for dark mode) */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background: white;
-  padding: 20px;
+**Alternative:** Skip status checking for v1.1 MVP. Just show "Launch app once to register extension" message. Status checking can be added in v1.2.
+
+### Pattern 3: Custom About Window (Full Control)
+
+**What:** Create custom SwiftUI view for About window with app icon, version, description, GitHub link.
+
+**When to use:** When you need interactive elements (clickable GitHub link) or custom layout beyond Credits.rtf.
+
+**Trade-offs:**
+- **Custom Window Pros:** Full design control, buttons/links, dynamic content
+- **Credits.rtf Pros:** Zero code, automatic system About panel (but no interactivity)
+
+**Example:**
+```swift
+import SwiftUI
+
+struct AboutWindow: View {
+    @StateObject private var extensionStatus = ExtensionStatus()
+
+    var body: some View {
+        VStack(spacing: 20) {
+            // App icon
+            Image(nsImage: NSImage(named: "AppIcon") ?? NSImage())
+                .resizable()
+                .frame(width: 128, height: 128)
+
+            // App name
+            Text("MD Quick Look")
+                .font(.largeTitle)
+                .fontWeight(.bold)
+
+            // Version
+            Text("Version \(appVersion)")
+                .foregroundStyle(.secondary)
+
+            // Description
+            Text("Beautiful markdown previews in Finder")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+
+            // Extension status (optional)
+            HStack {
+                Image(systemName: extensionStatus.isEnabled ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                    .foregroundStyle(extensionStatus.isEnabled ? .green : .orange)
+                Text(extensionStatus.isEnabled ? "Extension Active" : "Enable in System Settings")
+                    .foregroundStyle(.secondary)
+            }
+            .task {
+                await extensionStatus.check()
+            }
+
+            // GitHub link
+            Link("View on GitHub", destination: URL(string: "https://github.com/user/md-quick-look")!)
+                .buttonStyle(.link)
+        }
+        .padding(40)
+        .frame(width: 400)
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
 }
-code {
-  background: #f0f0f0;
-  border-radius: 4px;
-  padding: 2px 6px;
-}
-/* ... more theme CSS ... */
-</style>
-</head>
-<body>
-<!-- rendered markdown HTML -->
-<h1>My Document</h1>
-<p>Content here...</p>
-</body>
-</html>
 ```
 
-**Dark Mode Support:**
-- Quick Look respects system appearance
-- Detect via CSS media query: `@media (prefers-color-scheme: dark)`
-- Two theme sets in HTML or separate stylesheets
+**File location:** `md-spotlighter/Views/AboutWindow.swift`
+**Lines of code:** ~60-80
+
+### Pattern 4: Settings Scene with Placeholder
+
+**What:** Use SwiftUI Settings scene for automatic Preferences integration. Start with placeholder, expand in future versions.
+
+**When to use:** Always for macOS apps. System adds "Settings..." menu item automatically.
+
+**Trade-offs:**
+- **Pros:** Zero boilerplate, native menu integration, standard keyboard shortcut (Cmd+,)
+- **Cons:** Settings window has specific behavior (singleton, can't programmatically close)
+
+**Example:**
+```swift
+import SwiftUI
+
+struct SettingsView: View {
+    var body: some View {
+        Form {
+            Section {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Preferences coming in a future update")
+                        .foregroundStyle(.secondary)
+
+                    Text("Planned settings:")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                        .padding(.top, 4)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Label("Theme customization", systemImage: "paintpalette")
+                        Label("Font size options", systemImage: "textformat.size")
+                        Label("Code block styling", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                }
+            } header: {
+                Text("General")
+            }
+        }
+        .formStyle(.grouped)
+        .frame(width: 450, height: 200)
+    }
+}
+```
+
+**File location:** `md-spotlighter/Views/SettingsView.swift`
+**Lines of code:** ~30-40 (placeholder)
+
+**Future expansion (v1.2+):** Add real settings with @AppStorage for theme selection, font size, etc. Extension reads via UserDefaults.
 
 ---
 
-## Build and Signing Requirements
+## Data Flow
 
-### Bundle Structure for md-spotlighter
+### App Launch Flow
 
 ```
-md-spotlighter.app/
-├─ Contents/
-│  ├─ MacOS/
-│  │  └─ md-spotlighter (host app executable)
-│  ├─ Library/
-│  │  └─ Application Support/
-│  │     └─ QLPreviewExtension.appex/
-│  │        ├─ Contents/
-│  │        │  ├─ MacOS/QLPreviewExtension
-│  │        │  ├─ Resources/
-│  │        │  │  ├─ Assets.xcassets
-│  │        │  │  └─ styles.css
-│  │        │  ├─ Info.plist
-│  │        │  └─ _CodeSignature/
-│  ├─ Resources/
-│  │  └─ MainWindow.nib
-│  ├─ Info.plist
-│  ├─ PkgInfo
-│  └─ _CodeSignature/
+User double-clicks md-spotlighter.app
+    ↓
+App.swift @main struct initializes
+    ↓
+SwiftUI creates Window scene for About
+    ↓
+About window appears centered on screen
+    ↓
+(Optional) ExtensionStatus.check() runs async
+    ↓
+Status displayed: "Extension Active ✓" or "Enable in System Settings"
+    ↓
+User clicks GitHub link or closes window
+    ↓
+App remains running (can reopen via Dock)
+    OR
+App quits if applicationShouldTerminateAfterLastWindowClosed = true
 ```
 
-### Host Application Info.plist
+### Extension Registration Flow (macOS System)
 
-**Required for App Store distribution:**
+```
+User launches app first time
+    ↓
+macOS scans app bundle
+    ↓
+Discovers MDQuickLook.appex in PlugIns/
+    ↓
+Reads Info.plist → QLSupportedContentTypes
+    ↓
+Registers with Quick Look server (quicklookd)
+    ↓
+Extension appears in System Settings > Extensions > Quick Look
+    ↓
+User enables extension (may be automatic)
+    ↓
+Extension active for .md files in Finder
+```
+
+**Key insight:** Extension registration is **automatic**. Host app doesn't need code to "install" extension. Just launching the app once triggers macOS discovery.
+
+### Settings Access Flow (When User Presses Cmd+,)
+
+```
+User presses Cmd+, (or selects "Settings..." from menu)
+    ↓
+SwiftUI Settings scene activates
+    ↓
+SettingsView appears in singleton window
+    ↓
+User views placeholder content
+    ↓
+User closes window (Settings scene remains available)
+```
+
+### Extension Preview Flow (EXISTING - UNCHANGED)
+
+```
+User selects .md file in Finder
+    ↓
+User presses Spacebar
+    ↓
+Finder requests preview from quicklookd
+    ↓
+quicklookd loads MDQuickLook.appex
+    ↓
+PreviewViewController.preparePreviewOfFile() called
+    ↓
+MarkdownRenderer generates preview
+    ↓
+Preview displayed in Quick Look window
+```
+
+**No interaction with host app during preview.** Extension runs independently.
+
+---
+
+## Integration Points
+
+### Host App ↔ Extension Communication
+
+| Integration Type | Pattern | Notes |
+|------------------|---------|-------|
+| **No direct communication** | Standard approach | Extension runs in separate process managed by quicklookd |
+| **Shared settings (future)** | UserDefaults with app group | Requires app group entitlement, not needed for v1.1 |
+| **Version sync** | Bundle.main.infoDictionary | Extension can read host app version if needed |
+
+**Critical:** Host app and extension are **decoupled**. App can't send messages to running extension. For v1.1, there's no shared state.
+
+### Host App ↔ macOS System
+
+| Integration Point | Pattern | Notes |
+|-------------------|---------|-------|
+| **Extension registration** | Automatic on first launch | macOS scans .app/Contents/PlugIns/ |
+| **System Settings UI** | Automatic | macOS generates Extensions pane |
+| **Status detection** | `qlmanage -m` command | Parse output for bundle ID |
+| **About panel** | Custom Window scene or Credits.rtf | SwiftUI or system About |
+| **Settings menu** | Settings scene | SwiftUI adds menu item automatically |
+
+### Extension ↔ Quick Look Server (EXISTING)
+
+| Integration Point | Pattern | Notes |
+|-------------------|---------|-------|
+| **Preview requests** | QLPreviewingController protocol | Existing implementation in PreviewViewController |
+| **File access** | Sandbox with user-selected file access | Extension reads .md file passed by quicklookd |
+
+---
+
+## UI Architecture Details
+
+### SwiftUI vs AppKit Decision
+
+**Recommendation:** Pure SwiftUI for host app UI
+
+| Aspect | SwiftUI | AppKit | Chosen |
+|--------|---------|--------|--------|
+| About window | Window scene | NSWindow + NSWindowController | **SwiftUI** |
+| Settings window | Settings scene | NSPreferencePane or custom | **SwiftUI** |
+| Status checking | @Published + Process | NSTask | **SwiftUI** |
+| Complexity | Low (declarative) | High (imperative) | **SwiftUI** |
+| macOS 26 support | Native, modern | Native, legacy | **SwiftUI** |
+| Learning curve | Lower for first-timer | Higher | **SwiftUI** |
+
+**Rationale:**
+- No AppKit APIs needed for About/Settings UI
+- SwiftUI provides automatic menu integration
+- Simpler codebase, easier to maintain
+- Modern, declarative approach
+- Matches macOS 26+ target (no legacy support needed)
+
+**When to use AppKit:**
+- Only if specific AppKit API is required (none for v1.1)
+- Example: Custom NSView subclass for advanced drawing (not needed)
+
+### Window Activation Policy
+
+**Recommendation:** NSApplicationActivationPolicyRegular (default)
+
+| Policy | Dock Icon | Menu Bar | Use Case |
+|--------|-----------|----------|----------|
+| **Regular** | ✓ Yes | ✓ Yes | Standard apps (CHOOSE THIS) |
+| Accessory | ✗ No | ✗ No | Background/menu bar apps |
+| Prohibited | ✗ No | ✗ No | Daemons only |
+
+**Why Regular:**
+- User expects to see app in Dock when launched
+- About/Settings windows are user-facing
+- Can quit via Cmd+Q or app menu
+- Standard behavior for Quick Look host apps
+
+**How to ensure Regular policy:**
+- Don't set LSUIElement in Info.plist (or set to false)
+- Don't set LSBackgroundOnly
+- Default is Regular
+
+### Launch Behavior Options
+
+**Option A: Show About window, stay open**
+```swift
+@main
+struct MDQuickLookApp: App {
+    var body: some Scene {
+        Window("About MD Quick Look", id: "about") {
+            AboutWindow()
+        }
+        .defaultPosition(.center)
+
+        Settings {
+            SettingsView()
+        }
+    }
+}
+
+// No applicationShouldTerminateAfterLastWindowClosed
+// App stays running when window closes
+```
+
+**Option B: Show About window, quit when closed**
+```swift
+@main
+struct MDQuickLookApp: App {
+    @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
+
+    var body: some Scene {
+        Window("About MD Quick Look", id: "about") {
+            AboutWindow()
+        }
+
+        Settings {
+            SettingsView()
+        }
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return true  // Quit when About window closes
+    }
+}
+```
+
+**Recommendation for v1.1:** Option A (stay open). Simpler, allows reopening About from Dock without relaunching.
+
+---
+
+## Anti-Patterns
+
+### Anti-Pattern 1: Trying to Control Extension from Host App
+
+**What people do:** Add "Start Extension" or "Stop Extension" buttons in host app. Try to send messages to running extension.
+
+**Why it's wrong:**
+- Extension runs in separate process controlled by quicklookd, not host app
+- No IPC channel between app and extension
+- Extension lifecycle is system-managed
+
+**Do this instead:**
+- Host app only provides UI and settings storage
+- Extension reads settings independently when it runs
+- Direct users to System Settings for enable/disable
+
+### Anti-Pattern 2: Using LSUIElement to Hide from Dock
+
+**What people do:** Set `LSUIElement=true` in Info.plist thinking extension is "background only."
+
+**Why it's wrong:**
+- User can't find app to open Settings/About
+- No menu bar when LSUIElement=true
+- Confusing UX ("where did I install this?")
+
+**Do this instead:**
+- Use Regular activation policy (default)
+- App appears in Dock normally
+- User launches to see About/Settings
+- Extension works whether app is running or not
+
+### Anti-Pattern 3: Complex Extension Status Detection
+
+**What people do:** Poll System Settings state continuously, use private APIs, create extension-to-app communication channel.
+
+**Why it's wrong:**
+- Private APIs = App Store rejection
+- Polling wastes CPU/battery
+- Over-engineered for simple status check
+
+**Do this instead:**
+- Run `qlmanage -m` once when About window appears
+- Parse output for bundle ID (simple string search)
+- Show enabled/disabled state
+- Link to System Settings if disabled
+
+### Anti-Pattern 4: Mixing AppKit Without Reason
+
+**What people do:** Use NSHostingController to embed SwiftUI in AppKit windows when pure SwiftUI works.
+
+**Why it's wrong:**
+- Unnecessary complexity
+- More code to maintain
+- Bridge layer can have bugs
+
+**Do this instead:**
+- Pure SwiftUI for macOS 13+ apps
+- Only use AppKit if specific API is unavailable in SwiftUI
+
+### Anti-Pattern 5: View-Based Extension Controller (Not Relevant for v1.1 but Worth Noting)
+
+**What people do:** Use old QLPreviewingController pattern with storyboards for extension.
+
+**Why it's wrong:**
+- Extension already uses modern approach (QLPreviewingController with programmatic UI)
+- v1.1 doesn't touch extension code
+
+**Already avoided:** Extension uses PreviewViewController programmatically, no storyboards.
+
+---
+
+## File-by-File Implementation Guide
+
+### 1. App.swift (NEW)
+
+**Purpose:** SwiftUI app entry point, scene configuration
+
+**Responsibilities:**
+- Define Window scene for About
+- Define Settings scene for Preferences
+- Configure window appearance
+- Optional: AppDelegate for lifecycle hooks
+
+**Code structure:**
+```swift
+import SwiftUI
+
+@main
+struct MDQuickLookApp: App {
+    // Optional: for advanced lifecycle control
+    // @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
+
+    var body: some Scene {
+        Window("About MD Quick Look", id: "about") {
+            AboutWindow()
+        }
+        .windowResizability(.contentSize)
+        .defaultPosition(.center)
+
+        Settings {
+            SettingsView()
+        }
+    }
+}
+```
+
+**Lines of code:** ~20-30 (basic), ~40-50 (with AppDelegate)
+
+### 2. AboutWindow.swift (NEW)
+
+**Purpose:** About window UI
+
+**Responsibilities:**
+- Display app icon
+- Show app name and version
+- Show description
+- GitHub link
+- Optional: extension status
+
+**Code structure:**
+```swift
+import SwiftUI
+
+struct AboutWindow: View {
+    var body: some View {
+        VStack(spacing: 20) {
+            // Icon, name, version, description, link
+        }
+        .padding(40)
+        .frame(width: 400)
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+}
+
+#Preview {
+    AboutWindow()
+}
+```
+
+**Lines of code:** ~40-60 (without status), ~80-100 (with status)
+
+### 3. SettingsView.swift (NEW)
+
+**Purpose:** Settings/Preferences UI
+
+**Responsibilities:**
+- Show placeholder content for v1.1
+- Future: theme selection, font size, etc.
+
+**Code structure:**
+```swift
+import SwiftUI
+
+struct SettingsView: View {
+    var body: some View {
+        Form {
+            Section("General") {
+                Text("Preferences coming soon")
+            }
+        }
+        .formStyle(.grouped)
+        .frame(width: 450, height: 200)
+    }
+}
+
+#Preview {
+    SettingsView()
+}
+```
+
+**Lines of code:** ~20-30 (placeholder)
+
+### 4. ExtensionStatus.swift (NEW - OPTIONAL)
+
+**Purpose:** Check extension activation status
+
+**Responsibilities:**
+- Run `qlmanage -m`
+- Parse output for bundle ID
+- Publish status (enabled/disabled)
+
+**Code structure:**
+```swift
+import Foundation
+
+@MainActor
+class ExtensionStatus: ObservableObject {
+    @Published var isEnabled: Bool = false
+    @Published var isChecking: Bool = false
+
+    func check() async {
+        // Run qlmanage, parse output
+    }
+}
+```
+
+**Lines of code:** ~40-60
+
+**For v1.1 MVP:** This is optional. Can skip and add in v1.2 if desired.
+
+### 5. main.swift (REMOVE)
+
+**Current content:**
+```swift
+import AppKit
+NSApplication.shared.run()
+```
+
+**Action:** Delete this file. SwiftUI App struct with @main replaces it.
+
+### 6. Info.plist (UPDATE)
+
+**Ensure these keys:**
 ```xml
 <key>CFBundleIdentifier</key>
-<string>com.example.md-spotlighter</string>
+<string>com.yourdomain.md-spotlighter</string>
 
-<key>CFBundleVersion</key>
-<string>1</string>
+<key>CFBundleName</key>
+<string>MD Quick Look</string>
 
-<key>CFBundleShortVersionString</key>
-<string>1.0</string>
-
-<!-- App must have a visible window or UI element -->
-<key>LSUIElement</key>
-<false/> <!-- Must be false for App Store -->
+<!-- Don't set LSUIElement - let it default to false (Regular policy) -->
 ```
 
-### Extension Info.plist
+**Lines to change:** 1-2 (update app name if needed)
 
-**Critical for file type association:**
-```xml
-<key>CFBundleIdentifier</key>
-<string>com.example.md-spotlighter.QLPreviewExtension</string>
+### 7. Assets.xcassets (UPDATE)
 
-<key>NSExtensionPrincipalClass</key>
-<string>$(PRODUCT_MODULE_NAME).PreviewProvider</string>
-
-<!-- File types supported -->
-<key>NSExtensionAttributes</key>
-<dict>
-  <key>QLSupportedContentTypes</key>
-  <array>
-    <string>net.daringfireball.markdown</string> <!-- UTType for .md -->
-    <string>public.plain-text</string> <!-- Fallback for .md without UTType -->
-  </array>
-
-  <!-- Optional: specify supported content types for thumbnails -->
-  <key>QLSupportedContentTypesForThumbnail</key>
-  <array>
-    <string>net.daringfireball.markdown</string>
-  </array>
-</dict>
-
-<!-- Rendering preferences -->
-<key>QLThumbnailMinimumSize</key>
-<integer>16</integer> <!-- For list view icons -->
-
-<key>QLPreviewHeight</key>
-<integer>600</integer>
-
-<key>QLPreviewWidth</key>
-<integer>800</integer>
-
-<!-- Markdown: use data-based preview, not view-based -->
-<key>QLIsDataBasedPreview</key>
-<true/>
-```
-
-### Extension Entitlements
-
-**File: QLPreviewExtension.entitlements**
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <!-- Core sandbox (required) -->
-  <key>com.apple.security.app-sandbox</key>
-  <true/>
-
-  <!-- Can read file passed by Quick Look -->
-  <key>com.apple.security.files.user-selected.read-only</key>
-  <true/>
-
-  <!-- Debug allowance (remove for production) -->
-  <key>com.apple.security.get-task-allow</key>
-  <true/>
-
-  <!-- If using XPC service -->
-  <key>com.apple.security.application.groups</key>
-  <array>
-    <string>group.com.example.md-spotlighter</string>
-  </array>
-</dict>
-</plist>
-```
-
-### Code Signing Process
-
-**In Xcode:**
-
-1. **Select Extension Target** → Build Settings
-2. **Set Team ID** (required for macOS app)
-3. **Code Signing Identity** → Mac Developer (development) or 3rd Party Mac (distribution)
-4. **Set Provisioning Profile** → Automatic or manual
-5. **Provisioning Profile** for extension must match identifier (`com.example.md-spotlighter.QLPreviewExtension`)
-
-**Signing Identity Requirements:**
-- ✅ Host app and extension must have matching Team ID
-- ✅ Extension identifier must be scoped under host (e.g., `host.identifier.extension-name`)
-- ✅ Each target (host, extension, XPC service) gets separate code signature
-- ✅ Development: automatic provisioning usually works
-- ✅ Release: explicit provisioning profile required for App Store
-
-**Command-line verification:**
-```bash
-# Check if extension is signed
-codesign -v /path/to/md-spotlighter.app/Contents/Library/Application\ Support/QLPreviewExtension.appex
-
-# Verify entitlements
-codesign -d --entitlements - /path/to/extension.appex
-
-# Check embedded content types
-grep -A 5 "QLSupportedContentTypes" /path/to/extension.appex/Contents/Info.plist
-```
+**Add/update:** AppIcon with 1024x1024 image for About window display.
 
 ---
 
-## Extension Lifecycle and Resource Management
+## Build Configuration
 
-### Activation Timeline
+### Xcode Target Structure (v1.1)
 
-1. **Finder Selection** (0ms)
-   - User selects markdown file
+```
+Project: md-spotlighter
+├── Target: md-spotlighter (Application)
+│   ├── Product: md-spotlighter.app
+│   ├── Bundle ID: com.yourdomain.md-spotlighter
+│   ├── Deployment: macOS 26.0+
+│   ├── Sources:
+│   │   ├── App.swift (NEW)
+│   │   ├── Views/AboutWindow.swift (NEW)
+│   │   ├── Views/SettingsView.swift (NEW)
+│   │   └── Models/ExtensionStatus.swift (NEW - optional)
+│   ├── Resources:
+│   │   ├── Assets.xcassets (UPDATE)
+│   │   └── Info.plist (UPDATE)
+│   └── Embedded Content:
+│       └── MDQuickLook.appex
+│
+└── Target: MDQuickLook (App Extension)
+    ├── Product: MDQuickLook.appex
+    ├── Bundle ID: com.yourdomain.md-spotlighter.MDQuickLook
+    └── [UNCHANGED - no modifications for v1.1]
+```
 
-2. **Quick Look Panel Open** (10-50ms)
-   - Quick Look framework initializes
+### Build Order
 
-3. **Extension Discovery** (20-100ms)
-   - System queries installed extensions for supported types
-   - Checks QLSupportedContentTypes in Info.plist
+1. **Extension builds** (dependency)
+2. **Extension embedded** in app PlugIns/
+3. **App builds** with new SwiftUI files
+4. **Signing** (both targets)
 
-4. **Process Launch** (100-500ms)
-   - macOS launches `.appex` process in sandbox
-   - Extension binary loaded, linked, initialized
-
-5. **Preview Generation** (300-1000ms)
-   - `PreviewProvider.providePreview(for:)` called
-   - Markdown parsing and rendering
-   - HTML response generated
-
-6. **Cache Storage** (10-50ms)
-   - Quick Look stores result in cache
-
-7. **Display** (100-300ms)
-   - HTML rendered in WKWebView
-   - Preview shown to user
-
-### Timeout Handling
-
-**If preview generation exceeds timeout (~10 seconds):**
-- Extension process terminated
-- Quick Look shows error or placeholder
-- User experiences: "Could not generate preview"
-
-**Prevention:**
-- Profile rendering with large markdown files
-- Set realistic timeout expectations (< 5 seconds for 10MB file)
-- If timeout is problematic, move parsing to XPC service
-
-### Resource Cleanup
-
-**Process Lifetime:**
-- Extension process remains running after preview generated
-- Reused if same file previewed again
-- Terminated after inactivity (~5-30 seconds)
-- All memory and file handles released on termination
-
-**Implications:**
-- Don't hold resources across multiple preview requests
-- Safe to load libraries on first call (they'll be cached)
-- Caching in `.appex` process is ephemeral (lost when process exits)
-- For persistent cache, use XPC service or app container
+No changes to extension build process for v1.1.
 
 ---
 
-## Performance Architecture Decisions
+## Phase-Specific Recommendations for v1.1
 
-### Markdown Parsing Library Selection
+### Recommended Implementation Order
 
-| Library | Performance | Features | Sandbox Compat. | Notes |
-|---------|-------------|----------|-----------------|-------|
-| **cmark-gfm** | Fast (C impl) | GitHub Flavored | ✅ Yes | Recommended: used by QLMarkdown |
-| **commonmark-swift** | Medium | CommonMark spec | ✅ Yes | Pure Swift, no external deps |
-| **markdown-swift** | Slow | Limited | ✅ Yes | Lightweight, limited extensions |
-| **down** (swift-cmark) | Fast | GFM + extras | ✅ Yes | Good balance |
+**Phase 1: SwiftUI App Foundation**
+- Remove main.swift
+- Create App.swift with Window scene
+- Create minimal AboutWindow.swift
+- Build and verify app launches showing About window
 
-**Recommendation:** cmark-gfm via Swift wrapper
-- Proven in QLMarkdown project
-- Fast parsing (C implementation)
-- Supports all GitHub markdown features
-- Available via CocoaPods/SPM
+**Phase 2: About Window Content**
+- Add app icon to AboutWindow
+- Format version string from Bundle
+- Add description text
+- Test appearance in light/dark mode
 
-### Syntax Highlighting Strategy
+**Phase 3: Settings Scene**
+- Add Settings scene to App.swift
+- Create SettingsView.swift with placeholder
+- Verify "Settings..." menu item appears
+- Test Cmd+, keyboard shortcut
 
-**For code blocks in markdown:**
+**Phase 4: Polish (Optional)**
+- Add GitHub link to AboutWindow
+- Add extension status check (ExtensionStatus.swift)
+- Test status indicator updates
+- Link to System Settings if disabled
 
-**Option 1: Highlight.js (JavaScript in WebView)**
-- ❌ Requires JavaScript execution in WKWebView
-- ❌ Can impact performance
-- ✅ Supports 200+ languages
-- ❌ Cannot be loaded from network (sandbox)
+**Phase 5: Integration Testing**
+- Build and run
+- Verify extension still works (preview .md file)
+- Verify About window appears on launch
+- Verify Settings accessible via menu
+- Test in light and dark mode
 
-**Option 2: Native Swift highlighter (Highlighter library)**
-- ✅ Fast (native code)
-- ✅ Can be called in sandbox
-- ✅ Deterministic results
-- ❌ Limited language support
-- ❌ Must embed color scheme data
-
-**Option 3: No syntax highlighting (CSS-only)**
-- ✅ Instant rendering
-- ✅ Simple implementation
-- ✅ Works with any WKWebView
-- ❌ Less visually appealing for code
-- ✅ Still readable (monospace font)
-
-**Recommendation for MVP:** Option 3 (CSS-only)
-- Then move to Option 2 if desired (Swift highlighter library)
-- Avoid Option 1 (JavaScript adds complexity)
-
-### Large File Handling
-
-**For files > 5MB:**
-1. Consider truncating in preview (show first 50KB)
-2. Or implement XPC-based streaming rendering
-3. Or use lazy rendering (render visible sections only)
-
-**In Initial Implementation:**
-- Render entire file (simpler logic)
-- Test performance on 10MB file
-- If acceptable, leave as-is
-- If slow, optimize in Phase 2
+**Rationale:** Build foundation first, add features incrementally, test integration last.
 
 ---
 
-## Known Architecture Pitfalls
+## Known Pitfalls (Host App Specific)
 
-### Pitfall 1: Missing File Type Registration
-
-**What goes wrong:**
-- Extension built but Quick Look never calls it
-- User selects .md file, no preview appears
-
-**Root cause:**
-- Missing or incorrect `QLSupportedContentTypes` in Info.plist
-- Using file extension (`.md`) instead of UTI
-- Identifier mismatch between extension and registration
-
-**Prevention:**
-- Use correct UTI: `net.daringfireball.markdown`
-- Test with: `mdls -name kMDItemContentType file.md` to verify UTI
-- Verify with: `pluginkit -m plugin -p com.apple.quicklook.extension`
-
-### Pitfall 2: Sandbox Violation on Image Embedding
+### Pitfall 1: Forgetting to Remove main.swift
 
 **What goes wrong:**
-- Markdown with local image: `![alt](/Users/me/image.png)`
-- Extension crashes with sandbox violation
-- Preview fails silently
-
-**Root cause:**
-- Extension tries to read file outside passed URL
-- Sandbox denies access
+- Both main.swift and App.swift with @main exist
+- Build error: "Multiple @main entry points"
 
 **Prevention:**
-- Don't parse and load local image paths
-- Strip image tags or show placeholder
-- Use XPC service for image loading if needed
+- Delete main.swift when creating App.swift
+- Or remove NSApplication.shared.run() and use @NSApplicationMain
 
-### Pitfall 3: Timeout on Large Files
+### Pitfall 2: LSUIElement Confusion
 
 **What goes wrong:**
-- Selecting 50MB markdown file
-- Preview takes 15+ seconds
-- Quick Look shows "Could not generate preview"
-- User thinks extension is broken
-
-**Root cause:**
-- Parsing and rendering in main thread
-- Blocking operation exceeds timeout
+- Set LSUIElement=true thinking it makes app lightweight
+- App has no Dock icon, no menu bar
+- User can't access Settings
 
 **Prevention:**
-- Profile with test files (5MB, 10MB, 50MB)
-- Set file size limit for rendering
-- Implement truncation or streaming
-- Use XPC service for background parsing
+- Don't set LSUIElement in Info.plist
+- Use default Regular activation policy
 
-### Pitfall 4: View-Based Controller Instead of QLPreviewProvider
+### Pitfall 3: Hardcoded Version String
 
 **What goes wrong:**
-- Extension works but requires complex storyboard
-- Performance is sluggish
-- Breaks on macOS future versions
-
-**Root cause:**
-- Using deprecated QLPreviewingController pattern
-- Not adopting modern QLPreviewProvider
+- Show "Version 1.0" hardcoded in AboutWindow
+- Forget to update when releasing v1.1, v1.2
 
 **Prevention:**
-- Use QLPreviewProvider from the start (data-based)
-- Delete MainInterface.storyboard
-- Set `QLIsDataBasedPreview = true` in Info.plist
+- Read from Bundle: `Bundle.main.infoDictionary?["CFBundleShortVersionString"]`
+- Single source of truth in Info.plist
 
-### Pitfall 5: Hardcoded CSS Theme
+### Pitfall 4: Blocking Main Thread with qlmanage
 
 **What goes wrong:**
-- Extension always shows light theme
-- User switches macOS to dark mode
-- Preview remains light (jarring, unreadable)
-
-**Root cause:**
-- CSS doesn't include media query for system appearance
-- No support for `prefers-color-scheme` media query
+- Run `qlmanage -m` synchronously in view body
+- UI freezes while command executes
 
 **Prevention:**
-- Always include: `@media (prefers-color-scheme: dark)`
-- Test in both light and dark appearance
-- Use CSS variables for theme colors
+- Use async/await with `.task { await extensionStatus.check() }`
+- Or run in background DispatchQueue
+
+### Pitfall 5: Assuming Extension and App Share State
+
+**What goes wrong:**
+- Try to communicate between app and extension
+- Expect extension to respond to app UI changes in real-time
+
+**Prevention:**
+- Remember: extension runs in separate process
+- No direct communication channel
+- Settings changes only apply to next preview request
 
 ---
 
-## Recommended Architecture Summary
+## Alternatives Considered
 
-### For md-spotlighter MVP
+### Alternative 1: Credits.rtf Instead of Custom About Window
 
-**Choose this architecture:**
+**What:** Add Credits.rtf file to Resources, use system About panel.
 
-1. **Host App:**
-   - Minimal macOS app (required for extension hosting)
-   - Single window with "Extension installed" message
-   - Settings window for customizing theme
+**Pros:**
+- Zero code
+- Standard macOS appearance
+- Automatic dark mode
 
-2. **QLPreviewExtension.appex:**
-   - QLPreviewProvider subclass (data-based)
-   - Async `providePreview()` method
-   - No storyboards or view hierarchy
-   - Lightweight (< 5MB)
+**Cons:**
+- Can't add interactive elements (GitHub link button)
+- Limited layout control
+- Static content only
 
-3. **Rendering Engine:**
-   - Embed cmark-gfm for parsing
-   - Generate HTML with inline CSS theme
-   - Support light/dark via CSS media query
-   - No image embedding (use placeholders)
+**Decision:** Use custom About window for GitHub link and extension status.
 
-4. **No XPC Service (initially):**
-   - Simple enough to render in extension process
-   - Revisit for Phase 2 if performance issues arise
+### Alternative 2: AppKit-Based UI
 
-5. **Content Type:**
-   - Return HTML via `QLPreviewReply(dataOfContentType: .html)`
-   - WKWebView renders it automatically
+**What:** Use NSWindow, NSViewController for About/Settings.
 
-6. **Entitlements:**
-   - Standard sandbox only
-   - `com.apple.security.files.user-selected.read-only`
-   - No special file access
+**Pros:**
+- More control over window behavior
+- Access to all AppKit APIs
 
-This architecture is:
-- ✅ Modern (macOS 14+ native pattern)
-- ✅ Simple (no complex lifecycle management)
-- ✅ Performant (async, timeouts respected)
-- ✅ Future-proof (aligns with Apple's direction)
-- ✅ Secure (minimal sandbox escape needed)
+**Cons:**
+- More code (window controllers, view controllers)
+- Imperative instead of declarative
+- Higher learning curve
+
+**Decision:** Use SwiftUI for simpler, modern approach.
+
+### Alternative 3: No Status Indicator
+
+**What:** Skip extension status checking entirely.
+
+**Pros:**
+- Simpler implementation
+- No shell command execution
+- Less code to maintain
+
+**Cons:**
+- User might think extension isn't working
+- No feedback on activation state
+
+**Decision:** Include basic status indicator or defer to v1.2.
 
 ---
 
 ## Sources
 
-- [Apple Quick Look Framework Documentation](https://developer.apple.com/documentation/quicklook/)
-- [QLPreviewProvider Apple Documentation](https://developer.apple.com/documentation/quicklookui/qlpreviewprovider)
-- [QLPreviewingController Documentation](https://developer.apple.com/documentation/quicklook/qlpreviewingcontroller)
-- [GitHub: sbarex/QLMarkdown](https://github.com/sbarex/QLMarkdown) - Modern markdown extension reference
-- [GitHub: sbarex/SourceCodeSyntaxHighlight](https://github.com/sbarex/SourceCodeSyntaxHighlight) - Advanced rendering patterns
-- [Eclectic Light: How QuickLook Creates Thumbnails and Previews](https://eclecticlight.co/2024/11/04/how-does-quicklook-create-thumbnails-and-previews-with-an-update-to-mints/)
-- [Apple Documentation: Accessing Files from macOS App Sandbox](https://developer.apple.com/documentation/security/accessing-files-from-the-macos-app-sandbox)
-- [Apple TN3125: Inside Code Signing: Provisioning Profiles](https://developer.apple.com/documentation/technotes/tn3125-inside-code-signing-provisioning-profiles)
-- [WWDC 2019 Session 719: What's New in File Management and Quick Look](https://developer.apple.com/videos/play/wwdc2019/719/)
+**SwiftUI Architecture:**
+- [Create a fully custom About window for a Mac app in SwiftUI](https://nilcoalescing.com/blog/FullyCustomAboutWindowForAMacAppInSwiftUI/)
+- [Presenting The Preferences Window On macOS Using SwiftUI](https://serialcoder.dev/text-tutorials/macos-tutorials/presenting-the-preferences-window-on-macos-using-swiftui/)
+- [SwiftUI on macOS: Settings, defaults and About](https://eclecticlight.co/2024/04/30/swiftui-on-macos-settings-defaults-and-about/)
+- [Apple Developer Documentation: Settings Scene](https://developer.apple.com/documentation/swiftui/settings)
+- [Scenes types in a SwiftUI Mac app](https://nilcoalescing.com/blog/ScenesTypesInASwiftUIMacApp/)
+
+**SwiftUI + AppKit Integration:**
+- [Use SwiftUI with AppKit - WWDC22](https://developer.apple.com/videos/play/wwdc2022/10075/)
+- [NSHostingController | Apple Developer Documentation](https://developer.apple.com/documentation/swiftui/nshostingcontroller)
+- [macOS Apprentice, Chapter 18: Using SwiftUI in AppKit](https://www.kodeco.com/books/macos-apprentice/v1.0/chapters/18-using-swiftui-in-appkit)
+
+**Quick Look Extension Structure:**
+- [PeekX: Quick Look Extension for Folder Preview on macOS](https://github.com/altic-dev/PeekX)
+- [QLMarkdown: macOS Quick Look extension for Markdown files](https://github.com/sbarex/QLMarkdown)
+- [An overview of app extensions and plugins in macOS Sequoia](https://eclecticlight.co/2025/04/23/an-overview-of-app-extensions-and-plugins-in-macos-sequoia/)
+
+**Extension Status Detection:**
+- [qlmanage Man Page - macOS](https://ss64.com/mac/qlmanage.html)
+- [Inside QuickLook previews with qlmanage](https://eclecticlight.co/2018/04/05/inside-quicklook-previews-with-qlmanage/)
+- [macOS Hints: Enable QuickLook in macOS Sonoma and macOS Sequoia](https://www.projectwizards.net/en/blog/2025/01/quicklook)
+
+**macOS App Lifecycle:**
+- [SwiftUI on macOS: Life Cycle and App Delegate](https://eclecticlight.co/2024/04/17/swiftui-on-macos-life-cycle-and-appdelegate/)
+- [NSApplicationDelegateAdaptor | Apple Developer Documentation](https://developer.apple.com/documentation/swiftui/nsapplicationdelegateadaptor)
+- [LSUIElement | Apple Developer Documentation](https://developer.apple.com/documentation/bundleresources/information-property-list/lsuielement)
+- [A menu bar only macOS app using AppKit](https://www.polpiella.dev/a-menu-bar-only-macos-app-using-appkit/)
+
+**About Panel Customization:**
+- [Customizing the macOS About Panel in SwiftUI](https://danielsaidi.com/blog/2023/11/28/customizing-the-macos-about-panel-in-swiftui/)
+- [Credits - Swift macOS](https://gavinw.me/swift-macos/swiftui/credits.html)
+- [Apple Developer Documentation: NSApplication credits](https://developer.apple.com/documentation/appkit/nsapplication/aboutpaneloptionkey/credits)
+- [Customize About panel on macOS in SwiftUI](https://nilcoalescing.com/blog/CustomiseAboutPanelOnMacOSInSwiftUI/)
+
+---
+*Architecture research for: macOS Quick Look Extension Host App UI*
+*Researched: 2026-02-02*
+*Milestone: v1.1 - Public Release (GitHub)*
