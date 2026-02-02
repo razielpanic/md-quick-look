@@ -124,27 +124,24 @@ class TableRenderer {
         // Truncate long content with ellipsis for quick scanning
         paragraphStyle.lineBreakMode = .byTruncatingTail
 
-        // Handle empty cells: show middot indicator with gray color and subtle background
+        // Handle empty cells: show middot indicator with subtle color, no background
         let displayText: String
-        var additionalAttributes: [NSAttributedString.Key: Any] = [:]
+        let foregroundColor: NSColor
 
         if content.isEmpty {
             displayText = "\u{00B7}"  // middot
-            additionalAttributes[.foregroundColor] = NSColor.tertiaryLabelColor
-            additionalAttributes[.backgroundColor] = NSColor.quaternaryLabelColor.withAlphaComponent(0.2)
+            foregroundColor = NSColor.quaternaryLabelColor  // Lighter/more subtle
         } else {
             displayText = content
+            foregroundColor = NSColor.textColor
         }
 
         // Build attributes
-        var attributes: [NSAttributedString.Key: Any] = [
+        let attributes: [NSAttributedString.Key: Any] = [
             .paragraphStyle: paragraphStyle,
             .font: isHeader ? NSFont.boldSystemFont(ofSize: bodyFontSize) : NSFont.systemFont(ofSize: bodyFontSize),
-            .foregroundColor: content.isEmpty ? NSColor.tertiaryLabelColor : NSColor.textColor
+            .foregroundColor: foregroundColor
         ]
-
-        // Merge additional attributes for empty cells
-        attributes.merge(additionalAttributes) { (_, new) in new }
 
         // CRITICAL: Cell content MUST end with "\n" for NSTextTable to work
         let cellText = displayText + "\n"
