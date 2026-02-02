@@ -170,71 +170,29 @@ class MarkdownRenderer {
         return result
     }
 
-    /// Ensures list items end with newlines for proper separation
+    /// Ensures blockquotes have proper internal newlines for separation
     /// - Parameter attributedString: The AttributedString to process
-    /// - Returns: AttributedString with newlines added at the end of list items
+    /// - Returns: AttributedString with newlines added within blockquote blocks
     private func ensureIntraBlockNewlines(in attributedString: AttributedString) -> AttributedString {
         var result = attributedString
         var insertionPositions: [AttributedString.Index] = []
 
-        // Collect all runs in array for peeking
-        let allRuns = Array(attributedString.runs)
-
-        // Helper to extract list item ordinal from a run
-        func listItemOrdinal(for run: AttributedString.Runs.Run) -> Int? {
-            guard let intent = run.presentationIntent else { return nil }
-            for component in intent.components {
-                if case .listItem(ordinal: let ordinal) = component.kind {
-                    return ordinal
-                }
-            }
-            return nil
-        }
-
         // Collect positions where newlines need to be inserted
-        for (index, run) in allRuns.enumerated() {
+        for run in attributedString.runs {
             guard let intent = run.presentationIntent else { continue }
 
-            // Check if this run contains a list item or blockquote
-            var isListItem = false
+            // Check if this run contains a blockquote
             var isBlockquote = false
-            var currentOrdinal: Int?
 
             for component in intent.components {
-                switch component.kind {
-                case .listItem(ordinal: let ordinal):
-                    isListItem = true
-                    currentOrdinal = ordinal
-                case .blockQuote:
+                if case .blockQuote = component.kind {
                     isBlockquote = true
-                default:
                     break
                 }
             }
 
-            // For list items, only add newline if NEXT run is different list item
-            if isListItem {
-                let runText = String(attributedString[run.range].characters)
-                if !runText.hasSuffix("\n") {
-                    // Peek at next run
-                    let nextIndex = index + 1
-                    if nextIndex < allRuns.count {
-                        let nextOrdinal = listItemOrdinal(for: allRuns[nextIndex])
-                        // Only add newline if next run has different ordinal (or no ordinal)
-                        if nextOrdinal != currentOrdinal {
-                            insertionPositions.append(run.range.upperBound)
-                        }
-                        // If same ordinal, skip - inline formatting continues on same line
-                    } else {
-                        // Last run in document - add newline
-                        insertionPositions.append(run.range.upperBound)
-                    }
-                }
-            }
-
-            // For blockquotes, add newline if missing (same as before)
+            // For blockquotes, add newline if missing
             // Each blockquote paragraph/line needs its own newline for proper separation
-            // The block boundary logic will prevent double-newlines between different blocks
             if isBlockquote {
                 let runText = String(attributedString[run.range].characters)
                 if !runText.hasSuffix("\n") {
