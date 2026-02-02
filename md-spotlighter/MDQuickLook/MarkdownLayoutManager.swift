@@ -105,7 +105,7 @@ class MarkdownLayoutManager: NSLayoutManager {
                                 height: unionRect.height)
 
             // Use semantic color that adapts to appearance
-            NSColor.systemBlue.withAlphaComponent(0.4).setFill()
+            NSColor.separatorColor.setFill()
             barRect.fill()
 
             os_log("MarkdownLayoutManager: Drew blockquote border at y=%f height=%f for merged range %d-%d",
