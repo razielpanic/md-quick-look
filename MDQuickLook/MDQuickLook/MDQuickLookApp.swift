@@ -2,21 +2,12 @@ import SwiftUI
 
 @main
 struct MDQuickLookApp: App {
-    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
+    @StateObject private var appState = AppState()
 
     var body: some Scene {
-        // Main window that auto-opens and routes to first-launch or settings
+        // Main window that auto-opens
         WindowGroup {
-            if !hasLaunchedBefore {
-                FirstLaunchView()
-                    .onAppear {
-                        hasLaunchedBefore = true
-                    }
-                    .frame(width: 400, height: 360)
-            } else {
-                SettingsView()
-                    .frame(width: 450, height: 320)
-            }
+            ContentRouter(appState: appState)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
@@ -41,5 +32,41 @@ struct MDQuickLookApp: App {
                 }
             }
         }
+    }
+}
+
+// Separate router view to handle first-launch logic
+struct ContentRouter: View {
+    @ObservedObject var appState: AppState
+
+    var body: some View {
+        Group {
+            if appState.isFirstLaunch {
+                FirstLaunchView(onDismiss: {
+                    appState.markLaunchedBefore()
+                })
+                .frame(width: 400, height: 360)
+            } else {
+                SettingsView()
+                    .frame(width: 450, height: 320)
+            }
+        }
+    }
+}
+
+// App state manager
+class AppState: ObservableObject {
+    @Published var isFirstLaunch: Bool
+
+    private let hasLaunchedKey = "hasLaunchedBefore"
+
+    init() {
+        // Check if app has launched before
+        self.isFirstLaunch = !UserDefaults.standard.bool(forKey: hasLaunchedKey)
+    }
+
+    func markLaunchedBefore() {
+        UserDefaults.standard.set(true, forKey: hasLaunchedKey)
+        isFirstLaunch = false
     }
 }

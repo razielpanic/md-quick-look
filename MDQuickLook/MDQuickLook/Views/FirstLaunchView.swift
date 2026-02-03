@@ -3,6 +3,7 @@ import SwiftUI
 struct FirstLaunchView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
+    var onDismiss: (() -> Void)?
 
     var body: some View {
         VStack(spacing: 20) {
@@ -46,7 +47,8 @@ struct FirstLaunchView: View {
 
             // Dismiss button
             Button("Get Started") {
-                dismiss()
+                onDismiss?()
+                // Don't call dismiss() - let the content router switch views
             }
             .keyboardShortcut(.defaultAction)
         }
