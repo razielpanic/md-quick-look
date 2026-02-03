@@ -2,24 +2,33 @@ import SwiftUI
 
 @main
 struct MDQuickLookApp: App {
-    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
 
     var body: some Scene {
-        // Settings scene - automatically creates Preferences menu item (Cmd+,)
-        Settings {
-            SettingsView()
+        // Main window that auto-opens and routes to first-launch or settings
+        WindowGroup {
+            if !hasLaunchedBefore {
+                FirstLaunchView()
+                    .onAppear {
+                        hasLaunchedBefore = true
+                    }
+                    .frame(width: 400, height: 360)
+            } else {
+                SettingsView()
+                    .frame(width: 450, height: 320)
+            }
         }
-
-        // About window
-        Window("About MD Quick Look", id: "about") {
-            AboutView()
-        }
+        .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
         .commands {
             // Replace default About menu item with custom one
             CommandGroup(replacing: .appInfo) {
                 Button("About MD Quick Look") {
-                    NSApp.sendAction(#selector(AppDelegate.showAboutWindow), to: nil, from: nil)
+                    NSApp.orderFrontStandardAboutPanel(options: [
+                        .applicationName: "MD Quick Look",
+                        .applicationVersion: Bundle.main.releaseVersionNumber ?? "Unknown",
+                        .applicationIcon: NSApp.applicationIconImage
+                    ])
                 }
             }
 
@@ -32,50 +41,5 @@ struct MDQuickLookApp: App {
                 }
             }
         }
-
-        // First launch welcome window
-        Window("Welcome", id: "firstLaunch") {
-            FirstLaunchView()
-        }
-        .windowResizability(.contentSize)
     }
 }
-
-// App delegate for window management
-class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationDidFinishLaunching(_ notification: Notification) {
-        // Check if this is first launch
-        let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
-
-        if !hasLaunchedBefore {
-            // First launch - open welcome window
-            openWindow(id: "firstLaunch")
-            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
-        } else {
-            // Subsequent launch - open settings window
-            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-        }
-    }
-
-    private func openWindow(id: String) {
-        // Find and open window by ID
-        for window in NSApp.windows {
-            if window.identifier?.rawValue == id {
-                window.makeKeyAndOrderFront(nil)
-                NSApp.activate(ignoringOtherApps: true)
-                return
-            }
-        }
-
-        // If window doesn't exist yet, wait a bit and try again
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.openWindow(id: id)
-        }
-    }
-
-    @objc func showAboutWindow() {
-        openWindow(id: "about")
-    }
-}
-
-
