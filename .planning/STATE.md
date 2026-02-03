@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.1 Public Release - Phase 8 (SwiftUI Host App UI)
+**Current focus:** v1.1 Public Release - Phase 9 (Code Signing & Notarization)
 
 ## Current Position
 
-Phase: 8 of 11 (SwiftUI Host App UI)
-Plan: 2 of 4 complete
-Status: In progress - Plans 08-01, 08-02 complete
-Progress: [██████░░░░] 69% (v1.0 shipped, Phases 6-7 complete, 08-01, 08-02 complete)
+Phase: 9 of 11 (Code Signing & Notarization)
+Plan: Ready to plan Phase 9
+Status: Phase 8 complete, ready to plan Phase 9
+Progress: [███████░░░] 73% (v1.0 shipped, Phases 6-8 complete)
 
-Last activity: 2026-02-03 - Completed Plan 08-02 (Settings window)
+Last activity: 2026-02-03 - Phase 8 complete, SwiftUI host app UI functional
 
 ## Performance Metrics
 
@@ -34,8 +34,8 @@ Last activity: 2026-02-03 - Completed Plan 08-02 (Settings window)
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 7
-- Phases completed: 2/6
+- Plans completed: 8
+- Phases completed: 3/6
 
 **Phase 6 (Naming Cleanup):**
 - Plans completed: 3/3 (06-01, 06-02, 06-03)
@@ -50,10 +50,10 @@ Last activity: 2026-02-03 - Completed Plan 08-02 (Settings window)
 - Status: ✓ Complete (verified)
 
 **Phase 8 (SwiftUI Host App UI):**
-- Plans completed: 2/4 (08-01, 08-02)
-- Time spent: 6 min
-- Average: 3 min/plan
-- Status: In progress
+- Plans completed: 3/3 (08-01, 08-02, 08-03)
+- Time spent: ~20 min
+- Average: ~7 min/plan
+- Status: ✓ Complete (verified)
 
 **Timeline:**
 - Project start: 2026-01-19
