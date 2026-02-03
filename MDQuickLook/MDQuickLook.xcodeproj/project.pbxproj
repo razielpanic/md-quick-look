@@ -16,7 +16,6 @@
 		4A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6A1A1A1A1A1A1A1A1A1A1A1A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1B1B1B1B1B1B1B1B1B1B1B /* Markdown */; };
 		7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */; };
-	8E1E1E1E1E1E1E1E1E1E1E1E /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +55,6 @@
 		3B1B1B1B1B1B1B1B1B1B1B2F /* TableRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableRenderer.swift; sourceTree = "<group>"; };
 		5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MDQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-	8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,7 +108,6 @@
 		9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -217,7 +214,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */,
-				8E1E1E1E1E1E1E1E1E1E1E1E /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,7 +387,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "MDQuickLook/Info.plist";
-				INFOPLIST_KEY_CFBundleIconFile = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -417,7 +414,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "MDQuickLook/Info.plist";
-				INFOPLIST_KEY_CFBundleIconFile = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
