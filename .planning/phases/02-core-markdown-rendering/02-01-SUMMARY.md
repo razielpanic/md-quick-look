@@ -40,11 +40,11 @@ tech-stack:
 
 key-files:
   created:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
     - samples/headings.md
   modified:
-    - md-spotlighter/MDQuickLook/PreviewViewController.swift
-    - md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj
+    - md-quick-look/MDQuickLook/PreviewViewController.swift
+    - md-quick-look/md-quick-look.xcodeproj/project.pbxproj
 
 decisions:
   - slug: use-attributedstring-nsattributedstring-conversion
@@ -185,7 +185,7 @@ None - plan executed exactly as written.
 - ✅ No SwiftUI linker errors
 
 **Runtime Verification**
-- ✅ Extension installs to /Applications/md-spotlighter.app
+- ✅ Extension installs to /Applications/md-quick-look.app
 - ✅ Extension loads for .md files (qlmanage -p)
 - ✅ samples/headings.md created with all heading levels
 - ✅ Inline formatting preserved (bold, italic, strikethrough from AttributedString)

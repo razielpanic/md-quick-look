@@ -25,7 +25,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Set attachment.image before bounds (AppKit requirement)"
@@ -76,7 +76,7 @@ Work was completed but commits were merged into 02-04 due to execution sequencin
 **Note:** Changes were implemented during 02-04 execution and included in that plan's commits. This summary documents the 02-05 plan completion for tracking purposes.
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Fixed image placeholders and added strikethrough support
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Fixed image placeholders and added strikethrough support
 
 ## Decisions Made
 

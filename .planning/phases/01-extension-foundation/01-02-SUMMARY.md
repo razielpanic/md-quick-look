@@ -26,9 +26,9 @@ key-files:
     - samples/basic.md
     - samples/empty.md
   modified:
-    - md-spotlighter/MDQuickLook/PreviewViewController.swift
-    - md-spotlighter/MDQuickLook/Info.plist
-    - md-spotlighter/md-spotlighter.xcodeproj
+    - md-quick-look/MDQuickLook/PreviewViewController.swift
+    - md-quick-look/MDQuickLook/Info.plist
+    - md-quick-look/md-quick-look.xcodeproj
 
 key-decisions:
   - "Use AttributedString(markdown:) instead of WKWebView for synchronous rendering"
@@ -82,9 +82,9 @@ Each task was committed atomically:
 - `samples/empty.md` - Edge case test for empty markdown files
 
 ### Modified
-- `md-spotlighter/MDQuickLook/PreviewViewController.swift` - Switched from WKWebView to AttributedString(markdown:) for synchronous rendering
-- `md-spotlighter/MDQuickLook/Info.plist` - Quick Look generator configuration
-- `md-spotlighter/md-spotlighter.xcodeproj` - Project structure and embedding fixes
+- `md-quick-look/MDQuickLook/PreviewViewController.swift` - Switched from WKWebView to AttributedString(markdown:) for synchronous rendering
+- `md-quick-look/MDQuickLook/Info.plist` - Quick Look generator configuration
+- `md-quick-look/md-quick-look.xcodeproj` - Project structure and embedding fixes
 
 ## Decisions Made
 
@@ -138,7 +138,7 @@ Each task was committed atomically:
 - **Found during:** Task 2 (Extension not loading)
 - **Issue:** Extension bundle wasn't properly embedded in host app
 - **Fix:** Recreated Xcode project with correct target dependencies and Copy Files build phase
-- **Files modified:** md-spotlighter.xcodeproj
+- **Files modified:** md-quick-look.xcodeproj
 - **Verification:** Extension bundle appears at Contents/PlugIns/MDQuickLook.appex
 - **Committed in:** `a8cd11e`, `49c870e`
 

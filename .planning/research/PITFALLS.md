@@ -2,7 +2,7 @@
 
 **Domain:** Quick Look extension development (macOS 12+)
 **Researched:** 2026-01-19
-**Project Context:** md-spotlighter (markdown rendering with instant performance requirement)
+**Project Context:** md-quick-look (markdown rendering with instant performance requirement)
 
 ## Critical Pitfalls
 
@@ -22,7 +22,7 @@ macOS 12+ enforces strict sandbox isolation for all Quick Look extensions. File 
 
 **Prevention:**
 1. **Embed asset data:** Convert referenced images to base64 and embed in HTML (base64-encoded data URIs)
-2. **Accept limitation:** Document that md-spotlighter cannot render external references; design around this
+2. **Accept limitation:** Document that md-quick-look cannot render external references; design around this
 3. **Use absolute data:** Only support inline code blocks, embeds, and self-contained markdown
 4. **Test carefully:** Create test markdown with various reference types and verify each fails predictably
 
@@ -96,7 +96,7 @@ Quick Look extensions require cryptographic code signing with specific entitleme
 **Detection:**
 - Extension listed in System Preferences but doesn't activate → signing issue
 - `qlmanage -p` shows "failed to load" → likely signing problem
-- Check: `codesign -dv /Applications/md-spotlighter.app/Contents/PlugIns/*.extensionkit`
+- Check: `codesign -dv /Applications/md-quick-look.app/Contents/PlugIns/*.extensionkit`
 
 **Phase impact:** Distribution (Phase 3) — must validate code signing early; late discovery causes release delays
 
@@ -126,7 +126,7 @@ There is a known bug in Big Sur's Quick Look engine and WebKit integration. WebV
    }
    ```
 2. **Workaround with entitlements:** If Web rendering required on Big Sur, request temporary mach-lookup exception (but this triggers App Review scrutiny)
-3. **Choose rendering method wisely:** For md-spotlighter, consider NSAttributedString rendering which is stable across all versions
+3. **Choose rendering method wisely:** For md-quick-look, consider NSAttributedString rendering which is stable across all versions
 4. **Drop Big Sur support:** Document minimum requirement as macOS 12+ to avoid the issue entirely
 
 **Detection:**
@@ -144,7 +144,7 @@ There is a known bug in Big Sur's Quick Look engine and WebKit integration. WebV
 Even after building and signing the extension, Finder doesn't offer preview for .md files. Extension is installed but never invoked, or competes with default PDF preview for markdown files with conflicting UTI definitions.
 
 **Why it happens:**
-Quick Look's discovery mechanism relies entirely on UTI registration in Info.plist. If the extension doesn't declare support for `public.markdown` or `com.md-spotlighter.markdown` with correct priority, Finder won't associate the extension with .md files. Multiple extensions claiming the same UTI causes macOS to choose arbitrarily or ignore all of them.
+Quick Look's discovery mechanism relies entirely on UTI registration in Info.plist. If the extension doesn't declare support for `public.markdown` or `com.md-quick-look.markdown` with correct priority, Finder won't associate the extension with .md files. Multiple extensions claiming the same UTI causes macOS to choose arbitrarily or ignore all of them.
 
 **Consequences:**
 - Extension installed and signed, but never runs
@@ -172,10 +172,10 @@ Quick Look's discovery mechanism relies entirely on UTI registration in Info.pli
 2. **Test UTI registration:** Use `mdls` command to verify .md files report correct type:
    ```bash
    mdls -name kMDItemContentType /path/test.md
-   # Should output: public.markdown or com.md-spotlighter.markdown
+   # Should output: public.markdown or com.md-quick-look.markdown
    ```
 3. **Check priority:** If multiple extensions claim the same UTI, explicitly set priority in manifest
-4. **Verify after install:** After building, check System Preferences > Extensions > Quick Look to see if md-spotlighter is listed
+4. **Verify after install:** After building, check System Preferences > Extensions > Quick Look to see if md-quick-look is listed
 
 **Detection:**
 - `qlmanage -g /path/test.md` shows no provider found
@@ -189,10 +189,10 @@ Quick Look's discovery mechanism relies entirely on UTI registration in Info.pli
 ### Pitfall 6: Markdown Parsing Diverges From Target Rendering
 
 **What goes wrong:**
-Markdown files render differently in md-spotlighter than in GitHub, Markdown viewers, or the user's expected output. Syntax highlighting colors differ, table formatting varies, code block language detection fails silently, or complex formatting features are ignored.
+Markdown files render differently in md-quick-look than in GitHub, Markdown viewers, or the user's expected output. Syntax highlighting colors differ, table formatting varies, code block language detection fails silently, or complex formatting features are ignored.
 
 **Why it happens:**
-Different markdown parsing libraries implement different flavors of Markdown. GitHub-flavored Markdown (GFM) is not the same as CommonMark or original Markdown. The library used by md-spotlighter (e.g., cmark-gfm, marked, or custom) may not match the user's expectations or GitHub's actual rendering engine. Syntax highlighters add another layer of divergence.
+Different markdown parsing libraries implement different flavors of Markdown. GitHub-flavored Markdown (GFM) is not the same as CommonMark or original Markdown. The library used by md-quick-look (e.g., cmark-gfm, marked, or custom) may not match the user's expectations or GitHub's actual rendering engine. Syntax highlighters add another layer of divergence.
 
 **Consequences:**
 - Users see unexpected preview that doesn't match their mental model
@@ -203,7 +203,7 @@ Different markdown parsing libraries implement different flavors of Markdown. Gi
 
 **Prevention:**
 1. **Choose stable markdown library:** Use well-tested library (cmark-gfm or equivalent) rather than custom parser
-2. **Document flavor explicitly:** Clarify in help/docs: "md-spotlighter uses CommonMark + GFM extensions"
+2. **Document flavor explicitly:** Clarify in help/docs: "md-quick-look uses CommonMark + GFM extensions"
 3. **Limit feature scope:** In Phase 1, support only core features: headings, emphasis, lists, code blocks. Defer tables, footnotes, etc.
 4. **Test against reference:** Build test suite comparing output to GitHub or standard markdown specs
 5. **Set expectations:** Make clear that preview is "instant" by design and cannot support all markdown features
@@ -295,13 +295,13 @@ macOS enforces rendering timeouts to prevent frozen Finder. If markdown parsing 
 ### Pitfall 10: Conflicting Extensions Claim .md UTI
 
 **What goes wrong:**
-User has multiple Quick Look extensions installed (e.g., md-spotlighter + third-party markdown viewer). Finder unpredictably chooses one or neither. Preview may fail or show wrong renderer.
+User has multiple Quick Look extensions installed (e.g., md-quick-look + third-party markdown viewer). Finder unpredictably chooses one or neither. Preview may fail or show wrong renderer.
 
 **Why it happens:**
 If multiple extensions register for the same UTI without priority differences, macOS behavior becomes undefined. System may cache preference, choose alphabetically, or disable all conflicting extensions.
 
 **Prevention:**
-- Document compatible UTI scope: what file types md-spotlighter handles
+- Document compatible UTI scope: what file types md-quick-look handles
 - Set priority in Info.plist if competing with known extensions
 - Test with other popular Quick Look extensions installed
 - Recommend users disable other markdown Quick Look extensions
@@ -345,13 +345,13 @@ NSAttributedString has limited HTML support. It recognizes basic tags (bold, ita
 ### Pitfall 12: Extension Not Launched At Installation
 
 **What goes wrong:**
-User installs md-spotlighter app, but Quick Look extension doesn't work until the app is explicitly launched.
+User installs md-quick-look app, but Quick Look extension doesn't work until the app is explicitly launched.
 
 **Why it happens:**
 macOS requires the host app to be launched at least once so the system can discover and register the bundled Quick Look extension. If user installs but never opens the app, the extension remains unregistered.
 
 **Prevention:**
-- Document: "Launch md-spotlighter once after installation for Quick Look support"
+- Document: "Launch md-quick-look once after installation for Quick Look support"
 - Consider auto-launch on first installation (with user permission)
 - Provide setup wizard that launches app automatically
 - Check in System Preferences if extension is listed; if not, prompt user to launch app
@@ -396,7 +396,7 @@ Markdown files <100KB render instantly; files >500KB suddenly render slowly or t
 Markdown parsing is typically O(n) or worse. Large files exceed Finder's timeout or exceed available memory in QuickLookUIService. No graceful degradation; rendering either completes or crashes.
 
 **Prevention:**
-- Establish file size limits: "md-spotlighter works best with files <500KB"
+- Establish file size limits: "md-quick-look works best with files <500KB"
 - Implement smart truncation: render only first 100KB, show "(truncated)" notice
 - Add file size check: show warning for very large files
 - Profile with various file sizes to find performance cliff
@@ -412,7 +412,7 @@ Markdown parsing is typically O(n) or worse. Large files exceed Finder's timeout
 ### Pitfall 15: Missing Markdown Support for Certain Syntax
 
 **What goes wrong:**
-User's markdown uses GitHub-flavored extensions (task lists, strikethrough, tables) that md-spotlighter doesn't support. These render as plain text or break formatting.
+User's markdown uses GitHub-flavored extensions (task lists, strikethrough, tables) that md-quick-look doesn't support. These render as plain text or break formatting.
 
 **Why it happens:**
 If the markdown parsing library doesn't support GFM extensions or if the feature scope is limited, unsupported syntax is silently ignored. Users expect "standard" markdown but different flavors support different features.

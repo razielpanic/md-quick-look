@@ -2,7 +2,7 @@
 type: quick
 plan: 001
 files_modified:
-  - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+  - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 autonomous: true
 estimated_context: 30%
 
@@ -13,7 +13,7 @@ must_haves:
     - "Paragraphs are visually separated"
     - "Code blocks retain existing behavior"
   artifacts:
-    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
       provides: "Block boundary newline insertion"
       contains: "insertBlockBoundaryNewlines"
   key_links:
@@ -32,7 +32,7 @@ Output: MarkdownRenderer that correctly separates headings, paragraphs, list ite
 </objective>
 
 <context>
-@md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+@md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 **Root Cause Analysis:**
 1. `AttributedString(markdown:)` parses markdown and represents block structure via `PresentationIntent` attributes
@@ -51,7 +51,7 @@ Output: MarkdownRenderer that correctly separates headings, paragraphs, list ite
 
 <task type="auto">
   <name>Task 1: Add block boundary newline insertion to MarkdownRenderer</name>
-  <files>md-spotlighter/MDQuickLook/MarkdownRenderer.swift</files>
+  <files>md-quick-look/MDQuickLook/MarkdownRenderer.swift</files>
   <action>
 Add a new private method `insertBlockBoundaryNewlines(in:) -> AttributedString` that:
 

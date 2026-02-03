@@ -92,9 +92,9 @@ human_verification:
 
 | Artifact | Status | Details |
 |----------|--------|---------|
-| `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` | ✓ VERIFIED | 540 lines, all rendering logic present and wired |
-| `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` | ✓ VERIFIED | 104 lines, continuous background/border drawing implemented |
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | ✓ VERIFIED | 82 lines, integrates renderer with MarkdownLayoutManager |
+| `md-quick-look/MDQuickLook/MarkdownRenderer.swift` | ✓ VERIFIED | 540 lines, all rendering logic present and wired |
+| `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` | ✓ VERIFIED | 104 lines, continuous background/border drawing implemented |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | ✓ VERIFIED | 82 lines, integrates renderer with MarkdownLayoutManager |
 | `samples/comprehensive.md` | ✓ VERIFIED | 79 lines, test file with all markdown elements |
 
 ### Key Link Verification

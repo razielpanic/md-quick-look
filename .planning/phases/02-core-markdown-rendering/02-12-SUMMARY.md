@@ -24,7 +24,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Set paragraphSpacing = 0 for list items (newlines provide separation)"
@@ -68,7 +68,7 @@ Combined tasks into single logical fix:
    - Ensure same-ordinal runs don't trigger block boundaries
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Fixed list paragraph spacing and inline formatting continuity
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Fixed list paragraph spacing and inline formatting continuity
 
 ## Decisions Made
 

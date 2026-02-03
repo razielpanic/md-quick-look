@@ -22,7 +22,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Use __IMAGE_PLACEHOLDER__ marker instead of <<IMAGE:>> to prevent AttributedString from consuming angle brackets"
@@ -66,7 +66,7 @@ Related commit from plan 02-09:
 ## Files Created/Modified
 
 **From plan 02-09 (which included this fix):**
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Changed preprocessing and replacement patterns
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Changed preprocessing and replacement patterns
 
 ## Decisions Made
 

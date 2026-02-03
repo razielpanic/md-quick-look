@@ -58,11 +58,11 @@ must_haves:
     - "User sees links rendered as text (not clickable)"
     - "User sees images rendered as placeholders showing [Image: filename]"
   artifacts:
-    - path: "md-spotlighter/MDQuickLook/PreviewViewController.swift"
+    - path: "md-quick-look/MDQuickLook/PreviewViewController.swift"
       provides: "Quick Look preview controller with custom text stack"
-    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
       provides: "Markdown rendering with all essential elements"
-    - path: "md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownLayoutManager.swift"
       provides: "Custom drawing for blockquotes and code blocks"
     - path: "samples/comprehensive.md"
       provides: "Test file with all supported markdown elements"
@@ -259,9 +259,9 @@ The function went from handling BOTH list items AND blockquotes (with complex or
 
 | Artifact | L1: Exists | L2: Substantive | L3: Wired | Status |
 |----------|------------|-----------------|-----------|--------|
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (543 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (543 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
 | `samples/comprehensive.md` | ✓ | ✓ (78 lines) | ✓ | VERIFIED |
 
 **Level 1 (Existence):** All files present in repository.

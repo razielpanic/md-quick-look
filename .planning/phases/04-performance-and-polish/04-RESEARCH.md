@@ -147,11 +147,11 @@ NSColor.quaternarySystemFill.setFill()  // Instead of lightGray
 import os.signpost
 
 extension OSLog {
-    static let performance = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: .pointsOfInterest)
+    static let performance = OSLog(subsystem: "com.razielpanic.md-quick-look", category: .pointsOfInterest)
 }
 
 class MarkdownRenderer {
-    private let signposter = OSSignposter(subsystem: "com.razielpanic.md-spotlighter", category: .pointsOfInterest)
+    private let signposter = OSSignposter(subsystem: "com.razielpanic.md-quick-look", category: .pointsOfInterest)
 
     func render(markdown: String) -> NSAttributedString {
         let signpostID = signposter.makeSignpostID()
@@ -403,11 +403,11 @@ if isHeader {
 import os.signpost
 
 extension OSLog {
-    static let performance = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: .pointsOfInterest)
+    static let performance = OSLog(subsystem: "com.razielpanic.md-quick-look", category: .pointsOfInterest)
 }
 
 class MarkdownRenderer {
-    private let signposter = OSSignposter(subsystem: "com.razielpanic.md-spotlighter", category: .pointsOfInterest)
+    private let signposter = OSSignposter(subsystem: "com.razielpanic.md-quick-look", category: .pointsOfInterest)
 
     func render(markdown: String) -> NSAttributedString {
         #if DEBUG

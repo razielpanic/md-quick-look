@@ -21,7 +21,7 @@ tech-stack:
 
 key-files:
   created: []
-  modified: [md-spotlighter/MDQuickLook/PreviewViewController.swift]
+  modified: [md-quick-look/MDQuickLook/PreviewViewController.swift]
 
 key-decisions:
   - "500KB truncation threshold balances large documentation support with <1s render guarantee"
@@ -62,7 +62,7 @@ Each task was committed atomically:
 1. **Task 1: Implement file size checking and truncation** - `1f496a6` (feat)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/PreviewViewController.swift` - Added file size checking, truncation logic with FileHandle, and user-friendly truncation message
+- `md-quick-look/MDQuickLook/PreviewViewController.swift` - Added file size checking, truncation logic with FileHandle, and user-friendly truncation message
 
 ## Decisions Made
 

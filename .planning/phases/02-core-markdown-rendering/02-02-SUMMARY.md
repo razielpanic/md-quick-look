@@ -27,11 +27,11 @@ tech-stack:
 
 key-files:
   created:
-    - md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
+    - md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
-    - md-spotlighter/MDQuickLook/PreviewViewController.swift
-    - md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/PreviewViewController.swift
+    - md-quick-look/md-quick-look.xcodeproj/project.pbxproj
 
 key-decisions:
   - "PresentationIntent doesn't bridge to NSAttributedString - use custom blockquoteMarker attribute instead"
@@ -77,10 +77,10 @@ Each task was committed atomically:
 3. **Task 3: Wire up custom text stack in PreviewViewController** - `7e2c623` (feat)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added code block, inline code, list, and blockquote styling
-- `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` - Custom layout manager for drawing blockquote border bars
-- `md-spotlighter/MDQuickLook/PreviewViewController.swift` - Custom text stack with MarkdownLayoutManager
-- `md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj` - Added MarkdownLayoutManager.swift to build
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added code block, inline code, list, and blockquote styling
+- `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` - Custom layout manager for drawing blockquote border bars
+- `md-quick-look/MDQuickLook/PreviewViewController.swift` - Custom text stack with MarkdownLayoutManager
+- `md-quick-look/md-quick-look.xcodeproj/project.pbxproj` - Added MarkdownLayoutManager.swift to build
 
 ## Decisions Made
 
@@ -113,7 +113,7 @@ Each task was committed atomically:
 - **Found during:** Task 3 (Custom text stack wiring)
 - **Issue:** New Swift file not included in Xcode project build - compiler couldn't find MarkdownLayoutManager class
 - **Fix:** Manually edited project.pbxproj to add PBXFileReference, PBXBuildFile, group entry, and sources phase entry
-- **Files modified:** md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj
+- **Files modified:** md-quick-look/md-quick-look.xcodeproj/project.pbxproj
 - **Verification:** Build succeeded after project file update
 - **Committed in:** 7e2c623 (Task 3 commit)
 

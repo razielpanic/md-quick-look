@@ -1,4 +1,4 @@
-# Technology Stack: md-spotlighter
+# Technology Stack: md-quick-look
 
 **Project:** Quick Look extension for markdown rendering on macOS
 **Researched:** January 2026 (v1.0), February 2026 (v1.1 additions)
@@ -194,8 +194,8 @@ create-dmg --version   # Should show create-dmg version
 ### Project Structure
 
 ```
-md-spotlighter/
-├── md-spotlighter/                    # Main app (installer)
+md-quick-look/
+├── md-quick-look/                    # Main app (installer)
 │   ├── Assets.xcassets/
 │   │   └── AppIcon.appiconset/        # v1.1: App icon from Icon Composer
 │   ├── ContentView.swift              # v1.1: Status indicator UI

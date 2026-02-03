@@ -36,7 +36,7 @@ Replace all legacy "spotlighter" references throughout the codebase, Xcode proje
 
 ### Git History & Transition
 - **Commit strategy:** Single atomic commit for all renaming changes
-- **Repository rename:** Yes — rename GitHub repo from `md-spotlighter` to `md-quick-look`
+- **Repository rename:** Yes — rename GitHub repo from `md-quick-look` to `md-quick-look`
 - **Xcode project rename:** Claude's discretion (use safest approach that preserves build)
 - **Git tagging:** No special tag needed (regular commit, part of v1.1 work)
 

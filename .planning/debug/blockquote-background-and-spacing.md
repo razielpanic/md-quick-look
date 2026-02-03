@@ -13,7 +13,7 @@ Two related issues with blockquote rendering:
 
 ## Test Case
 
-From `/Users/razielpanic/Projects/md-spotlighter/samples/comprehensive.md`:
+From `/Users/razielpanic/Projects/md-quick-look/samples/comprehensive.md`:
 
 ```markdown
 > This is a blockquote.
@@ -291,13 +291,13 @@ This is a blockquote. It can span multiple lines.
 ## Files Involved
 
 **Background Color:**
-- `/Users/razielpanic/Projects/md-spotlighter/md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift:96` - Blockquote background (quaternarySystemFill - LIGHTER)
-- `/Users/razielpanic/Projects/md-spotlighter/md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift:144` - Code block background (secondarySystemFill - DARKER)
+- `/Users/razielpanic/Projects/md-quick-look/md-quick-look/MDQuickLook/MarkdownLayoutManager.swift:96` - Blockquote background (quaternarySystemFill - LIGHTER)
+- `/Users/razielpanic/Projects/md-quick-look/md-quick-look/MDQuickLook/MarkdownLayoutManager.swift:144` - Code block background (secondarySystemFill - DARKER)
 
 **Line Spacing:**
-- `/Users/razielpanic/Projects/md-spotlighter/md-spotlighter/MDQuickLook/MarkdownRenderer.swift:176-221` - ensureIntraBlockNewlines() with identity-based tracking
-- `/Users/razielpanic/Projects/md-spotlighter/md-spotlighter/MDQuickLook/MarkdownRenderer.swift:200` - Conditional newline insertion (only when identity changes)
-- `/Users/razielpanic/Projects/md-spotlighter/samples/comprehensive.md:55-56` - Test markdown with soft line breaks
+- `/Users/razielpanic/Projects/md-quick-look/md-quick-look/MDQuickLook/MarkdownRenderer.swift:176-221` - ensureIntraBlockNewlines() with identity-based tracking
+- `/Users/razielpanic/Projects/md-quick-look/md-quick-look/MDQuickLook/MarkdownRenderer.swift:200` - Conditional newline insertion (only when identity changes)
+- `/Users/razielpanic/Projects/md-quick-look/samples/comprehensive.md:55-56` - Test markdown with soft line breaks
 
 ## Additional Context: Previous Fixes
 

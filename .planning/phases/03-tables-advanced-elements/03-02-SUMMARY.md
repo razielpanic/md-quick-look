@@ -26,8 +26,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
-    - md-spotlighter/MDQuickLook/TableRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/TableRenderer.swift
 
 key-decisions:
   - "Use ensureBlockSeparation() helper to add \\n\\n between content segments and tables"
@@ -85,8 +85,8 @@ Each task/fix was committed atomically:
 _Note: Task 2 was build-only (no code commit). Multiple rebuild/reinstall cycles occurred during verification._
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added hybrid rendering with table detection, block separation helper, source range and placeholder approaches
-- `md-spotlighter/MDQuickLook/TableRenderer.swift` - Added text width measurement, content-based column sizing, refined empty cell styling
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added hybrid rendering with table detection, block separation helper, source range and placeholder approaches
+- `md-quick-look/MDQuickLook/TableRenderer.swift` - Added text width measurement, content-based column sizing, refined empty cell styling
 
 ## Decisions Made
 
@@ -119,7 +119,7 @@ Use `.fixedLayoutAlgorithm` with explicit column widths instead of percentage-ba
 - **Found during:** Task 3 (Verification checkpoint)
 - **Issue:** Tables immediately adjacent to preceding content without proper block separation - looked cramped
 - **Fix:** Added `ensureBlockSeparation()` helper to check for `\n\n` and add missing newlines. Applied before tables and after tables before next content.
-- **Files modified:** `md-spotlighter/MDQuickLook/MarkdownRenderer.swift`
+- **Files modified:** `md-quick-look/MDQuickLook/MarkdownRenderer.swift`
 - **Verification:** Visual verification showed proper spacing between text and tables
 - **Committed in:** `a613a77` (separate fix commit)
 
@@ -127,7 +127,7 @@ Use `.fixedLayoutAlgorithm` with explicit column widths instead of percentage-ba
 - **Found during:** Task 3 (Verification checkpoint)
 - **Issue:** Empty cells had gray background box that was visually distracting and inconsistent with subtle indicator goal
 - **Fix:** Removed `.backgroundColor` attribute from empty cells, kept only middot character with `quaternaryLabelColor` for subtle presence
-- **Files modified:** `md-spotlighter/MDQuickLook/TableRenderer.swift`
+- **Files modified:** `md-quick-look/MDQuickLook/TableRenderer.swift`
 - **Verification:** Visual verification showed subtle middot without box
 - **Committed in:** `23487dc` (separate fix commit)
 
@@ -140,7 +140,7 @@ Use `.fixedLayoutAlgorithm` with explicit column widths instead of percentage-ba
   3. Third attempt (00a9282): Reverted to 75% fixed width (temporary)
   4. Fourth attempt (54a7a30): Content-based sizing approach
   5. Final solution (3918711): Measure actual text widths with proper constraints
-- **Files modified:** `md-spotlighter/MDQuickLook/TableRenderer.swift`
+- **Files modified:** `md-quick-look/MDQuickLook/TableRenderer.swift`
 - **Verification:** Visual verification showed small tables compact, wide tables expanded naturally, long content truncated with ellipsis
 - **Committed in:** `3918711` (final fix commit capturing complete solution)
 

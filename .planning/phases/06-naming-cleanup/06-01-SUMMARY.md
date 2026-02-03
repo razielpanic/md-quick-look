@@ -7,9 +7,9 @@ tags: [xcode, bundle-identifiers, naming, refactoring]
 # Dependency graph
 requires:
   - phase: 05-documentation
-    provides: Shipped v1.0 with md-spotlighter naming
+    provides: Shipped v1.0 with md-quick-look naming
 provides:
-  - Complete codebase rename from md-spotlighter to MDQuickLook
+  - Complete codebase rename from md-quick-look to MDQuickLook
   - Updated bundle IDs: com.rocketpop.MDQuickLook
   - User-facing name: "MD Quick Look"
 affects: [07-app-icon, 08-swiftui-host, 09-code-signing, documentation]
@@ -50,7 +50,7 @@ completed: 2026-02-03
 
 # Phase 6 Plan 1: Codebase Rename Summary
 
-**Complete codebase rename from md-spotlighter to MDQuickLook with new bundle IDs (com.rocketpop.MDQuickLook), verified build and runtime display name**
+**Complete codebase rename from md-quick-look to MDQuickLook with new bundle IDs (com.rocketpop.MDQuickLook), verified build and runtime display name**
 
 ## Performance
 
@@ -61,8 +61,8 @@ completed: 2026-02-03
 - **Files modified:** 14
 
 ## Accomplishments
-- Renamed entire Xcode project structure from md-spotlighter to MDQuickLook
-- Updated all bundle identifiers from com.razielpanic.md-spotlighter to com.rocketpop.MDQuickLook
+- Renamed entire Xcode project structure from md-quick-look to MDQuickLook
+- Updated all bundle identifiers from com.razielpanic.md-quick-look to com.rocketpop.MDQuickLook
 - Changed user-facing display name to "MD Quick Look" in Info.plist files
 - Updated all OSLog subsystems and error domains to match new naming
 - Verified build success and runtime display ("MD Quick Look" in menu bar)
@@ -83,9 +83,9 @@ All tasks were combined into a single atomic commit as per locked decision:
 ## Files Created/Modified
 
 **Directory structure:**
-- `MDQuickLook/MDQuickLook.xcodeproj/` - Renamed from md-spotlighter.xcodeproj
-- `MDQuickLook/MDQuickLook/` - Renamed from md-spotlighter/md-spotlighter
-- `MDQuickLook/MDQuickLook Extension/` - Renamed from md-spotlighter Extension
+- `MDQuickLook/MDQuickLook.xcodeproj/` - Renamed from md-quick-look.xcodeproj
+- `MDQuickLook/MDQuickLook/` - Renamed from md-quick-look/md-quick-look
+- `MDQuickLook/MDQuickLook Extension/` - Renamed from md-quick-look Extension
 
 **Configuration files:**
 - `MDQuickLook/MDQuickLook.xcodeproj/project.pbxproj` - Updated bundle IDs, target names, paths

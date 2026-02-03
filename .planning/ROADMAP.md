@@ -71,7 +71,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Rename project from md-spotlighter to MD Quick Look (directories, bundle IDs, Swift files, Makefile, GitHub repo)
+- [ ] 06-01: Rename project from md-quick-look to MD Quick Look (directories, bundle IDs, Swift files, Makefile, GitHub repo)
 - [ ] 06-02: Update planning documentation to consistent MD Quick Look naming
 
 #### Phase 7: App Icon Design

@@ -38,11 +38,11 @@ This phase uses no external libraries - it's a refactoring/renaming task using b
 
 ### Current Project Structure
 ```
-md-spotlighter/                      # ROOT - to remain for local folder (repo rename separate)
-├── md-spotlighter/                  # PROJECT FOLDER - rename to MDQuickLook/
-│   ├── md-spotlighter.xcodeproj/    # XCODE PROJECT - rename to MDQuickLook.xcodeproj/
+md-quick-look/                      # ROOT - to remain for local folder (repo rename separate)
+├── md-quick-look/                  # PROJECT FOLDER - rename to MDQuickLook/
+│   ├── md-quick-look.xcodeproj/    # XCODE PROJECT - rename to MDQuickLook.xcodeproj/
 │   │   └── project.pbxproj          # Contains many spotlighter references
-│   ├── md-spotlighter/              # MAIN APP SOURCE - rename to MDQuickLook/
+│   ├── md-quick-look/              # MAIN APP SOURCE - rename to MDQuickLook/
 │   │   ├── main.swift               # Clean - no spotlighter refs
 │   │   └── Info.plist               # Bundle ID, app name - NEEDS UPDATE
 │   └── MDQuickLook/                 # EXTENSION SOURCE - already correct name
@@ -59,10 +59,10 @@ md-spotlighter/                      # ROOT - to remain for local folder (repo r
 
 ### Target Structure After Rename
 ```
-md-spotlighter/                      # Local folder stays (user can rename manually)
-├── MDQuickLook/                     # PROJECT FOLDER (was md-spotlighter/)
-│   ├── MDQuickLook.xcodeproj/       # XCODE PROJECT (was md-spotlighter.xcodeproj/)
-│   ├── MDQuickLook/                 # MAIN APP SOURCE (was md-spotlighter/)
+md-quick-look/                      # Local folder stays (user can rename manually)
+├── MDQuickLook/                     # PROJECT FOLDER (was md-quick-look/)
+│   ├── MDQuickLook.xcodeproj/       # XCODE PROJECT (was md-quick-look.xcodeproj/)
+│   ├── MDQuickLook/                 # MAIN APP SOURCE (was md-quick-look/)
 │   │   ├── main.swift
 │   │   └── Info.plist               # Updated bundle ID and app name
 │   └── MDQuickLook/                 # EXTENSION SOURCE (unchanged path)
@@ -78,8 +78,8 @@ md-spotlighter/                      # Local folder stays (user can rename manua
 
 | Component | Old Bundle ID | New Bundle ID |
 |-----------|--------------|---------------|
-| Main App | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
-| Extension | `com.razielpanic.md-spotlighter.quicklook` | `com.rocketpop.MDQuickLook.Extension` |
+| Main App | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
+| Extension | `com.razielpanic.md-quick-look.quicklook` | `com.rocketpop.MDQuickLook.Extension` |
 
 **Validation:** Extension bundle ID must start with `com.rocketpop.MDQuickLook.`
 
@@ -129,22 +129,22 @@ md-spotlighter/                      # Local folder stays (user can rename manua
 **Source:** [Apple Developer Forums](https://developer.apple.com/forums/thread/20239)
 
 ### Pitfall 3: Stale Build Artifacts
-**What goes wrong:** Old "md-spotlighter.app" still installed in /Applications, confusing Quick Look system.
+**What goes wrong:** Old "md-quick-look.app" still installed in /Applications, confusing Quick Look system.
 **Why it happens:** `make clean` doesn't remove previously installed app.
-**How to avoid:** Run `rm -rf /Applications/md-spotlighter.app` before installing new version. Update Makefile to clean old name too.
+**How to avoid:** Run `rm -rf /Applications/md-quick-look.app` before installing new version. Update Makefile to clean old name too.
 **Warning signs:** Quick Look shows old behavior, wrong bundle ID in Activity Monitor.
 
 ### Pitfall 4: GitHub Redirect Collisions
-**What goes wrong:** If someone later creates a repo named "md-spotlighter", redirects from old links break.
+**What goes wrong:** If someone later creates a repo named "md-quick-look", redirects from old links break.
 **Why it happens:** GitHub prioritizes existing repos over redirects.
-**How to avoid:** Document that redirects exist; don't reuse "md-spotlighter" name. Redirects are indefinite otherwise.
+**How to avoid:** Document that redirects exist; don't reuse "md-quick-look" name. Redirects are indefinite otherwise.
 **Warning signs:** Old links suddenly 404.
 **Source:** [GitHub Community Discussion](https://github.com/orgs/community/discussions/42814)
 
 ### Pitfall 5: Case-Sensitivity Issues on macOS
-**What goes wrong:** Renaming "md-spotlighter" to "MDQuickLook" may not register on case-insensitive file systems.
+**What goes wrong:** Renaming "md-quick-look" to "MDQuickLook" may not register on case-insensitive file systems.
 **Why it happens:** macOS default filesystem treats these as "same" folder.
-**How to avoid:** Use two-step rename: `git mv md-spotlighter temp && git mv temp MDQuickLook`
+**How to avoid:** Use two-step rename: `git mv md-quick-look temp && git mv temp MDQuickLook`
 **Warning signs:** `git status` doesn't show the rename.
 **Source:** [TheLinuxCode - Git Move Files 2026](https://thelinuxcode.com/git-move-files-practical-renames-refactors-and-history-preservation-in-2026/)
 
@@ -160,7 +160,7 @@ md-spotlighter/                      # Local folder stays (user can rename manua
 ```swift
 // BEFORE (current code)
 extension OSLog {
-    private static var subsystem = "com.razielpanic.md-spotlighter"
+    private static var subsystem = "com.razielpanic.md-quick-look"
     static let quicklook = OSLog(subsystem: subsystem, category: "quicklook")
 }
 
@@ -200,9 +200,9 @@ handler(NSError(domain: "MDQuickLook", code: -1, userInfo: [...]))
 ### Verified: git mv Two-Step Rename (for case changes)
 ```bash
 # Safe rename preserving history on case-insensitive filesystems
-cd /Users/razielpanic/Projects/md-spotlighter
-git mv md-spotlighter/md-spotlighter.xcodeproj md-spotlighter/temp.xcodeproj
-git mv md-spotlighter/temp.xcodeproj md-spotlighter/MDQuickLook.xcodeproj
+cd /Users/razielpanic/Projects/md-quick-look
+git mv md-quick-look/md-quick-look.xcodeproj md-quick-look/temp.xcodeproj
+git mv md-quick-look/temp.xcodeproj md-quick-look/MDQuickLook.xcodeproj
 # Repeat for other directories needing case-change renames
 ```
 
@@ -218,8 +218,8 @@ git remote -v  # Should show new URL after fetch
 ### Verified: project.pbxproj Key Replacements
 ```
 # These strings need replacement in project.pbxproj:
-"md-spotlighter" -> "MDQuickLook"           # Target names, product names
-"com.razielpanic.md-spotlighter" -> "com.rocketpop.MDQuickLook"  # Bundle IDs
+"md-quick-look" -> "MDQuickLook"           # Target names, product names
+"com.razielpanic.md-quick-look" -> "com.rocketpop.MDQuickLook"  # Bundle IDs
 ```
 
 ## State of the Art
@@ -239,43 +239,43 @@ git remote -v  # Should show new URL after fetch
 ### Source Files (4 files, 8 occurrences)
 | File | Line | Current | Target |
 |------|------|---------|--------|
-| PreviewViewController.swift | 7 | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
-| PreviewViewController.swift | 19 | `MD Spotlighter Quick Look` | `MD Quick Look Extension` |
+| PreviewViewController.swift | 7 | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
+| PreviewViewController.swift | 19 | `MD Quick Look Quick Look` | `MD Quick Look Extension` |
 | PreviewViewController.swift | 28,43 | `MDSpotlighter` (error domain) | `MDQuickLook` |
-| MarkdownRenderer.swift | 7 | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
-| MarkdownLayoutManager.swift | 5 | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
-| TableRenderer.swift | 7 | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
+| MarkdownRenderer.swift | 7 | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
+| MarkdownLayoutManager.swift | 5 | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
+| TableRenderer.swift | 7 | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
 
 ### Info.plist Files (2 files)
 | File | Key | Current | Target |
 |------|-----|---------|--------|
-| md-spotlighter/Info.plist | CFBundleIdentifier | `com.razielpanic.md-spotlighter` | `com.rocketpop.MDQuickLook` |
-| md-spotlighter/Info.plist | CFBundleName | `MD Spotlighter` | `MD Quick Look` |
-| MDQuickLook/Info.plist | CFBundleIdentifier | `com.razielpanic.md-spotlighter.quicklook` | `com.rocketpop.MDQuickLook.Extension` |
+| md-quick-look/Info.plist | CFBundleIdentifier | `com.razielpanic.md-quick-look` | `com.rocketpop.MDQuickLook` |
+| md-quick-look/Info.plist | CFBundleName | `MD Quick Look` | `MD Quick Look` |
+| MDQuickLook/Info.plist | CFBundleIdentifier | `com.razielpanic.md-quick-look.quicklook` | `com.rocketpop.MDQuickLook.Extension` |
 | MDQuickLook/Info.plist | CFBundleDisplayName | `.md for QuickLook` | `MD Quick Look` |
 | MDQuickLook/Info.plist | CFBundleName | `.md for QuickLook` | `MD Quick Look` |
 
 ### project.pbxproj (1 file, many occurrences)
-- Target name: `md-spotlighter` -> `MDQuickLook` (or "MD Quick Look" for display)
-- Product name: `md-spotlighter.app` -> `MDQuickLook.app` (or "MD Quick Look.app")
+- Target name: `md-quick-look` -> `MDQuickLook` (or "MD Quick Look" for display)
+- Product name: `md-quick-look.app` -> `MDQuickLook.app` (or "MD Quick Look.app")
 - Bundle identifiers: As above
 - INFOPLIST_FILE paths: Update after directory rename
 
 ### Makefile (1 file)
 ```makefile
 # Current values needing update:
-PROJECT_DIR = md-spotlighter
-SCHEME = md-spotlighter
-APP_NAME = md-spotlighter.app
-# References in commands: killall md-spotlighter
+PROJECT_DIR = md-quick-look
+SCHEME = md-quick-look
+APP_NAME = md-quick-look.app
+# References in commands: killall md-quick-look
 ```
 
 ### Directory Renames (via git mv)
 ```bash
 # In order:
-md-spotlighter/md-spotlighter/ -> md-spotlighter/MDQuickLook/      # App source
-md-spotlighter/md-spotlighter.xcodeproj/ -> md-spotlighter/MDQuickLook.xcodeproj/
-md-spotlighter/ -> MDQuickLook/                                    # Project folder
+md-quick-look/md-quick-look/ -> md-quick-look/MDQuickLook/      # App source
+md-quick-look/md-quick-look.xcodeproj/ -> md-quick-look/MDQuickLook.xcodeproj/
+md-quick-look/ -> MDQuickLook/                                    # Project folder
 ```
 
 ### Planning Documentation

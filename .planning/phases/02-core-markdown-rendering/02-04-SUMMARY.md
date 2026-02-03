@@ -25,7 +25,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Insert list prefixes in NSAttributedString after block styling to avoid interference with PresentationIntent detection"
@@ -67,7 +67,7 @@ Each task was committed atomically:
 2. **Task 2: Add intra-block newlines for list items and blockquotes** - `1bc9a09` (feat)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added list prefix insertion and intra-block newline handling
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added list prefix insertion and intra-block newline handling
 
 ## Decisions Made
 

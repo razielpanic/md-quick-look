@@ -23,19 +23,19 @@ tech-stack:
 
 key-files:
   created:
-    - md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj
-    - md-spotlighter/md-spotlighter/main.swift
-    - md-spotlighter/md-spotlighter/Info.plist
-    - md-spotlighter/MDQuickLook/PreviewViewController.swift
-    - md-spotlighter/MDQuickLook/Info.plist
-    - md-spotlighter/MDQuickLook/PreviewViewController.xib
+    - md-quick-look/md-quick-look.xcodeproj/project.pbxproj
+    - md-quick-look/md-quick-look/main.swift
+    - md-quick-look/md-quick-look/Info.plist
+    - md-quick-look/MDQuickLook/PreviewViewController.swift
+    - md-quick-look/MDQuickLook/Info.plist
+    - md-quick-look/MDQuickLook/PreviewViewController.xib
   modified: []
 
 key-decisions:
   - "Use AttributedString(markdown:) instead of swift-markdown AST traversal for rendering"
   - "Combine Task 1 and Task 2 implementation to avoid non-compilable intermediate state"
   - "Target macOS 26.0 as minimum deployment (aligns with project requirements)"
-  - "Use OSLog for debug logging with subsystem 'com.razielpanic.md-spotlighter'"
+  - "Use OSLog for debug logging with subsystem 'com.razielpanic.md-quick-look'"
 
 patterns-established:
   - "Quick Look extensions use App Extension architecture embedded in host app"
@@ -81,12 +81,12 @@ Each task was committed atomically:
 ## Files Created/Modified
 
 **Created:**
-- `md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj` - Xcode project with two targets, SPM dependency on swift-markdown
-- `md-spotlighter/md-spotlighter/main.swift` - Minimal SwiftUI host app for extension registration
-- `md-spotlighter/md-spotlighter/Info.plist` - Host app configuration with macOS 26.0 deployment target
-- `md-spotlighter/MDQuickLook/PreviewViewController.swift` - QLPreviewingController implementation with markdown parsing
-- `md-spotlighter/MDQuickLook/Info.plist` - Extension configuration with UTI declarations
-- `md-spotlighter/MDQuickLook/PreviewViewController.xib` - Extension UI interface definition
+- `md-quick-look/md-quick-look.xcodeproj/project.pbxproj` - Xcode project with two targets, SPM dependency on swift-markdown
+- `md-quick-look/md-quick-look/main.swift` - Minimal SwiftUI host app for extension registration
+- `md-quick-look/md-quick-look/Info.plist` - Host app configuration with macOS 26.0 deployment target
+- `md-quick-look/MDQuickLook/PreviewViewController.swift` - QLPreviewingController implementation with markdown parsing
+- `md-quick-look/MDQuickLook/Info.plist` - Extension configuration with UTI declarations
+- `md-quick-look/MDQuickLook/PreviewViewController.xib` - Extension UI interface definition
 
 ## Decisions Made
 
@@ -113,7 +113,7 @@ Each task was committed atomically:
 - **Found during:** Task 1 (Xcode project creation)
 - **Issue:** Plan separated project structure (Task 1) from PreviewViewController implementation (Task 2), but PreviewViewController.swift was listed in Task 1's files and .xib references it
 - **Fix:** Implemented full PreviewViewController with markdown parsing in Task 1 instead of creating placeholder
-- **Files modified:** md-spotlighter/MDQuickLook/PreviewViewController.swift
+- **Files modified:** md-quick-look/MDQuickLook/PreviewViewController.swift
 - **Verification:** Code is syntactically correct, implements required protocol
 - **Committed in:** 3da119a (Task 1 commit)
 

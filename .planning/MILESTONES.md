@@ -1,4 +1,4 @@
-# Project Milestones: md-spotlighter
+# Project Milestones: md-quick-look
 
 ## v1.0 Initial Release (Shipped: 2026-02-02)
 

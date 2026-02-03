@@ -38,7 +38,7 @@ Quick Look extension that integrates with macOS Finder to load and display markd
 ### Extension metadata & branding
 - **Extension name:** ".md for QuickLook" (as shown in System Settings)
 - **Icon:** Default system icon (no custom icon in Phase 1)
-- **Bundle identifier:** com.razielpanic.md-spotlighter
+- **Bundle identifier:** com.razielpanic.md-quick-look
 - **Version numbering:** Claude's discretion
 
 ### Claude's Discretion

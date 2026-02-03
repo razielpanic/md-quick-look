@@ -23,7 +23,7 @@ tech_stack:
 key_files:
   created: []
   modified:
-    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
       changes:
         - "preprocessImages(): Changed marker format to IMAGEPLACEHOLDERSTART...END"
         - "applyImagePlaceholderStyles(): Updated regex pattern to match new markers"

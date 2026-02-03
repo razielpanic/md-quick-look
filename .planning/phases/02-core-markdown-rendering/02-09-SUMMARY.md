@@ -24,7 +24,7 @@ tech-stack:
 
 key-files:
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 decisions:
   - decision: Check for existing newlines before insertion
@@ -130,7 +130,7 @@ Both functions now maintain:
 
 ## Files Modified
 
-### md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+### md-quick-look/MDQuickLook/MarkdownRenderer.swift
 **Changes:**
 1. `ensureIntraBlockNewlines`: Added newline existence check
 2. `insertBlockBoundaryNewlines`: Added identity tracking and comparison

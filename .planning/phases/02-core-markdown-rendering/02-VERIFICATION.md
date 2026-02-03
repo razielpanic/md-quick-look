@@ -155,9 +155,9 @@ uat_round_8:
 
 | Artifact | L1: Exists | L2: Substantive | L3: Wired | Status |
 |----------|------------|-----------------|-----------|--------|
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (585 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (585 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
 | `samples/comprehensive.md` | ✓ | ✓ (78 lines) | ✓ | VERIFIED |
 
 **Level 1 (Existence):** All files present in repository.

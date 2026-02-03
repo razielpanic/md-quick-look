@@ -205,7 +205,7 @@ The v1.1 milestone has lower technical risk than v1.0 (extension already works) 
 - **Not blocking:** Happens during Phase 3; doesn't affect earlier phases
 
 **Bundle identifier final naming:**
-- Research emphasizes choosing carefully (can't change after App Store submission) but project still uses "md-spotlighter" internally
+- Research emphasizes choosing carefully (can't change after App Store submission) but project still uses "md-quick-look" internally
 - **Resolution:** Decide final naming (MDQuickLook? MarkdownQuickLook?) in Phase 4 before public release; search/replace across project
 - **Not blocking:** Internal development can continue with current naming; update before first GitHub release
 

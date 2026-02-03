@@ -20,7 +20,7 @@ tech-stack:
 
 key-files:
   created: []
-  modified: [md-spotlighter/MDQuickLook/MarkdownRenderer.swift]
+  modified: [md-quick-look/MDQuickLook/MarkdownRenderer.swift]
 
 key-decisions:
   - "Remove list item handling from ensureIntraBlockNewlines to prevent duplicate newline insertion"
@@ -61,7 +61,7 @@ Each task was committed atomically:
 **Plan metadata:** (will be committed after SUMMARY.md creation)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Removed list item handling from ensureIntraBlockNewlines(), function now only handles blockquote newlines
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Removed list item handling from ensureIntraBlockNewlines(), function now only handles blockquote newlines
 
 ## Decisions Made
 

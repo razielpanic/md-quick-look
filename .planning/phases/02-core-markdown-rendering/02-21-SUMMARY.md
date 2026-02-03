@@ -25,7 +25,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Apply ordinal tracking pattern to insertListPrefixes() to prevent duplicate prefixes for list items with inline formatting"
@@ -62,7 +62,7 @@ Each task was committed atomically:
 1. **Task 1: Add ordinal tracking to insertListPrefixes** - `644858e` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added lastProcessedOrdinal tracking to prevent duplicate list prefixes
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added lastProcessedOrdinal tracking to prevent duplicate list prefixes
 
 ## Decisions Made
 

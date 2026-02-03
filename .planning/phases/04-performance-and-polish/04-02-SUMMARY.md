@@ -23,9 +23,9 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
-    - md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
-    - md-spotlighter/MDQuickLook/TableRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
+    - md-quick-look/MDQuickLook/TableRenderer.swift
 
 key-decisions:
   - "Use NSColor.labelColor for all primary text (replaces hard-coded .black)"
@@ -73,9 +73,9 @@ Each task was committed atomically:
 **Plan metadata:** (to be committed with this summary)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Updated text, link, and inline code colors to semantic colors
-- `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` - Updated blockquote border to semantic color
-- `md-spotlighter/MDQuickLook/TableRenderer.swift` - Updated table cell text to semantic color
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Updated text, link, and inline code colors to semantic colors
+- `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` - Updated blockquote border to semantic color
+- `md-quick-look/MDQuickLook/TableRenderer.swift` - Updated table cell text to semantic color
 
 ## Decisions Made
 - **Use NSColor.labelColor for all primary text**: Replaces hard-coded .black with system-adaptive color that works in both light and dark mode

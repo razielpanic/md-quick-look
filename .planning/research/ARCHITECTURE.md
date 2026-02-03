@@ -29,7 +29,7 @@ This research focuses on adding user-facing UI to the existing MD Quick Look hos
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  ┌───────────────────────────────────────────────────────┐  │
-│  │         Host Application (md-spotlighter.app)         │  │
+│  │         Host Application (md-quick-look.app)         │  │
 │  │                  SwiftUI App Lifecycle                 │  │
 │  ├───────────────────────────────────────────────────────┤  │
 │  │                                                         │  │
@@ -95,8 +95,8 @@ This research focuses on adding user-facing UI to the existing MD Quick Look hos
 ## Recommended Project Structure
 
 ```
-md-spotlighter/
-├── md-spotlighter/                    # Host app target
+md-quick-look/
+├── md-quick-look/                    # Host app target
 │   ├── App.swift                      # NEW: @main SwiftUI App entry
 │   ├── Views/
 │   │   ├── AboutWindow.swift          # NEW: About window content
@@ -175,7 +175,7 @@ struct MDQuickLookApp: App {
 }
 ```
 
-**File location:** `md-spotlighter/App.swift`
+**File location:** `md-quick-look/App.swift`
 **Lines of code:** ~30-50
 
 ### Pattern 2: Extension Status Detection via qlmanage
@@ -197,7 +197,7 @@ class ExtensionStatus: ObservableObject {
     @Published var isEnabled: Bool = false
     @Published var isChecking: Bool = false
 
-    private let bundleID = "com.yourdomain.md-spotlighter.MDQuickLook"
+    private let bundleID = "com.yourdomain.md-quick-look.MDQuickLook"
 
     func check() async {
         isChecking = true
@@ -228,7 +228,7 @@ class ExtensionStatus: ObservableObject {
 }
 ```
 
-**File location:** `md-spotlighter/Models/ExtensionStatus.swift`
+**File location:** `md-quick-look/Models/ExtensionStatus.swift`
 **Lines of code:** ~40-60
 
 **Alternative:** Skip status checking for v1.1 MVP. Just show "Launch app once to register extension" message. Status checking can be added in v1.2.
@@ -296,7 +296,7 @@ struct AboutWindow: View {
 }
 ```
 
-**File location:** `md-spotlighter/Views/AboutWindow.swift`
+**File location:** `md-quick-look/Views/AboutWindow.swift`
 **Lines of code:** ~60-80
 
 ### Pattern 4: Settings Scene with Placeholder
@@ -344,7 +344,7 @@ struct SettingsView: View {
 }
 ```
 
-**File location:** `md-spotlighter/Views/SettingsView.swift`
+**File location:** `md-quick-look/Views/SettingsView.swift`
 **Lines of code:** ~30-40 (placeholder)
 
 **Future expansion (v1.2+):** Add real settings with @AppStorage for theme selection, font size, etc. Extension reads via UserDefaults.
@@ -356,7 +356,7 @@ struct SettingsView: View {
 ### App Launch Flow
 
 ```
-User double-clicks md-spotlighter.app
+User double-clicks md-quick-look.app
     ↓
 App.swift @main struct initializes
     ↓
@@ -779,7 +779,7 @@ NSApplication.shared.run()
 **Ensure these keys:**
 ```xml
 <key>CFBundleIdentifier</key>
-<string>com.yourdomain.md-spotlighter</string>
+<string>com.yourdomain.md-quick-look</string>
 
 <key>CFBundleName</key>
 <string>MD Quick Look</string>
@@ -800,10 +800,10 @@ NSApplication.shared.run()
 ### Xcode Target Structure (v1.1)
 
 ```
-Project: md-spotlighter
-├── Target: md-spotlighter (Application)
-│   ├── Product: md-spotlighter.app
-│   ├── Bundle ID: com.yourdomain.md-spotlighter
+Project: md-quick-look
+├── Target: md-quick-look (Application)
+│   ├── Product: md-quick-look.app
+│   ├── Bundle ID: com.yourdomain.md-quick-look
 │   ├── Deployment: macOS 26.0+
 │   ├── Sources:
 │   │   ├── App.swift (NEW)
@@ -818,7 +818,7 @@ Project: md-spotlighter
 │
 └── Target: MDQuickLook (App Extension)
     ├── Product: MDQuickLook.appex
-    ├── Bundle ID: com.yourdomain.md-spotlighter.MDQuickLook
+    ├── Bundle ID: com.yourdomain.md-quick-look.MDQuickLook
     └── [UNCHANGED - no modifications for v1.1]
 ```
 

@@ -23,7 +23,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Apply ordinal tracking pattern from insertBlockBoundaryNewlines to ensureIntraBlockNewlines"
@@ -63,7 +63,7 @@ Each task was committed atomically:
 **Note:** Task 2 was verification only (install and visual check), no code changes.
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Modified ensureIntraBlockNewlines to track ordinals and peek ahead before inserting newlines
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Modified ensureIntraBlockNewlines to track ordinals and peek ahead before inserting newlines
 
 ## Decisions Made
 

@@ -23,8 +23,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Use LayoutManager custom drawing for code block backgrounds to achieve uniform appearance"
@@ -63,8 +63,8 @@ Each task was committed atomically:
 2. **Task 2: Ensure proper trailing newlines throughout** - `3c5a2d2` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` - Added codeBlockMarker attribute and custom background drawing for code blocks
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Replaced inline backgroundColor with marker attribute, enhanced newline insertion logic to track run endings
+- `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` - Added codeBlockMarker attribute and custom background drawing for code blocks
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Replaced inline backgroundColor with marker attribute, enhanced newline insertion logic to track run endings
 
 ## Decisions Made
 

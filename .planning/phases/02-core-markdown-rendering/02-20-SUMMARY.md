@@ -21,7 +21,7 @@ tech-stack:
 
 key-files:
   created: []
-  modified: [md-spotlighter/MDQuickLook/MarkdownRenderer.swift]
+  modified: [md-quick-look/MDQuickLook/MarkdownRenderer.swift]
 
 key-decisions:
   - "Track blockquote identity in ensureIntraBlockNewlines to differentiate intra-paragraph runs from inter-paragraph runs"
@@ -59,7 +59,7 @@ Each task was committed atomically:
 1. **Task 1: Add blockquote identity tracking to ensureIntraBlockNewlines** - `fc47160` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added identity tracking to differentiate blockquote paragraph boundaries
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added identity tracking to differentiate blockquote paragraph boundaries
 
 ## Decisions Made
 

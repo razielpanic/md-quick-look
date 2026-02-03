@@ -211,9 +211,9 @@ human_verification:
 
 | Artifact | L1: Exists | L2: Substantive | L3: Wired | Status |
 |----------|------------|-----------------|-----------|--------|
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (560 lines) | ✓ | VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | ✓ | ✓ (97 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownRenderer.swift` | ✓ | ✓ (560 lines) | ✓ | VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` | ✓ | ✓ (152 lines) | ✓ | VERIFIED |
 | `samples/comprehensive.md` | ✓ | ✓ (79 lines) | ✓ | VERIFIED |
 
 **Level 1 (Existence):** All files present in repository.

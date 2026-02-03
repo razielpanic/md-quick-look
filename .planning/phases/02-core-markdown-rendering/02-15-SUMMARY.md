@@ -25,7 +25,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Remove blockquote continuation peek-ahead logic from ensureIntraBlockNewlines()"
@@ -66,7 +66,7 @@ Each task was committed atomically:
 1. **Task 1: Fix blockquote newline logic** - `59ec719` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Simplified blockquote newline insertion logic
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Simplified blockquote newline insertion logic
 
 ## Decisions Made
 

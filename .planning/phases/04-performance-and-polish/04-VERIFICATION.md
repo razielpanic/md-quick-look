@@ -58,7 +58,7 @@ All automated structural checks passed. Human verification required for behavior
 
 | Artifact | Expected | Exists | Substantive | Wired | Status |
 |----------|----------|--------|-------------|-------|--------|
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | File size check and truncation logic | ✓ | ✓ 134 lines | ✓ | ✓ VERIFIED |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | File size check and truncation logic | ✓ | ✓ 134 lines | ✓ | ✓ VERIFIED |
 
 **Details:**
 - **Existence:** File exists at expected path
@@ -92,9 +92,9 @@ All automated structural checks passed. Human verification required for behavior
 
 | Artifact | Expected | Exists | Substantive | Wired | Status |
 |----------|----------|--------|-------------|-------|--------|
-| `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` | Semantic color usage for text and links | ✓ | ✓ 838 lines | ✓ | ✓ VERIFIED |
-| `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` | Semantic color usage for borders | ✓ | ✓ 153 lines | ✓ | ✓ VERIFIED |
-| `md-spotlighter/MDQuickLook/TableRenderer.swift` | Semantic color usage for table cells | ✓ | ✓ 226 lines | ✓ | ✓ VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownRenderer.swift` | Semantic color usage for text and links | ✓ | ✓ 838 lines | ✓ | ✓ VERIFIED |
+| `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` | Semantic color usage for borders | ✓ | ✓ 153 lines | ✓ | ✓ VERIFIED |
+| `md-quick-look/MDQuickLook/TableRenderer.swift` | Semantic color usage for table cells | ✓ | ✓ 226 lines | ✓ | ✓ VERIFIED |
 
 **Details:**
 

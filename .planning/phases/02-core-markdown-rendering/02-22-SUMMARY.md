@@ -24,7 +24,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Convert blockquote soft breaks to hard breaks in preprocessing stage"
@@ -71,7 +71,7 @@ Each task was committed atomically:
    - Verified blockquote rendering behavior
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added preprocessBlockquoteSoftBreaks method and integrated into render pipeline
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added preprocessBlockquoteSoftBreaks method and integrated into render pipeline
 
 ## Decisions Made
 

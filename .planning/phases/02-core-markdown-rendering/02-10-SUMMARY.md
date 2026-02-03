@@ -22,8 +22,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/PreviewViewController.swift
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/PreviewViewController.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Set textView.isVerticallyResizable = true and textContainer.heightTracksTextView = false for infinite scroll height"
@@ -64,8 +64,8 @@ Each task was committed atomically:
 2. **Task 2: Verify image placeholder display after scrolling works** - `72fbbbd` (feat)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/PreviewViewController.swift` - Configured NSTextView for vertical scrolling, added forced layout and debug logging
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added comprehensive logging for image marker detection and replacement
+- `md-quick-look/MDQuickLook/PreviewViewController.swift` - Configured NSTextView for vertical scrolling, added forced layout and debug logging
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added comprehensive logging for image marker detection and replacement
 
 ## Decisions Made
 

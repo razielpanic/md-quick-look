@@ -26,7 +26,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Apply list paragraph style to prefix text during insertion"
@@ -66,7 +66,7 @@ completed: 2026-02-01
    - Prevents default paragraph style from being applied to prefixes
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Added paragraph style to list prefix insertion
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Added paragraph style to list prefix insertion
 
 ## Decisions Made
 

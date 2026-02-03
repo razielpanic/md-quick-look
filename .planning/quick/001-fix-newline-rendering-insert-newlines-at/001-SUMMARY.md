@@ -4,7 +4,7 @@ plan: 001
 completed: 2026-02-01
 duration: 3min
 files_modified:
-  - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+  - md-quick-look/MDQuickLook/MarkdownRenderer.swift
   - samples/test-newlines.md (test file)
 ---
 
@@ -55,7 +55,7 @@ The method is called in `render()` before NSAttributedString conversion, ensurin
 
 ## Changes
 
-**File: md-spotlighter/MDQuickLook/MarkdownRenderer.swift**
+**File: md-quick-look/MDQuickLook/MarkdownRenderer.swift**
 
 1. Added `insertBlockBoundaryNewlines(in:) -> AttributedString` method
 2. Modified `render()` to call newline insertion before NSAttributedString conversion:

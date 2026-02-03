@@ -21,8 +21,8 @@ tech-stack:
 
 key-files:
   created:
-    - md-spotlighter/MDQuickLook/TableExtractor.swift
-    - md-spotlighter/MDQuickLook/TableRenderer.swift
+    - md-quick-look/MDQuickLook/TableExtractor.swift
+    - md-quick-look/MDQuickLook/TableRenderer.swift
   modified: []
 
 key-decisions:
@@ -69,8 +69,8 @@ Each task was committed atomically:
 2. **Task 2: Create TableRenderer with NSTextTable** - `9e3f49b` (feat)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/TableExtractor.swift` - MarkupVisitor implementation extracting table structure (alignments, header cells, body rows) from swift-markdown Table nodes
-- `md-spotlighter/MDQuickLook/TableRenderer.swift` - Converts ExtractedTable to NSAttributedString using NSTextTable/NSTextTableBlock with proper cell structure, padding, alignment, and styling
+- `md-quick-look/MDQuickLook/TableExtractor.swift` - MarkupVisitor implementation extracting table structure (alignments, header cells, body rows) from swift-markdown Table nodes
+- `md-quick-look/MDQuickLook/TableRenderer.swift` - Converts ExtractedTable to NSAttributedString using NSTextTable/NSTextTableBlock with proper cell structure, padding, alignment, and styling
 
 ## Decisions Made
 

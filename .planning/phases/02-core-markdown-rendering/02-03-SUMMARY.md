@@ -15,8 +15,8 @@ tech-stack:
 key-files:
   created: [samples/comprehensive.md]
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
-    - md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
 
 decisions:
   - key: default-paragraph-spacing
@@ -147,13 +147,13 @@ metrics:
 - samples/comprehensive.md (79 lines)
 
 **Modified:**
-- md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+- md-quick-look/MDQuickLook/MarkdownRenderer.swift
   - Added link styling in applyLinkStyles
   - Added image preprocessing regex
   - Added image placeholder creation with SF Symbol
   - Added default paragraph spacing in applyBaseStyles
   - Added explicit bounds for image icon attachment
-- md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
+- md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
   - Repositioned blockquote border from x=8 to x=4
 
 ## Commits

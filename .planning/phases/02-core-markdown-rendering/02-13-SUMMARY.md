@@ -23,7 +23,7 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
 
 key-decisions:
   - "Use plain text [Image: filename] placeholders instead of __IMAGE_PLACEHOLDER__ markers"
@@ -68,7 +68,7 @@ Relevant commit:
   - Removed createImagePlaceholder() helper function
 
 ## Files Modified
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Refactored image preprocessing and styling
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Refactored image preprocessing and styling
 
 ## Changes Made
 

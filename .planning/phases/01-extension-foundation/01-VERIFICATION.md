@@ -30,12 +30,12 @@ re_verification: false
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `md-spotlighter/md-spotlighter.xcodeproj/project.pbxproj` | Xcode project with host app and Quick Look extension targets | ✓ VERIFIED | xcodebuild -list shows both targets: md-spotlighter, MDQuickLook |
-| `md-spotlighter/MDQuickLook/PreviewViewController.swift` | QLPreviewingController implementation | ✓ VERIFIED | 70 lines, implements protocol, no stubs, uses AttributedString(markdown:) |
-| `md-spotlighter/MDQuickLook/Info.plist` | UTI registration for markdown files | ✓ VERIFIED | QLSupportedContentTypes: net.daringfireball.markdown, public.markdown |
+| `md-quick-look/md-quick-look.xcodeproj/project.pbxproj` | Xcode project with host app and Quick Look extension targets | ✓ VERIFIED | xcodebuild -list shows both targets: md-quick-look, MDQuickLook |
+| `md-quick-look/MDQuickLook/PreviewViewController.swift` | QLPreviewingController implementation | ✓ VERIFIED | 70 lines, implements protocol, no stubs, uses AttributedString(markdown:) |
+| `md-quick-look/MDQuickLook/Info.plist` | UTI registration for markdown files | ✓ VERIFIED | QLSupportedContentTypes: net.daringfireball.markdown, public.markdown |
 | `Makefile` | Build automation with install, clean, reload targets | ✓ VERIFIED | 52 lines, contains qlmanage -r, cp to /Applications |
 | `samples/basic.md` | Test file with heading, bold, italic, list, code | ✓ VERIFIED | 23 lines, contains all required markdown elements |
-| `md-spotlighter/md-spotlighter/Info.plist` | Host app configuration | ✓ VERIFIED | LSMinimumSystemVersion 26.0, UTExportedTypeDeclarations for markdown |
+| `md-quick-look/md-quick-look/Info.plist` | Host app configuration | ✓ VERIFIED | LSMinimumSystemVersion 26.0, UTExportedTypeDeclarations for markdown |
 
 ### Artifact Deep Verification
 
@@ -55,8 +55,8 @@ re_verification: false
 - Level 1 (Exists): ✓ File exists
 - Level 2 (Substantive): ✓ Contains QLSupportedContentTypes key with markdown UTIs
 - Level 3 (Wired): ✓ Extension registered with pluginkit
-  - `pluginkit -m` shows com.razielpanic.md-spotlighter.quicklook
-  - Installed at /Applications/md-spotlighter.app/Contents/PlugIns/MDQuickLook.appex
+  - `pluginkit -m` shows com.razielpanic.md-quick-look.quicklook
+  - Installed at /Applications/md-quick-look.app/Contents/PlugIns/MDQuickLook.appex
 
 **Makefile:**
 - Level 1 (Exists): ✓ File exists at project root
@@ -76,7 +76,7 @@ re_verification: false
 | PreviewViewController.swift | AttributedString parser | AttributedString(markdown:) | ✓ WIRED | Line 30: `try AttributedString(markdown: markdownContent)` |
 | AttributedString | NSTextView | setAttributedString | ✓ WIRED | Line 48: `textStorage?.setAttributedString(NSAttributedString(attributedString))` |
 | NSTextView | View hierarchy | addSubview | ✓ WIRED | Line 55: `view.addSubview(scrollView)` containing textView |
-| Extension bundle | App bundle | Xcode embedding | ✓ WIRED | /Applications/md-spotlighter.app/Contents/PlugIns/MDQuickLook.appex exists |
+| Extension bundle | App bundle | Xcode embedding | ✓ WIRED | /Applications/md-quick-look.app/Contents/PlugIns/MDQuickLook.appex exists |
 | Extension | pluginkit | Installation in /Applications | ✓ WIRED | pluginkit shows registration, binary is valid Mach-O arm64 |
 | Makefile install | /Applications | cp command | ✓ WIRED | Line 22: `cp -R ... /Applications/` |
 | Makefile reload | qlmanage | qlmanage -r | ✓ WIRED | Lines 33-34: reload and cache commands |
@@ -111,18 +111,18 @@ Phase 1 maps to requirements SYSINT-01 and SYSINT-03 from REQUIREMENTS.md.
 ### Build Verification
 
 **Build artifacts verified:**
-- Build directory exists: /Users/razielpanic/Projects/md-spotlighter/build/
-- Built app exists: build/Build/Products/Release/md-spotlighter.app
+- Build directory exists: /Users/razielpanic/Projects/md-quick-look/build/
+- Built app exists: build/Build/Products/Release/md-quick-look.app
 - Extension embedded: build/Build/Products/Release/MDQuickLook.appex
-- Installed app: /Applications/md-spotlighter.app (1.6MB binary, Feb 1 00:05)
-- Extension binary: /Applications/md-spotlighter.app/Contents/PlugIns/MDQuickLook.appex/Contents/MacOS/MDQuickLook
+- Installed app: /Applications/md-quick-look.app (1.6MB binary, Feb 1 00:05)
+- Extension binary: /Applications/md-quick-look.app/Contents/PlugIns/MDQuickLook.appex/Contents/MacOS/MDQuickLook
   - Type: Mach-O 64-bit executable arm64
   - Size: 1.6MB
   - Timestamp: Feb 1 00:05
 
 **Xcode project verification:**
-- Targets exist: md-spotlighter (host), MDQuickLook (extension)
-- Schemes exist: md-spotlighter, MDQuickLook
+- Targets exist: md-quick-look (host), MDQuickLook (extension)
+- Schemes exist: md-quick-look, MDQuickLook
 - SPM dependencies resolved: swift-markdown, cmark-gfm
 
 ### Human Verification Results

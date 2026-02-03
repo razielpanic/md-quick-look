@@ -21,7 +21,7 @@ tech-stack:
 
 key-files:
   created: []
-  modified: [md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift]
+  modified: [md-quick-look/MDQuickLook/MarkdownLayoutManager.swift]
 
 key-decisions:
   - "Use enumerateLineFragments instead of boundingRect to eliminate per-line gaps"
@@ -59,7 +59,7 @@ Each task was committed atomically:
 1. **Task 1: Fix code block and blockquote background/border gaps** - `096631d` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` - Replaced boundingRect with enumerateLineFragments + rect union
+- `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` - Replaced boundingRect with enumerateLineFragments + rect union
 
 ## Decisions Made
 

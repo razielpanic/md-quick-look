@@ -92,9 +92,9 @@ skipped: 0
   test: 10
   root_cause: "Two issues: (1) Background color likely visual perception issue - code uses quaternarySystemFill (lighter) vs secondarySystemFill (darker) correctly. (2) Line breaks: Markdown soft breaks collapse into single paragraph per CommonMark spec - AttributedString parser converts soft breaks to spaces"
   artifacts:
-    - path: "md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownLayoutManager.swift"
       issue: "Line 96: Blockquote background uses quaternarySystemFill (correct)"
-    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
       issue: "Lines 176-221: ensureIntraBlockNewlines() identity tracking working correctly"
     - path: "samples/comprehensive.md"
       issue: "Lines 55-56: Test markdown uses soft breaks (no trailing spaces)"
@@ -110,7 +110,7 @@ skipped: 0
   test: 14
   root_cause: "AttributedString markdown parser follows CommonMark spec - soft breaks (single newlines) are converted to spaces within paragraphs. The blockquote lines create 3 runs (text + space + text) with same paragraph identity, so ensureIntraBlockNewlines() correctly does not insert newlines"
   artifacts:
-    - path: "md-spotlighter/MDQuickLook/MarkdownRenderer.swift"
+    - path: "md-quick-look/MDQuickLook/MarkdownRenderer.swift"
       issue: "Lines 176-221: ensureIntraBlockNewlines() only handles paragraph boundaries (identity changes), has no mechanism for soft breaks within paragraphs"
   missing:
     - "Pre-process markdown input to convert soft breaks in blockquotes to hard breaks"

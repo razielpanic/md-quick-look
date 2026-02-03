@@ -27,8 +27,8 @@ tech-stack:
 key-files:
   created: []
   modified:
-    - md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift
-    - md-spotlighter/MDQuickLook/MarkdownRenderer.swift
+    - md-quick-look/MDQuickLook/MarkdownLayoutManager.swift
+    - md-quick-look/MDQuickLook/MarkdownRenderer.swift
 
 key-decisions:
   - "Merge blockquote ranges before drawing instead of drawing each separately"
@@ -70,8 +70,8 @@ Each task was committed atomically:
 2. **Task 2 & 3: Fix background and extra newlines** - `fef5de8` (fix)
 
 ## Files Created/Modified
-- `md-spotlighter/MDQuickLook/MarkdownLayoutManager.swift` - Added range merging, full-width background drawing
-- `md-spotlighter/MDQuickLook/MarkdownRenderer.swift` - Removed inline backgroundColor, added blockquote continuation detection
+- `md-quick-look/MDQuickLook/MarkdownLayoutManager.swift` - Added range merging, full-width background drawing
+- `md-quick-look/MDQuickLook/MarkdownRenderer.swift` - Removed inline backgroundColor, added blockquote continuation detection
 
 ## Decisions Made
 

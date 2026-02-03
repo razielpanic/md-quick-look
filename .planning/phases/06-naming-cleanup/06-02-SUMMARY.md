@@ -52,7 +52,7 @@ completed: 2026-02-02
 - **Files modified:** 0 tracked (infrastructure-only change)
 
 ## Accomplishments
-- Renamed GitHub repository from md-spotlighter to md-quick-look using gh CLI
+- Renamed GitHub repository from md-quick-look to md-quick-look using gh CLI
 - Updated local git remote URL to github.com/razielpanic/md-quick-look
 - Verified GitHub automatic redirects are active for old URL
 - Pushed all changes to renamed repository successfully
@@ -68,7 +68,7 @@ completed: 2026-02-02
 ## Files Created/Modified
 
 **.git/config (local only, not tracked):**
-- Updated remote origin URL from md-spotlighter to md-quick-look
+- Updated remote origin URL from md-quick-look to md-quick-look
 
 **No tracked repository files modified** - This was purely an infrastructure change affecting GitHub and local git configuration.
 

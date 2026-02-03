@@ -52,8 +52,8 @@ dependencies: [
 
 ### Recommended Project Structure
 ```
-md-spotlighter/
-├── md-spotlighter/              # Host application (minimal, just to launch extension)
+md-quick-look/
+├── md-quick-look/              # Host application (minimal, just to launch extension)
 │   ├── Info.plist
 │   └── main.swift
 ├── MDQuickLook/                 # Quick Look extension target
@@ -284,7 +284,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.razielpanic.md-spotlighter.quicklook</string>
+    <string>com.razielpanic.md-quick-look.quicklook</string>
     <key>CFBundleName</key>
     <string>.md for QuickLook</string>
     <key>NSExtension</key>
@@ -311,11 +311,11 @@ class PreviewViewController: NSViewController, QLPreviewingController {
 # Source: Community best practices (SourceCodeSyntaxHighlight, Makefiles for Mobile CI)
 .PHONY: build install clean reload
 
-QLEXT_NAME = md-spotlighter.qlgenerator
+QLEXT_NAME = md-quick-look.qlgenerator
 INSTALL_DIR = $(HOME)/Library/QuickLook
 
 build:
-	xcodebuild -scheme "md-spotlighter" -configuration Release
+	xcodebuild -scheme "md-quick-look" -configuration Release
 
 install: build
 	rm -rf "$(INSTALL_DIR)/$(QLEXT_NAME)"
@@ -339,7 +339,7 @@ test: install reload
 import os.log
 
 extension OSLog {
-    private static var subsystem = "com.razielpanic.md-spotlighter"
+    private static var subsystem = "com.razielpanic.md-quick-look"
     static let quicklook = OSLog(subsystem: subsystem, category: "quicklook")
 }
 
@@ -354,7 +354,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     }
 }
 
-// View logs: log stream --predicate 'subsystem == "com.razielpanic.md-spotlighter"' --level info
+// View logs: log stream --predicate 'subsystem == "com.razielpanic.md-quick-look"' --level info
 ```
 
 ## State of the Art
@@ -430,6 +430,6 @@ Things that couldn't be fully resolved:
 **Valid until:** 2026-03-01 (30 days - macOS Quick Look API is stable)
 
 **Notes:**
-- User decisions constrain: Must use styled rendering from start (no raw markdown), manual Finder testing, build script automation, bundle identifier com.razielpanic.md-spotlighter
+- User decisions constrain: Must use styled rendering from start (no raw markdown), manual Finder testing, build script automation, bundle identifier com.razielpanic.md-quick-look
 - Claude's discretion areas: Build script format (recommended Makefile), logging control (recommended OSLog with subsystem), styling depth (recommended AttributedString defaults), version numbering (recommended semantic 0.1.0)
 - Phase scope: Foundation only - get extension loading and displaying basic styled markdown. Advanced features (syntax highlighting, image handling) deferred to later phases per project decisions.
