@@ -35,7 +35,7 @@ struct MDQuickLookApp: App {
 
         // First launch welcome window
         Window("Welcome", id: "firstLaunch") {
-            FirstLaunchHandler()
+            FirstLaunchView()
         }
         .windowResizability(.contentSize)
     }
@@ -44,37 +44,38 @@ struct MDQuickLookApp: App {
 // App delegate for window management
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // First-launch logic handled by FirstLaunchHandler view
+        // Check if this is first launch
+        let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
+
+        if !hasLaunchedBefore {
+            // First launch - open welcome window
+            openWindow(id: "firstLaunch")
+            UserDefaults.standard.set(true, forKey: "hasLaunchedBefore")
+        } else {
+            // Subsequent launch - open settings window
+            NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+        }
     }
 
-    @objc func showAboutWindow() {
-        // Find and activate the about window
+    private func openWindow(id: String) {
+        // Find and open window by ID
         for window in NSApp.windows {
-            if window.identifier?.rawValue == "about" {
+            if window.identifier?.rawValue == id {
                 window.makeKeyAndOrderFront(nil)
                 NSApp.activate(ignoringOtherApps: true)
                 return
             }
         }
+
+        // If window doesn't exist yet, wait a bit and try again
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.openWindow(id: id)
+        }
+    }
+
+    @objc func showAboutWindow() {
+        openWindow(id: "about")
     }
 }
 
-// View that handles first-launch detection
-struct FirstLaunchHandler: View {
-    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        FirstLaunchView()
-            .onAppear {
-                if hasLaunchedBefore {
-                    // Already launched before, close this window
-                    dismiss()
-                } else {
-                    // First launch, mark as launched
-                    hasLaunchedBefore = true
-                }
-            }
-    }
-}
 
