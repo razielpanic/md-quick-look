@@ -24,6 +24,8 @@
 	<string>NSApplication</string>
 	<key>NSHighResolutionCapable</key>
 	<true/>
+	<key>CFBundleIconName</key>
+	<string>AppIcon</string>
 	<key>UTExportedTypeDeclarations</key>
 	<array>
 		<dict>
