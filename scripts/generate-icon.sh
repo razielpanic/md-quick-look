@@ -36,28 +36,31 @@ mkdir -p "$OUTPUT_DIR"
 echo "Creating master icon (1024x1024)..."
 
 # Step 1: Create purple gradient background
+# Rotate then crop to exact 1024x1024 to avoid dimension inflation
 magick -size 1024x1024 \
     gradient:"${GRADIENT_START}-${GRADIENT_END}" \
     -rotate 135 \
+    -gravity center \
+    -extent 1024x1024 \
     /tmp/icon_bg.png
 
 # Step 2: Create star symbol (★) with frosted glass effect
-# Using a large bold font to ensure visibility
+# Using geometric drawing (5-pointed star) - more reliable than font rendering
 magick -size 1024x1024 xc:none \
-    -font "Helvetica-Bold" -pointsize 800 \
-    -gravity center \
     -fill "$SYMBOL_COLOR" \
-    -annotate 0 "★" \
+    -draw "translate 512,512 path 'M 0,-400 L -117,-123 L -381,-123 L -191,50 L -235,315 L 0,154 L 235,315 L 191,50 L 381,-123 L 117,-123 Z'" \
     -blur 0x8 \
     /tmp/icon_star.png
 
 # Step 3: Create octothorpe (#) symbol for carving effect
-# Slightly smaller and offset for visual interest
+# Using rectangles to draw # shape - more reliable than font rendering
 magick -size 1024x1024 xc:none \
-    -font "Helvetica-Bold" -pointsize 700 \
-    -gravity center \
     -fill "$SYMBOL_COLOR" \
-    -annotate 0 "#" \
+    -draw "rectangle 280,200 420,824" \
+    -draw "rectangle 604,200 744,824" \
+    -draw "rectangle 200,350 824,470" \
+    -draw "rectangle 200,554 824,674" \
+    -blur 0x6 \
     /tmp/icon_hash.png
 
 # Step 4: Create the carved-out effect
