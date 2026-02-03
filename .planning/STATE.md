@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 8 of 11 (SwiftUI Host App UI)
-Plan: 1 of 4 complete
-Status: In progress - Plan 08-01 complete
-Progress: [██████░░░░] 67% (v1.0 shipped, Phases 6-7 complete, 08-01 complete)
+Plan: 2 of 4 complete
+Status: In progress - Plans 08-01, 08-02 complete
+Progress: [██████░░░░] 69% (v1.0 shipped, Phases 6-7 complete, 08-01, 08-02 complete)
 
-Last activity: 2026-02-03 - Completed Plan 08-01 (SwiftUI App entry point)
+Last activity: 2026-02-03 - Completed Plan 08-02 (Settings window)
 
 ## Performance Metrics
 
@@ -34,7 +34,7 @@ Last activity: 2026-02-03 - Completed Plan 08-01 (SwiftUI App entry point)
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 6
+- Plans completed: 7
 - Phases completed: 2/6
 
 **Phase 6 (Naming Cleanup):**
@@ -50,8 +50,8 @@ Last activity: 2026-02-03 - Completed Plan 08-01 (SwiftUI App entry point)
 - Status: ✓ Complete (verified)
 
 **Phase 8 (SwiftUI Host App UI):**
-- Plans completed: 1/4 (08-01)
-- Time spent: 3 min
+- Plans completed: 2/4 (08-01, 08-02)
+- Time spent: 6 min
 - Average: 3 min/plan
 - Status: In progress
 
@@ -85,6 +85,10 @@ Recent v1.1 decisions:
 - NSApplicationDelegateAdaptor for lifecycle hooks - SwiftUI Scene.task doesn't exist for Scene types (08-01)
 - Remove newer SwiftUI APIs for macOS 14 compatibility - restorationBehavior/windowMinimizeBehavior unavailable (08-01)
 - NSApp window management over Environment.openWindow - Environment values not accessible in Scene context (08-01)
+- Display GitHub link as URL text not button - Maintains standard macOS About window appearance (08-02)
+- NSApp.applicationIconImage for icon display - Works automatically with asset catalog (08-02)
+- Direct users to System Settings for extension status - No programmatic check available (08-02)
+- Semantic colors for dark mode - Color.secondary and controlBackgroundColor for automatic adaptation (08-02)
 
 ### v1.1 Roadmap Structure
 
@@ -110,13 +114,13 @@ None
 
 ### Blockers/Concerns
 
-None - Plan 08-01 complete, ready for Plan 08-02
+None - Plans 08-01 and 08-02 complete, ready for Plan 08-03 (functional testing)
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed Plan 08-01 (SwiftUI App entry point)
-Resume action: Execute Plan 08-02 (Settings window)
+Stopped at: Completed Plan 08-02 (Settings window)
+Resume action: Execute Plan 08-03 (functional testing)
 
 ---
 
