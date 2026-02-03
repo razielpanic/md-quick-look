@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 8 of 11 (SwiftUI Host App UI)
-Plan: Ready to plan Phase 8
-Status: Phase 7 complete, ready to plan Phase 8
-Progress: [██████░░░░] 64% (v1.0 shipped, Phases 6-7 complete)
+Plan: 1 of 4 complete
+Status: In progress - Plan 08-01 complete
+Progress: [██████░░░░] 67% (v1.0 shipped, Phases 6-7 complete, 08-01 complete)
 
-Last activity: 2026-02-03 - Phase 7 complete, icon verified in Finder and Dock
+Last activity: 2026-02-03 - Completed Plan 08-01 (SwiftUI App entry point)
 
 ## Performance Metrics
 
@@ -34,7 +34,7 @@ Last activity: 2026-02-03 - Phase 7 complete, icon verified in Finder and Dock
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 5
+- Plans completed: 6
 - Phases completed: 2/6
 
 **Phase 6 (Naming Cleanup):**
@@ -48,6 +48,12 @@ Last activity: 2026-02-03 - Phase 7 complete, icon verified in Finder and Dock
 - Time spent: 5 min
 - Average: 2.5 min/plan
 - Status: ✓ Complete (verified)
+
+**Phase 8 (SwiftUI Host App UI):**
+- Plans completed: 1/4 (08-01)
+- Time spent: 3 min
+- Average: 3 min/plan
+- Status: In progress
 
 **Timeline:**
 - Project start: 2026-01-19
@@ -76,6 +82,9 @@ Recent v1.1 decisions:
 - Asset catalog over direct .icon files - Standard Apple approach, better build integration (07-02)
 - ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon - Proper asset catalog compilation (07-02)
 - Remove INFOPLIST_KEY_CFBundleIconFile for asset catalogs - Conflicts with catalog compilation (07-02)
+- NSApplicationDelegateAdaptor for lifecycle hooks - SwiftUI Scene.task doesn't exist for Scene types (08-01)
+- Remove newer SwiftUI APIs for macOS 14 compatibility - restorationBehavior/windowMinimizeBehavior unavailable (08-01)
+- NSApp window management over Environment.openWindow - Environment values not accessible in Scene context (08-01)
 
 ### v1.1 Roadmap Structure
 
@@ -101,13 +110,13 @@ None
 
 ### Blockers/Concerns
 
-None - Phase 7 complete, ready for Phase 8 planning
+None - Plan 08-01 complete, ready for Plan 08-02
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Phase 7 complete (icon verified displaying correctly)
-Resume action: Plan Phase 8 (SwiftUI Host App UI)
+Stopped at: Completed Plan 08-01 (SwiftUI App entry point)
+Resume action: Execute Plan 08-02 (Settings window)
 
 ---
 
