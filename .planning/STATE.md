@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.1 Public Release - Phase 7 (App Icon Design)
+**Current focus:** v1.1 Public Release - Phase 8 (SwiftUI Host App UI)
 
 ## Current Position
 
-Phase: 7 of 11 (App Icon Design)
-Plan: 2 of [TBD] in Phase 7
-Status: Phase 7 awaiting verification checkpoint
-Progress: [█████░░░░░] 53% (v1.0 shipped, Phase 6 complete, Phase 7 in progress)
+Phase: 8 of 11 (SwiftUI Host App UI)
+Plan: Ready to plan Phase 8
+Status: Phase 7 complete, ready to plan Phase 8
+Progress: [██████░░░░] 64% (v1.0 shipped, Phases 6-7 complete)
 
-Last activity: 2026-02-03 - Completed 07-02-SUMMARY.md (Icon integration with asset catalog)
+Last activity: 2026-02-03 - Phase 7 complete, icon verified in Finder and Dock
 
 ## Performance Metrics
 
@@ -34,8 +34,8 @@ Last activity: 2026-02-03 - Completed 07-02-SUMMARY.md (Icon integration with as
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 4
-- Phases completed: 1/6
+- Plans completed: 5
+- Phases completed: 2/6
 
 **Phase 6 (Naming Cleanup):**
 - Plans completed: 3/3 (06-01, 06-02, 06-03)
@@ -44,10 +44,10 @@ Last activity: 2026-02-03 - Completed 07-02-SUMMARY.md (Icon integration with as
 - Status: ✓ Complete (verified)
 
 **Phase 7 (App Icon Design):**
-- Plans completed: 2/[TBD] (07-01, 07-02)
+- Plans completed: 2/2 (07-01, 07-02)
 - Time spent: 5 min
 - Average: 2.5 min/plan
-- Status: Awaiting verification checkpoint
+- Status: ✓ Complete (verified)
 
 **Timeline:**
 - Project start: 2026-01-19
@@ -97,21 +97,17 @@ Recent v1.1 decisions:
 
 ### Pending Todos
 
-None - Asset catalog integration completed in 07-02.
+None
 
 ### Blockers/Concerns
 
-**Icon visual verification pending (Phase 7):**
-- App deployed to /Applications/MDQuickLook.app with 07-01 purple gradient icons
-- Asset catalog compiled to 47KB AppIcon.icns
-- Awaiting human verification of icon appearance in Finder and Dock
-- If approved, Phase 7 complete and ready for Phase 8
+None - Phase 7 complete, ready for Phase 8 planning
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 07-02-SUMMARY.md (Icon integration checkpoint)
-Resume action: User verifies icon in Finder/Dock, then either approve or request adjustments
+Stopped at: Phase 7 complete (icon verified displaying correctly)
+Resume action: Plan Phase 8 (SwiftUI Host App UI)
 
 ---
 
