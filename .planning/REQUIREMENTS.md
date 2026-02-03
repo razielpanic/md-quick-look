@@ -9,10 +9,10 @@ Requirements for first public release on GitHub. Professional polish and distrib
 
 ### Naming & Cleanup
 
-- [ ] **NAMING-01**: Remove all "spotlighter" references from codebase
-- [ ] **NAMING-02**: Remove all "spotlighter" references from documentation
-- [ ] **NAMING-03**: Update bundle identifiers to consistent naming scheme
-- [ ] **NAMING-04**: Verify app name "MD Quick Look" appears in all user-facing locations
+- [x] **NAMING-01**: Remove all "spotlighter" references from codebase
+- [x] **NAMING-02**: Remove all "spotlighter" references from documentation
+- [x] **NAMING-03**: Update bundle identifiers to consistent naming scheme
+- [x] **NAMING-04**: Verify app name "MD Quick Look" appears in all user-facing locations
 
 ### App Icon
 
@@ -101,10 +101,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAMING-01 | Phase 6 | Pending |
-| NAMING-02 | Phase 6 | Pending |
-| NAMING-03 | Phase 6 | Pending |
-| NAMING-04 | Phase 6 | Pending |
+| NAMING-01 | Phase 6 | Complete |
+| NAMING-02 | Phase 6 | Complete |
+| NAMING-03 | Phase 6 | Complete |
+| NAMING-04 | Phase 6 | Complete |
 | ICON-01 | Phase 7 | Pending |
 | ICON-02 | Phase 7 | Pending |
 | ICON-03 | Phase 7 | Pending |
