@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2A1A1A1A1A1A1A1A1A1A1A1A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */; };
+		AA1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLookApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1A /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1B /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1D /* MarkdownLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */; };
@@ -16,6 +16,7 @@
 		4A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6A1A1A1A1A1A1A1A1A1A1A1A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1B1B1B1B1B1B1B1B1B1B1B /* Markdown */; };
 		7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */; };
+		E08A24C72F3289140066E83C /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = E08924C72F3289140066E83C /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +45,7 @@
 
 /* Begin PBXFileReference section */
 		1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDQuickLook.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDQuickLookApp.swift; sourceTree = "<group>"; };
 		2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
@@ -100,7 +101,7 @@
 		2C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */ = {
 			isa = PBXGroup;
 			children = (
-				2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */,
+				AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */,
 				2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */,
 				7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */,
 				9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */,
@@ -218,6 +219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */,
+				E08A24C72F3289140066E83C /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,7 +237,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2A1A1A1A1A1A1A1A1A1A1A1A /* main.swift in Sources */,
+				AA1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLookApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +385,7 @@
 		9A1A1A1A1A1A1A1A1A1A1A1C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -408,6 +411,7 @@
 		9A1A1A1A1A1A1A1A1A1A1A1D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;

@@ -2,9 +2,7 @@ import SwiftUI
 
 @main
 struct MDQuickLookApp: App {
-    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.openURL) private var openURL
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {
         // Settings scene - automatically creates Preferences menu item (Cmd+,)
@@ -17,28 +15,11 @@ struct MDQuickLookApp: App {
             EmptyView()
         }
         .windowResizability(.contentSize)
-        .restorationBehavior(.disabled)
-        .windowMinimizeBehavior(.disabled)
-
-        // First launch welcome window
-        Window("Welcome", id: "firstLaunch") {
-            EmptyView()
-        }
-        .windowResizability(.contentSize)
-        .restorationBehavior(.disabled)
-
-        // Hidden window for first-launch detection
-        WindowGroup {
-            EmptyView()
-                .frame(width: 0, height: 0)
-                .hidden()
-        }
-        .windowResizability(.contentSize)
         .commands {
             // Replace default About menu item with custom one
             CommandGroup(replacing: .appInfo) {
                 Button("About MD Quick Look") {
-                    openWindow(id: "about")
+                    NSApp.sendAction(#selector(AppDelegate.showAboutWindow), to: nil, from: nil)
                 }
             }
 
@@ -46,18 +27,54 @@ struct MDQuickLookApp: App {
             CommandGroup(replacing: .help) {
                 Button("MD Quick Look Help") {
                     if let url = URL(string: "https://github.com/razielpanic/md-quick-look") {
-                        openURL(url)
+                        NSWorkspace.shared.open(url)
                     }
                 }
             }
         }
-        .task {
-            // First-launch logic
-            if !hasLaunchedBefore {
-                openWindow(id: "firstLaunch")
-                hasLaunchedBefore = true
+
+        // First launch welcome window
+        Window("Welcome", id: "firstLaunch") {
+            FirstLaunchHandler()
+        }
+        .windowResizability(.contentSize)
+    }
+}
+
+// App delegate for window management
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // First-launch logic handled by FirstLaunchHandler view
+    }
+
+    @objc func showAboutWindow() {
+        // Find and activate the about window
+        for window in NSApp.windows {
+            if window.identifier?.rawValue == "about" {
+                window.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+                return
             }
         }
+    }
+}
+
+// View that handles first-launch detection
+struct FirstLaunchHandler: View {
+    @AppStorage("hasLaunchedBefore") private var hasLaunchedBefore = false
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        EmptyView()
+            .onAppear {
+                if hasLaunchedBefore {
+                    // Already launched before, close this window
+                    dismiss()
+                } else {
+                    // First launch, mark as launched
+                    hasLaunchedBefore = true
+                }
+            }
     }
 }
 
