@@ -94,7 +94,8 @@ Recent v1.1 decisions:
 
 ### Pending Todos
 
-None yet.
+1. Update Xcode project to use Icon Composer instead of AppIcon asset catalog (tooling)
+   - File: .planning/todos/pending/2026-02-03-update-xcode-icon-composer.md
 
 ### Blockers/Concerns
 
