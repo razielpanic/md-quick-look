@@ -1,0 +1,12 @@
+{
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/PreviewViewController.swift" : {
+    "abi-baseline-json" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook_Extension.abi.json",
+    "const-values" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.swiftconstvalues",
+    "dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.d",
+    "diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.dia",
+    "objc-header" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook_Extension-Swift.h",
+    "swiftdoc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook_Extension.swiftdoc",
+    "swiftmodule" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook_Extension.swiftmodule",
+    "swiftsourceinfo" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook_Extension.swiftsourceinfo"
+  }
+}

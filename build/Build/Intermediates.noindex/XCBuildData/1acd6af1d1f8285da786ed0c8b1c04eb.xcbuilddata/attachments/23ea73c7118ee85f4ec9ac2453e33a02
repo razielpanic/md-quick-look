@@ -1,0 +1,21 @@
+{
+  "" : {
+    "const-values" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.swiftconstvalues",
+    "dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.d",
+    "diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.dia",
+    "emit-module-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-emit-module.dia",
+    "pch" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/MDQuickLook-primary.swiftdeps"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook/main.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/main.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/main.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/main.o"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}

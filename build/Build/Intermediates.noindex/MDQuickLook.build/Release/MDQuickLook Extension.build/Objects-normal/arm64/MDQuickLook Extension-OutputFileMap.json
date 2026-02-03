@@ -1,0 +1,36 @@
+{
+  "" : {
+    "const-values" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.swiftconstvalues",
+    "dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.d",
+    "diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.dia",
+    "emit-module-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary-emit-module.dia",
+    "pch" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MDQuickLook Extension-primary.swiftdeps"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/MarkdownLayoutManager.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownLayoutManager.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownLayoutManager.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownLayoutManager.o"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/MarkdownRenderer.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownRenderer.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownRenderer.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/MarkdownRenderer.o"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/PreviewViewController.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/PreviewViewController.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/PreviewViewController.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/PreviewViewController.o"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/TableExtractor.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableExtractor.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableExtractor.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableExtractor.o"
+  },
+  "/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook Extension/TableRenderer.swift" : {
+    "index-unit-output-path" : "/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableRenderer.o",
+    "llvm-bc" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableRenderer.bc",
+    "object" : "/Users/razielpanic/Projects/md-spotlighter/build/Build/Intermediates.noindex/MDQuickLook.build/Release/MDQuickLook Extension.build/Objects-normal/arm64/TableRenderer.o"
+  }
+}
