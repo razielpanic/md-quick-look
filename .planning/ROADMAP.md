@@ -68,10 +68,11 @@ Plans:
   2. No "spotlighter" references exist in documentation (README, comments, file names)
   3. Bundle identifiers follow consistent naming scheme (com.rocketpop.MDQuickLook)
   4. "MD Quick Look" appears in all user-facing locations (app name, menu bar, About window placeholder)
-**Plans**: 1 plan
+**Plans**: 2 plans
 
 Plans:
 - [ ] 06-01: Rename project from md-spotlighter to MD Quick Look (directories, bundle IDs, Swift files, Makefile, GitHub repo)
+- [ ] 06-02: Update planning documentation to consistent MD Quick Look naming
 
 #### Phase 7: App Icon Design
 **Goal**: Professional app icon that represents markdown preview functionality
@@ -167,7 +168,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 3. Tables & Advanced Elements | v1.0 | 2/2 | Complete | 2026-01-30 |
 | 4. Performance & Polish | v1.0 | 2/2 | Complete | 2026-02-01 |
 | 5. Documentation Sync | v1.0 | 2/2 | Complete | 2026-02-02 |
-| 6. Naming Cleanup | v1.1 | 0/1 | Ready | - |
+| 6. Naming Cleanup | v1.1 | 0/2 | Ready | - |
 | 7. App Icon Design | v1.1 | 0/TBD | Not started | - |
 | 8. SwiftUI Host App UI | v1.1 | 0/TBD | Not started | - |
 | 9. Code Signing & Notarization | v1.1 | 0/TBD | Not started | - |
