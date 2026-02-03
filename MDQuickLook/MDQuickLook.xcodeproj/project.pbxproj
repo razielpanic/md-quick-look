@@ -16,6 +16,7 @@
 		4A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6A1A1A1A1A1A1A1A1A1A1A1A /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 6B1B1B1B1B1B1B1B1B1B1B1B /* Markdown */; };
 		7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */; };
+		8D1D1D1D1D1D1D1D1D1D1D1D /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,7 +44,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MDQuickLook.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDQuickLook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
@@ -53,8 +54,9 @@
 		3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownLayoutManager.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B2E /* TableExtractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableExtractor.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B2F /* TableRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableRenderer.swift; sourceTree = "<group>"; };
-		5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MDQuickLook.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; name = MDQuickLook.appex; path = "MDQuickLook Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder; path = AppIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,7 +78,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A1A1A1A1A1A1A1A1A1A1A1B /* MDQuickLook */ = {
+		1A1A1A1A1A1A1A1A1A1A1A1B = {
 			isa = PBXGroup;
 			children = (
 				2C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */,
@@ -102,14 +104,7 @@
 				7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */,
 				9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */,
 			);
-			path = "MDQuickLook";
-			sourceTree = "<group>";
-		};
-		9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
+			path = MDQuickLook;
 			sourceTree = "<group>";
 		};
 		3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook Extension */ = {
@@ -124,6 +119,14 @@
 				3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */,
 			);
 			path = "MDQuickLook Extension";
+			sourceTree = "<group>";
+		};
+		9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8F1F1F1F1F1F1F1F1F1F1F1F /* AppIcon.icon */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,8 +146,8 @@
 			dependencies = (
 				4B1B1B1B1B1B1B1B1B1B1B1C /* PBXTargetDependency */,
 			);
-			name = "MDQuickLook";
-			productName = "MDQuickLook";
+			name = MDQuickLook;
+			productName = MDQuickLook;
 			productReference = 1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -194,7 +197,7 @@
 				en,
 				Base,
 			);
-			mainGroup = 1A1A1A1A1A1A1A1A1A1A1A1B /* MDQuickLook */;
+			mainGroup = 1A1A1A1A1A1A1A1A1A1A1A1B;
 			packageReferences = (
 				6A1A1A1A1A1A1A1A1A1A1A1B /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
@@ -214,6 +217,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7D1D1D1D1D1D1D1D1D1D1D1D /* Assets.xcassets in Resources */,
+				8D1D1D1D1D1D1D1D1D1D1D1D /* AppIcon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,9 +390,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "MDQuickLook/Info.plist";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-
+				INFOPLIST_FILE = MDQuickLook/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -396,7 +398,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rocketpop.MDQuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -413,9 +415,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "MDQuickLook/Info.plist";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-
+				INFOPLIST_FILE = MDQuickLook/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -423,7 +423,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rocketpop.MDQuickLook;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -449,7 +449,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rocketpop.MDQuickLook.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -476,7 +476,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook.Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = com.rocketpop.MDQuickLook.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -487,20 +487,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "MDQuickLook" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9A1A1A1A1A1A1A1A1A1A1A1A /* Debug */,
-				9A1A1A1A1A1A1A1A1A1A1A1B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		7A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A1A1A1A1A1A1A1A1A1A1A1C /* Debug */,
 				9A1A1A1A1A1A1A1A1A1A1A1D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "MDQuickLook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9A1A1A1A1A1A1A1A1A1A1A1A /* Debug */,
+				9A1A1A1A1A1A1A1A1A1A1A1B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
