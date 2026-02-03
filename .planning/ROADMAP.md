@@ -103,10 +103,12 @@ Plans:
   5. App displays first-launch welcome message or status indicator on launch
   6. Extension status (enabled/disabled) can be displayed to user
   7. All UI elements render correctly in both light and dark appearance modes
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 08-01: TBD
+- [ ] 08-01-PLAN.md — SwiftUI App entry point with Settings scene and menu bar
+- [ ] 08-02-PLAN.md — About, Preferences, and First-launch views
+- [ ] 08-03-PLAN.md — Visual and functional verification checkpoint
 
 #### Phase 9: Code Signing & Notarization
 **Goal**: App is signed and notarized for secure distribution without security warnings
@@ -172,11 +174,11 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 5. Documentation Sync | v1.0 | 2/2 | Complete | 2026-02-02 |
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 7. App Icon Design | v1.1 | 2/2 | Complete | 2026-02-03 |
-| 8. SwiftUI Host App UI | v1.1 | 0/TBD | Not started | - |
+| 8. SwiftUI Host App UI | v1.1 | 0/3 | Not started | - |
 | 9. Code Signing & Notarization | v1.1 | 0/TBD | Not started | - |
 | 10. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
 | 11. Documentation & Marketing | v1.1 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 (Phase 7 planned)*
+*Last updated: 2026-02-03 (Phase 8 planned)*
