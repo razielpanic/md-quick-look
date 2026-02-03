@@ -85,10 +85,11 @@ Plans:
   3. Icon appears correctly in Finder (Applications folder, Get Info)
   4. Icon appears in Dock when app is launched
   5. Icon will be available for About window and DMG background (verified in Phase 8+)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TBD
+- [ ] 07-01: Create master icon and generate all sizes
+- [ ] 07-02: Integrate into Xcode project and verify display
 
 #### Phase 8: SwiftUI Host App UI
 **Goal**: Professional app UI with About window, Preferences, and extension status indicator
@@ -170,7 +171,7 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 4. Performance & Polish | v1.0 | 2/2 | Complete | 2026-02-01 |
 | 5. Documentation Sync | v1.0 | 2/2 | Complete | 2026-02-02 |
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
-| 7. App Icon Design | v1.1 | 0/TBD | Not started | - |
+| 7. App Icon Design | v1.1 | 0/2 | Not started | - |
 | 8. SwiftUI Host App UI | v1.1 | 0/TBD | Not started | - |
 | 9. Code Signing & Notarization | v1.1 | 0/TBD | Not started | - |
 | 10. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
@@ -178,4 +179,4 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 (Phase 6 complete)*
+*Last updated: 2026-02-02 (Phase 7 planned)*
