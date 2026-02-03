@@ -3,16 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>files</key>
-	<dict>
-		<key>Resources/AppIcon.icns</key>
-		<data>
-		iNHw73+wFPCTqtXehagdV9cWbVc=
-		</data>
-		<key>Resources/Assets.car</key>
-		<data>
-		buKUmPobd0sZpVofN5AyPHIKEcU=
-		</data>
-	</dict>
+	<dict/>
 	<key>files2</key>
 	<dict>
 		<key>PlugIns/MDQuickLook Extension.appex</key>
@@ -23,20 +14,6 @@
 			</data>
 			<key>requirement</key>
 			<string>cdhash H"71e6853ac5874611641c6a8fe003c3032adfd19f"</string>
-		</dict>
-		<key>Resources/AppIcon.icns</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			dZAi4qSquXniY+JhKaVvHLdu1DhDwGqhfINuXbdBLWk=
-			</data>
-		</dict>
-		<key>Resources/Assets.car</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			3ROJIy3vKEwhY2pAEA1xlsavRGcjvreWSEY2xpJaUxQ=
-			</data>
 		</dict>
 	</dict>
 	<key>rules</key>
