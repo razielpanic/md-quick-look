@@ -1,0 +1,292 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.33728,0.17784,0.64589,1.00000",
+      "display-p3:0.06481,0.01094,0.16908,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "blend-mode" : "normal",
+      "blur-material" : null,
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "gray:0.96155,1.00000"
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "number.circle.fill.png",
+          "name" : "top hash",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 0.3,
+            "translation-in-points" : [
+              -81,
+              -7
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "gray:0.96321,1.00000"
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "asterisk.circle.fill.png",
+          "name" : "asterisk",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 0.46,
+            "translation-in-points" : [
+              -81,
+              385
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "gray:0.96321,1.00000"
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "number.circle.fill.png",
+          "name" : "bottom hash",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 0.3,
+            "translation-in-points" : [
+              -81,
+              775
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "name" : "Marks",
+      "opacity" : 1,
+      "position" : {
+        "scale" : 0.57,
+        "translation-in-points" : [
+          -218,
+          -211
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0
+      }
+    },
+    {
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill" : {
+            "solid" : "srgb:0.60590,0.60590,0.60590,1.00000"
+          },
+          "glass" : true,
+          "image-name" : "rectangle.grid.1x3.fill.png",
+          "name" : "rectangle.grid.1x3.fill",
+          "position" : {
+            "scale" : 0.51,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "name" : "bars",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 1
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.36
+      }
+    },
+    {
+      "hidden" : true,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : "none",
+          "hidden" : true,
+          "image-name" : "eye.fill.png",
+          "name" : "eye.fill",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 0.62,
+            "translation-in-points" : [
+              0,
+              0.4900000000000091
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode" : "normal",
+      "blur-material" : 1,
+      "hidden" : true,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.66792,0.74186,1.05032,1.00000",
+              "display-p3:0.21842,0.00000,0.14588,1.00000"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.5,
+                "y" : 0
+              },
+              "stop" : {
+                "x" : 0.5,
+                "y" : 0.7
+              }
+            }
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "number.circle.fill.png",
+          "name" : "number.circle.fill",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 2.5,
+            "translation-in-points" : [
+              -84,
+              119
+            ]
+          }
+        },
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "solid" : "display-p3:0.00083,0.58604,0.30862,0.56663"
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "number.circle.fill.png",
+          "name" : "number.circle.fill",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 2.5,
+            "translation-in-points" : [
+              229,
+              -151
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "name" : "Group",
+      "opacity" : 1,
+      "position" : {
+        "scale" : 0.82,
+        "translation-in-points" : [
+          68,
+          -97
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.32
+      }
+    },
+    {
+      "blend-mode" : "normal",
+      "blur-material" : 1,
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.46293,0.00000,1.00000,1.00000",
+              "display-p3:0.08645,0.00000,0.18674,1.00000"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.5,
+                "y" : 0.2783236806400893
+              },
+              "stop" : {
+                "x" : 0.5,
+                "y" : 0.7
+              }
+            }
+          },
+          "glass" : true,
+          "hidden" : true,
+          "image-name" : "number.circle.fill.png",
+          "name" : "large hash",
+          "opacity" : 1,
+          "position" : {
+            "scale" : 2.48,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "lighting" : "individual",
+      "name" : "Large Hash",
+      "opacity" : 1,
+      "position" : {
+        "scale" : 1,
+        "translation-in-points" : [
+          0,
+          0
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.32
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "squares" : "shared"
+  }
+}
