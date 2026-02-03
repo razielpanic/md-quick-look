@@ -100,7 +100,7 @@ Next action: Continue Phase 6 with plan 06-03 (file header updates) or 06-04 (do
 Config:
 ```json
 {
-  "project_name": "md-spotlighter",
+  "project_name": "md-quick-look",
   "workflow": {
     "mode": "yolo",
     "depth": "standard",

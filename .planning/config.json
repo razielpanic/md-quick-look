@@ -1,5 +1,5 @@
 {
-  "project_name": "md-spotlighter",
+  "project_name": "md-quick-look",
   "workflow": {
     "mode": "yolo",
     "depth": "standard",
