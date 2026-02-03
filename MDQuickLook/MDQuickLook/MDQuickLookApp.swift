@@ -12,7 +12,7 @@ struct MDQuickLookApp: App {
 
         // About window
         Window("About MD Quick Look", id: "about") {
-            EmptyView()
+            AboutView()
         }
         .windowResizability(.contentSize)
         .commands {
@@ -65,7 +65,7 @@ struct FirstLaunchHandler: View {
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        EmptyView()
+        FirstLaunchView()
             .onAppear {
                 if hasLaunchedBefore {
                     // Already launched before, close this window
@@ -78,9 +78,3 @@ struct FirstLaunchHandler: View {
     }
 }
 
-// Placeholder for Settings view (will be implemented in Plan 08-02)
-struct SettingsView: View {
-    var body: some View {
-        EmptyView()
-    }
-}

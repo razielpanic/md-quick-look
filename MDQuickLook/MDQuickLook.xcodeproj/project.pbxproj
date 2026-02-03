@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		AA1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLookApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */; };
+		AC1C1C1C1C1C1C1C1C1C1C1C /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD1D1D1D1D1D1D1D1D1D1D1D /* AboutView.swift */; };
+		AE2E2E2E2E2E2E2E2E2E2E2E /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF2F2F2F2F2F2F2F2F2F2F2F /* SettingsView.swift */; };
+		B01010101010101010101010 /* FirstLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B11111111111111111111111 /* FirstLaunchView.swift */; };
+		B23232323232323232323232 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B33333333333333333333333 /* AppState.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1A /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1B /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */; };
 		3A1A1A1A1A1A1A1A1A1A1A1D /* MarkdownLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */; };
@@ -46,6 +50,10 @@
 /* Begin PBXFileReference section */
 		1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MDQuickLook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MDQuickLookApp.swift; sourceTree = "<group>"; };
+		AD1D1D1D1D1D1D1D1D1D1D1D /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutView.swift; sourceTree = "<group>"; };
+		AF2F2F2F2F2F2F2F2F2F2F2F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B11111111111111111111111 /* FirstLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstLaunchView.swift; sourceTree = "<group>"; };
+		B33333333333333333333333 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
@@ -102,11 +110,31 @@
 			isa = PBXGroup;
 			children = (
 				AB1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLookApp.swift */,
+				C44444444444444444444444 /* Views */,
+				C55555555555555555555555 /* Models */,
 				2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */,
 				7E1E1E1E1E1E1E1E1E1E1E1E /* Assets.xcassets */,
 				9F1F1F1F1F1F1F1F1F1F1F1F /* Resources */,
 			);
 			path = MDQuickLook;
+			sourceTree = "<group>";
+		};
+		C44444444444444444444444 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AD1D1D1D1D1D1D1D1D1D1D1D /* AboutView.swift */,
+				AF2F2F2F2F2F2F2F2F2F2F2F /* SettingsView.swift */,
+				B11111111111111111111111 /* FirstLaunchView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C55555555555555555555555 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B33333333333333333333333 /* AppState.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook Extension */ = {
@@ -238,6 +266,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLookApp.swift in Sources */,
+				AC1C1C1C1C1C1C1C1C1C1C1C /* AboutView.swift in Sources */,
+				AE2E2E2E2E2E2E2E2E2E2E2E /* SettingsView.swift in Sources */,
+				B01010101010101010101010 /* FirstLaunchView.swift in Sources */,
+				B23232323232323232323232 /* AppState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
