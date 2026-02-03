@@ -4,7 +4,7 @@ import os.log
 import Foundation
 
 extension OSLog {
-    private static var subsystem = "com.razielpanic.md-spotlighter"
+    private static var subsystem = "com.rocketpop.MDQuickLook"
     static let quicklook = OSLog(subsystem: subsystem, category: "quicklook")
 }
 
@@ -16,7 +16,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     }
 
     func preparePreviewOfFile(at url: URL, completionHandler handler: @escaping (Error?) -> Void) {
-        os_log("=== MD Spotlighter Quick Look Extension ===", log: .quicklook, type: .info)
+        os_log("=== MD Quick Look Extension ===", log: .quicklook, type: .info)
         os_log("Extension loaded for file: %@", log: .quicklook, type: .info, url.path)
         os_log("File exists: %@", log: .quicklook, type: .debug, FileManager.default.fileExists(atPath: url.path) ? "YES" : "NO")
 
@@ -25,7 +25,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             let attrs = try FileManager.default.attributesOfItem(atPath: url.path)
             guard let fileSize = attrs[.size] as? UInt64 else {
                 os_log("ERROR: Cannot determine file size", log: .quicklook, type: .error)
-                handler(NSError(domain: "MDSpotlighter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot determine file size"]))
+                handler(NSError(domain: "MDQuickLook", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot determine file size"]))
                 return
             }
 
@@ -40,7 +40,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                 // File is large - read only first 500KB
                 guard let fileHandle = FileHandle(forReadingAtPath: url.path) else {
                     os_log("ERROR: Cannot open file for reading", log: .quicklook, type: .error)
-                    handler(NSError(domain: "MDSpotlighter", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot open file for reading"]))
+                    handler(NSError(domain: "MDQuickLook", code: -1, userInfo: [NSLocalizedDescriptionKey: "Cannot open file for reading"]))
                     return
                 }
                 defer { try? fileHandle.close() }

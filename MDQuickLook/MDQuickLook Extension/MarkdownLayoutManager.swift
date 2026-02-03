@@ -2,13 +2,13 @@ import Cocoa
 import os.log
 
 extension OSLog {
-    static let layoutManager = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "layoutManager")
+    static let layoutManager = OSLog(subsystem: "com.rocketpop.MDQuickLook", category: "layoutManager")
 }
 
 /// Custom NSAttributedString.Key for marking blockquote ranges and code blocks
 extension NSAttributedString.Key {
-    static let blockquoteMarker = NSAttributedString.Key("com.razielpanic.blockquoteMarker")
-    static let codeBlockMarker = NSAttributedString.Key("com.razielpanic.codeBlockMarker")
+    static let blockquoteMarker = NSAttributedString.Key("com.rocketpop.blockquoteMarker")
+    static let codeBlockMarker = NSAttributedString.Key("com.rocketpop.codeBlockMarker")
 }
 
 /// Custom layout manager for drawing blockquote decorations

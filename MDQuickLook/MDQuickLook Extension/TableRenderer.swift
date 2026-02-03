@@ -4,7 +4,7 @@ import os.log
 import Markdown
 
 extension OSLog {
-    static let tableRenderer = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "tableRenderer")
+    static let tableRenderer = OSLog(subsystem: "com.rocketpop.MDQuickLook", category: "tableRenderer")
 }
 
 /// Renders ExtractedTable to NSAttributedString using NSTextTable and NSTextTableBlock

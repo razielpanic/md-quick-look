@@ -4,7 +4,7 @@ import os.log
 import Markdown
 
 extension OSLog {
-    static let renderer = OSLog(subsystem: "com.razielpanic.md-spotlighter", category: "renderer")
+    static let renderer = OSLog(subsystem: "com.rocketpop.MDQuickLook", category: "renderer")
 }
 
 /// Custom markdown renderer that transforms PresentationIntent attributes into visual styling

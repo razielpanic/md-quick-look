@@ -1,15 +1,15 @@
 .PHONY: build install clean reload test all
 
 # Variables
-PROJECT_DIR = md-spotlighter
-SCHEME = md-spotlighter
+PROJECT_DIR = MDQuickLook
+SCHEME = MDQuickLook
 BUILD_DIR = build
 INSTALL_DIR = /Applications
-APP_NAME = md-spotlighter.app
+APP_NAME = MDQuickLook.app
 
 # Build the Xcode project
 build:
-	xcodebuild -project $(PROJECT_DIR)/md-spotlighter.xcodeproj \
+	xcodebuild -project $(PROJECT_DIR)/MDQuickLook.xcodeproj \
 		-scheme $(SCHEME) \
 		-configuration Release \
 		-derivedDataPath $(BUILD_DIR) \
@@ -25,7 +25,7 @@ install: build
 	@echo "Registering extension with pluginkit..."
 	@open "$(INSTALL_DIR)/$(APP_NAME)" 2>/dev/null || true
 	@sleep 2
-	@killall md-spotlighter 2>/dev/null || true
+	@killall MDQuickLook 2>/dev/null || true
 	@echo "Extension registered successfully"
 
 # Reload Quick Look system
@@ -38,6 +38,7 @@ reload:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf "$(INSTALL_DIR)/$(APP_NAME)"
+	rm -rf "$(INSTALL_DIR)/md-spotlighter.app"
 	rm -rf "$(HOME)/Applications/$(APP_NAME)"
 	@echo "Build artifacts and installed extension removed."
 

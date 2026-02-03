@@ -42,7 +42,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		1B1B1B1B1B1B1B1B1B1B1B1B /* md-spotlighter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "md-spotlighter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MDQuickLook.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
@@ -74,11 +74,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A1A1A1A1A1A1A1A1A1A1A1B /* md-spotlighter */ = {
+		1A1A1A1A1A1A1A1A1A1A1A1B /* MDQuickLook */ = {
 			isa = PBXGroup;
 			children = (
-				2C1C1C1C1C1C1C1C1C1C1C1C /* md-spotlighter */,
-				3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */,
+				2C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */,
+				3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook Extension */,
 				1C1C1C1C1C1C1C1C1C1C1C1C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -86,22 +86,22 @@
 		1C1C1C1C1C1C1C1C1C1C1C1C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1B1B1B1B1B1B1B1B1B1B1B1B /* md-spotlighter.app */,
+				1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */,
 				5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		2C1C1C1C1C1C1C1C1C1C1C1C /* md-spotlighter */ = {
+		2C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */ = {
 			isa = PBXGroup;
 			children = (
 				2B1B1B1B1B1B1B1B1B1B1B1B /* main.swift */,
 				2B1B1B1B1B1B1B1B1B1B1B1C /* Info.plist */,
 			);
-			path = "md-spotlighter";
+			path = "MDQuickLook";
 			sourceTree = "<group>";
 		};
-		3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook */ = {
+		3C1C1C1C1C1C1C1C1C1C1C1C /* MDQuickLook Extension */ = {
 			isa = PBXGroup;
 			children = (
 				3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */,
@@ -112,15 +112,15 @@
 				3B1B1B1B1B1B1B1B1B1B1B1D /* Info.plist */,
 				3B1B1B1B1B1B1B1B1B1B1B1E /* MDQuickLook.entitlements */,
 			);
-			path = MDQuickLook;
+			path = "MDQuickLook Extension";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1A1A1A1A1A1A1A1A1A1A1A19 /* md-spotlighter */ = {
+		1A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "md-spotlighter" */;
+			buildConfigurationList = 7A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook" */;
 			buildPhases = (
 				1A1A1A1A1A1A1A1A1A1A1A1D /* Sources */,
 				1A1A1A1A1A1A1A1A1A1A1A1C /* Frameworks */,
@@ -132,14 +132,14 @@
 			dependencies = (
 				4B1B1B1B1B1B1B1B1B1B1B1C /* PBXTargetDependency */,
 			);
-			name = "md-spotlighter";
-			productName = "md-spotlighter";
-			productReference = 1B1B1B1B1B1B1B1B1B1B1B1B /* md-spotlighter.app */;
+			name = "MDQuickLook";
+			productName = "MDQuickLook";
+			productReference = 1B1B1B1B1B1B1B1B1B1B1B1B /* MDQuickLook.app */;
 			productType = "com.apple.product-type.application";
 		};
-		5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook */ = {
+		5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook Extension */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook" */;
+			buildConfigurationList = 8A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook Extension" */;
 			buildPhases = (
 				5A1A1A1A1A1A1A1A1A1A1A1D /* Sources */,
 				5A1A1A1A1A1A1A1A1A1A1A1C /* Frameworks */,
@@ -149,11 +149,11 @@
 			);
 			dependencies = (
 			);
-			name = MDQuickLook;
+			name = "MDQuickLook Extension";
 			packageProductDependencies = (
 				6B1B1B1B1B1B1B1B1B1B1B1B /* Markdown */,
 			);
-			productName = MDQuickLook;
+			productName = "MDQuickLook Extension";
 			productReference = 5A1A1A1A1A1A1A1A1A1A1A1A /* MDQuickLook.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
@@ -175,7 +175,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "md-spotlighter" */;
+			buildConfigurationList = 7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "MDQuickLook" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -183,7 +183,7 @@
 				en,
 				Base,
 			);
-			mainGroup = 1A1A1A1A1A1A1A1A1A1A1A1B /* md-spotlighter */;
+			mainGroup = 1A1A1A1A1A1A1A1A1A1A1A1B /* MDQuickLook */;
 			packageReferences = (
 				6A1A1A1A1A1A1A1A1A1A1A1B /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
@@ -191,8 +191,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				1A1A1A1A1A1A1A1A1A1A1A19 /* md-spotlighter */,
-				5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook */,
+				1A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook */,
+				5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook Extension */,
 			);
 		};
 /* End PBXProject section */
@@ -240,7 +240,7 @@
 /* Begin PBXTargetDependency section */
 		4B1B1B1B1B1B1B1B1B1B1B1C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook */;
+			target = 5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook Extension */;
 			targetProxy = 4B1B1B1B1B1B1B1B1B1B1B1B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -374,7 +374,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "md-spotlighter/Info.plist";
+				INFOPLIST_FILE = "MDQuickLook/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -382,7 +382,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.razielpanic.md-spotlighter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -399,7 +399,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "md-spotlighter/Info.plist";
+				INFOPLIST_FILE = "MDQuickLook/Info.plist";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -407,7 +407,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.razielpanic.md-spotlighter";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -417,14 +417,14 @@
 		9A1A1A1A1A1A1A1A1A1A1A1E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = MDQuickLook/MDQuickLook.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "MDQuickLook Extension/MDQuickLook.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = MDQuickLook/Info.plist;
+				INFOPLIST_FILE = "MDQuickLook Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = ".md for QuickLook";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -433,7 +433,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.razielpanic.md-spotlighter.quicklook";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -444,14 +444,14 @@
 		9A1A1A1A1A1A1A1A1A1A1A1F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = MDQuickLook/MDQuickLook.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "MDQuickLook Extension/MDQuickLook.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = MDQuickLook/Info.plist;
+				INFOPLIST_FILE = "MDQuickLook Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = ".md for QuickLook";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -460,7 +460,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.razielpanic.md-spotlighter.quicklook";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.rocketpop.MDQuickLook.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -471,7 +471,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "md-spotlighter" */ = {
+		7A1A1A1A1A1A1A1A1A1A1A1B /* Build configuration list for PBXProject "MDQuickLook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A1A1A1A1A1A1A1A1A1A1A1A /* Debug */,
@@ -480,7 +480,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "md-spotlighter" */ = {
+		7A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A1A1A1A1A1A1A1A1A1A1A1C /* Debug */,
@@ -489,7 +489,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook" */ = {
+		8A1A1A1A1A1A1A1A1A1A1A1A /* Build configuration list for PBXNativeTarget "MDQuickLook Extension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9A1A1A1A1A1A1A1A1A1A1A1E /* Debug */,
