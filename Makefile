@@ -5,7 +5,7 @@ PROJECT_DIR = MDQuickLook
 SCHEME = MDQuickLook
 BUILD_DIR = build
 INSTALL_DIR = /Applications
-APP_NAME = MDQuickLook.app
+APP_NAME = MD Quick Look.app
 
 # Build the Xcode project
 build:
