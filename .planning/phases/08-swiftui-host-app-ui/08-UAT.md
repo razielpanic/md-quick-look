@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 08-swiftui-host-app-ui
 source: [08-01-SUMMARY.md, 08-02-SUMMARY.md, 08-03-SUMMARY.md]
 started: 2026-02-03T22:15:00Z
-updated: 2026-02-03T22:35:00Z
+updated: 2026-02-03T22:37:00Z
 ---
 
 ## Current Test
@@ -73,21 +73,42 @@ skipped: 0
   reason: "User reported: should be a normal app window"
   severity: cosmetic
   test: 2
-  artifacts: []
-  missing: []
+  root_cause: "SettingsView uses Form with .formStyle(.grouped) creating iOS-style visual chrome inappropriate for Mac utility apps"
+  artifacts:
+    - path: "MDQuickLook/MDQuickLook/Views/SettingsView.swift"
+      issue: "Form with .formStyle(.grouped) creates heavy iOS-style sections"
+    - path: "MDQuickLook/MDQuickLook/Views/FirstLaunchView.swift"
+      issue: "Could benefit from simpler VStack layout instead of heavy visual hierarchy"
+  missing:
+    - "Replace Form/.formStyle(.grouped) with simple VStack layout for Mac utility aesthetic"
+    - "Remove section headers or make more subtle"
+    - "Simplify visual chrome to match utility app purpose"
 
 - truth: "Settings window should be accessible and display extension status"
   status: failed
   reason: "User reported: I don't see a settings window or a way to get to it. There's no settings item in the application menu"
   severity: major
   test: 3
-  artifacts: []
-  missing: []
+  root_cause: "Settings content only shows in main WindowGroup after first-launch dismissal, but no menu item or window reopen mechanism exists"
+  artifacts:
+    - path: "MDQuickLook/MDQuickLook/MDQuickLookApp.swift"
+      issue: "No Settings scene or menu item - content trapped in WindowGroup"
+  missing:
+    - "Add Settings scene with Cmd+, keyboard shortcut"
+    - "Or add menu item to reopen main window"
+    - "Or implement NSApplicationDelegate.applicationShouldHandleReopen to show window"
 
 - truth: "System Settings link should deep-link to Extensions section"
   status: failed
   reason: "User reported: doesn't scroll to the extensions section"
   severity: minor
   test: 8
-  artifacts: []
-  missing: []
+  root_cause: "Using incomplete x-apple.systempreferences URL scheme that opens System Settings but doesn't navigate to Extensions"
+  artifacts:
+    - path: "MDQuickLook/MDQuickLook/Views/FirstLaunchView.swift"
+      issue: "URL scheme x-apple.systempreferences:com.apple.LoginItems-Settings.extension not precise enough"
+    - path: "MDQuickLook/MDQuickLook/Views/SettingsView.swift"
+      issue: "Same imprecise URL scheme used"
+  missing:
+    - "Research and use more precise x-apple.systempreferences URL for Extensions pane"
+    - "Potentially use com.apple.ExtensionsPreferences or updated scheme"
