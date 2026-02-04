@@ -11,10 +11,10 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 Phase: 9 of 11 (Code Signing & Notarization)
 Plan: Ready to plan Phase 9
-Status: Phase 8 complete, ready to plan Phase 9
-Progress: [███████░░░] 73% (v1.0 shipped, Phases 6-8 complete)
+Status: Phase 8 complete (gap closure plans done), ready to plan Phase 9
+Progress: [███████░░░] 76% (v1.0 shipped, Phases 6-8 complete, gap closure done)
 
-Last activity: 2026-02-03 - Phase 8 complete, SwiftUI host app UI functional
+Last activity: 2026-02-03 - Completed 08-05-PLAN.md (Settings scene gap closure)
 
 ## Performance Metrics
 
@@ -34,7 +34,7 @@ Last activity: 2026-02-03 - Phase 8 complete, SwiftUI host app UI functional
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 8
+- Plans completed: 11
 - Phases completed: 3/6
 
 **Phase 6 (Naming Cleanup):**
@@ -50,10 +50,10 @@ Last activity: 2026-02-03 - Phase 8 complete, SwiftUI host app UI functional
 - Status: ✓ Complete (verified)
 
 **Phase 8 (SwiftUI Host App UI):**
-- Plans completed: 3/3 (08-01, 08-02, 08-03)
-- Time spent: ~20 min
-- Average: ~7 min/plan
-- Status: ✓ Complete (verified)
+- Plans completed: 6/6 (08-01, 08-02, 08-03 + gap closure 08-04, 08-05, 08-06)
+- Time spent: ~32 min
+- Average: ~5.3 min/plan
+- Status: ✓ Complete (all gaps closed, UAT re-verification pending)
 
 **Timeline:**
 - Project start: 2026-01-19
@@ -89,6 +89,7 @@ Recent v1.1 decisions:
 - NSApp.applicationIconImage for icon display - Works automatically with asset catalog (08-02)
 - Direct users to System Settings for extension status - No programmatic check available (08-02)
 - Semantic colors for dark mode - Color.secondary and controlBackgroundColor for automatic adaptation (08-02)
+- SwiftUI Settings scene for standard macOS behavior - Automatic Settings menu item and Cmd+, shortcut (08-05)
 
 ### v1.1 Roadmap Structure
 
@@ -114,13 +115,13 @@ None
 
 ### Blockers/Concerns
 
-None - Plans 08-01 and 08-02 complete, ready for Plan 08-03 (functional testing)
+None - All Phase 8 gap closure plans complete (08-04, 08-05, 08-06). Ready to plan Phase 9 (Code Signing & Notarization).
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed Plan 08-02 (Settings window)
-Resume action: Execute Plan 08-03 (functional testing)
+Stopped at: Completed Plan 08-05 (Settings scene)
+Resume action: Plan Phase 9 (Code Signing & Notarization)
 
 ---
 
