@@ -32,6 +32,11 @@ struct MDQuickLookApp: App {
                 }
             }
         }
+
+        // Settings window accessible via Cmd+,
+        Settings {
+            SettingsView()
+        }
     }
 }
 
