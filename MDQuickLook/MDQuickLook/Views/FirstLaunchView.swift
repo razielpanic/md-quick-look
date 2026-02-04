@@ -27,15 +27,15 @@ struct FirstLaunchView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 // Link to System Settings
-                Button("Open Login Items & Extensions...") {
-                    // Open System Settings to Login Items & Extensions
-                    if let url = URL(string: "x-apple.systempreferences:com.apple.LoginItems-Settings.extension") {
+                Button("Open Extensions Settings...") {
+                    // Open System Settings to Extensions
+                    if let url = URL(string: "x-apple.systempreferences:com.apple.ExtensionsPreferences") {
                         openURL(url)
                     }
                 }
                 .buttonStyle(.borderedProminent)
 
-                Text("Enable \"MD Quick Look\" under Quick Look extensions.")
+                Text("Enable \"MD Quick Look\" under Quick Look.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
