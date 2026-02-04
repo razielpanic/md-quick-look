@@ -109,8 +109,8 @@ Plans:
 - [x] 08-01-PLAN.md — SwiftUI App entry point with Settings scene and menu bar
 - [x] 08-02-PLAN.md — About, Preferences, and First-launch views
 - [x] 08-03-PLAN.md — Visual and functional verification checkpoint
-- [ ] 08-04-PLAN.md — Fix visual styling and System Settings URL (gap closure)
-- [ ] 08-05-PLAN.md — Add Settings scene for menu access (gap closure)
+- [x] 08-04-PLAN.md — Fix visual styling and System Settings URL (gap closure)
+- [x] 08-05-PLAN.md — Add Settings scene for menu access (gap closure)
 
 #### Phase 9: Code Signing & Notarization
 **Goal**: App is signed and notarized for secure distribution without security warnings
@@ -124,10 +124,11 @@ Plans:
   5. App successfully notarizes via xcrun notarytool without errors
   6. Notarization ticket is stapled to app bundle
   7. Signed app launches on clean Mac without security warnings
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Configure Xcode project for Developer ID code signing
+- [ ] 09-02-PLAN.md — Sign, notarize, and staple for distribution
 
 #### Phase 10: Distribution Packaging
 **Goal**: Professional DMG distribution package available on GitHub Releases
@@ -177,10 +178,10 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 7. App Icon Design | v1.1 | 2/2 | Complete | 2026-02-03 |
 | 8. SwiftUI Host App UI | v1.1 | 5/5 | Complete | 2026-02-03 |
-| 9. Code Signing & Notarization | v1.1 | 0/TBD | Not started | - |
+| 9. Code Signing & Notarization | v1.1 | 0/2 | Not started | - |
 | 10. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
 | 11. Documentation & Marketing | v1.1 | 0/TBD | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 8 complete)*
+*Last updated: 2026-02-03 (Phase 9 planned)*
