@@ -158,10 +158,11 @@ Plans:
   5. 2-3 feature screenshots show different markdown rendering examples
   6. LICENSE file exists (MIT or Apache 2.0)
   7. README is scannable and comprehensive (under 10-12 screens of scrolling)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 11-01: TBD
+- [ ] 11-01-PLAN.md — LICENSE file, docs directory, and complete README with all sections
+- [ ] 11-02-PLAN.md — Screenshot and demo GIF capture (hero, light/dark mode, demo GIF)
 
 ## Progress
 
@@ -180,8 +181,8 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 8. SwiftUI Host App UI | v1.1 | 5/5 | Complete | 2026-02-03 |
 | 9. Code Signing & Notarization | v1.1 | 0/2 | Not started | - |
 | 10. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
-| 11. Documentation & Marketing | v1.1 | 0/TBD | Not started | - |
+| 11. Documentation & Marketing | v1.1 | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 9 planned)*
+*Last updated: 2026-02-04 (Phase 11 planned)*
