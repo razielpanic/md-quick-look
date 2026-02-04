@@ -1,9 +1,11 @@
 ---
-status: diagnosed
+status: verified
 phase: 08-swiftui-host-app-ui
 source: [08-01-SUMMARY.md, 08-02-SUMMARY.md, 08-03-SUMMARY.md]
 started: 2026-02-03T22:15:00Z
-updated: 2026-02-03T22:37:00Z
+updated: 2026-02-03T23:45:00Z
+re_verified: 2026-02-03T23:45:00Z
+gaps_closed: 2/3 (major and cosmetic fixed, minor improved)
 ---
 
 ## Current Test
@@ -112,3 +114,41 @@ skipped: 0
   missing:
     - "Research and use more precise x-apple.systempreferences URL for Extensions pane"
     - "Potentially use com.apple.ExtensionsPreferences or updated scheme"
+
+## Re-Verification (Post Gap Closure)
+
+Following execution of gap closure plans 08-04 and 08-05, re-verify the 3 failed tests:
+
+### Re-Test 2: First-Launch Window Styling
+expected: First-launch window uses clean VStack layout without iOS-style Form sections or heavy visual chrome. Should look like a native macOS utility app window.
+result: pass
+
+### Re-Test 3: Settings Menu Access
+expected: "Settings..." menu item appears in MD Quick Look app menu. Cmd+, keyboard shortcut opens Settings window. Settings can be accessed even after closing the main window.
+result: pass
+
+### Re-Test 8: System Settings Deep Link
+expected: Clicking "Open System Settings" or "Open Extensions Settings" button opens System Settings app directly to the Extensions preferences pane (not Login Items or general settings).
+result: partial
+reported: "it doesn't open the settings to the extensions section, but a second click scrolls it to the extensions section"
+severity: minor
+
+## Re-Verification Summary
+
+total: 3
+passed: 2
+issues: 1
+pending: 0
+
+## Final Assessment
+
+**Gap closure outcome:** ACCEPTED
+
+Original UAT found 3 issues:
+- **Test #2 (cosmetic):** iOS-style Form sections → **FIXED** ✓ (Plan 08-04)
+- **Test #3 (major):** No Settings menu access → **FIXED** ✓ (Plan 08-05)
+- **Test #8 (minor):** Imprecise System Settings URL → **IMPROVED** ⚡ (Plan 08-04)
+
+Re-verification confirmed that major and cosmetic issues are fully resolved. The minor deep-link issue is improved (works on second click) and accepted as reasonable behavior for v1.1 GitHub release.
+
+**Phase 8 status:** Ready for Phase 9 (Code Signing & Notarization)
