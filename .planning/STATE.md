@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 11 of 11 (Documentation & Marketing)
-Plan: 1 of 3 (11-01 complete)
-Status: In progress - 11-01 complete, ready for 11-02 (Screenshots & Demo GIF)
-Progress: [█████████░] 91% (v1.0 shipped, Phases 6-10 complete, Phase 11 in progress)
+Plan: 2 of 3 (11-01, 11-02 complete)
+Status: In progress - 11-02 complete, ready for 11-03 (App Store listing)
+Progress: [█████████░] 93% (v1.0 shipped, Phases 6-10 complete, Phase 11 2/3 plans done)
 
-Last activity: 2026-02-04 - Completed 11-01-PLAN.md (LICENSE, README, docs/ directory)
+Last activity: 2026-02-04 - Completed 11-02-PLAN.md (Screenshots & Demo GIF)
 
 ## Performance Metrics
 
@@ -34,7 +34,7 @@ Last activity: 2026-02-04 - Completed 11-01-PLAN.md (LICENSE, README, docs/ dire
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 11
+- Plans completed: 12
 - Phases completed: 3/6
 
 **Phase 6 (Naming Cleanup):**
@@ -56,10 +56,10 @@ Last activity: 2026-02-04 - Completed 11-01-PLAN.md (LICENSE, README, docs/ dire
 - Status: ✓ Complete (verified after UAT gap closure)
 
 **Phase 11 (Documentation & Marketing):**
-- Plans completed: 1/3 (11-01)
-- Time spent: 1 min
+- Plans completed: 2/3 (11-01, 11-02)
+- Time spent: 2 min
 - Average: 1 min/plan
-- Status: In progress (11-01 complete)
+- Status: In progress (11-02 complete)
 
 **Timeline:**
 - Project start: 2026-01-19
@@ -103,6 +103,8 @@ Recent v1.1 decisions:
 - macOS 26 (Tahoe) minimum requirement - Documented in README badges and requirements (11-01)
 - Manual DMG installation only - Simpler for v1.1 GitHub release, no Homebrew cask yet (11-01)
 - Three-tier troubleshooting structure - Gatekeeper, extension discovery, Finder relaunch covers 95% of user issues (11-01)
+- Three feature images instead of two - Column view, dark mode, light mode shows browsing and preview progression (11-02)
+- Descriptive alt text for accessibility - Context-aware descriptions instead of generic "markdown rendering" (11-02)
 
 ### v1.1 Roadmap Structure
 
@@ -128,13 +130,13 @@ None
 
 ### Blockers/Concerns
 
-None - Plan 11-01 complete, ready for 11-02
+None - Plan 11-02 complete, ready for 11-03
 
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed 11-01-PLAN.md
-Resume action: Execute 11-02 (Screenshots & Demo GIF) or plan remaining Phase 11 plans
+Stopped at: Completed 11-02-PLAN.md
+Resume action: Execute 11-03 (App Store listing) or plan remaining Phase 11 plans
 Resume file: None
 
 ---
