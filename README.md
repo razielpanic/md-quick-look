@@ -1,29 +1,24 @@
 # MD Quick Look
 
-> Beautiful markdown previews in Finder. Just press spacebar.
+> Finder is for browsing, not editing. See your markdown rendered — just press spacebar.
 
 <p align="center">
   <img src="docs/hero-screenshot.png" alt="MD Quick Look showing rendered markdown in Finder's Quick Look panel" width="800">
 </p>
 
-## Badges
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![macOS](https://img.shields.io/badge/macOS-26%2B-blue.svg)](https://www.apple.com/macos/)
-[![Release](https://img.shields.io/github/v/release/razielpanic/md-quick-look)](https://github.com/razielpanic/md-quick-look/releases)
+[![Release](https://img.shields.io/github/v/release/razielpanic/md-quick-look?include_prereleases)](https://github.com/razielpanic/md-quick-look/releases)
+
+Markdown strains human readability — deep heading hierarchies, tables, horizontal rules. MD Quick Look renders it all so you can actually read it.
 
 ## Features
 
-- **Headings with visual hierarchy** (h1-h6)
-- **Bold, italic, and strikethrough text** styling
-- **Ordered and unordered lists** with proper indentation
-- **Code blocks** with monospaced font
-- **Blockquotes** with visual styling
-- **GitHub-flavored markdown tables** with borders
-- **Links** displayed as text
-- **Image placeholders** shown
-- **Automatic dark mode support** - adapts to system appearance
-- **Instant rendering** - under 1 second for typical files
+- Headings, bold, italic, strikethrough, lists, blockquotes
+- Code blocks with monospaced font
+- GitHub-flavored tables with borders
+- Automatic dark mode support
+- Instant rendering — under 1 second
 
 <p align="center">
   <img src="docs/feature-column.png" alt="Browsing markdown files in Finder column view" width="600">
