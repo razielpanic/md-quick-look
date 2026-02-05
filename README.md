@@ -10,7 +10,7 @@
 [![macOS](https://img.shields.io/badge/macOS-26%2B-blue.svg)](https://www.apple.com/macos/)
 [![Release](https://img.shields.io/github/v/release/razielpanic/md-quick-look?include_prereleases)](https://github.com/razielpanic/md-quick-look/releases)
 
-Markdown strains human readability — deep heading hierarchies, tables, horizontal rules. MD Quick Look renders it all so you can actually read it.
+Coding agents tend to fill markdown with deep heading hierarchies, tables, and horizontal rules, straining the limits of its human readability. MD Quick Look renders it for easy browsing in the Finder.
 
 ## Features
 
