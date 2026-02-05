@@ -14,7 +14,7 @@ Plan: All plans complete
 Status: Phase 11 verified. Phases 9 and 10 still pending.
 Progress: [█████████░] 82% (v1.0 shipped, Phases 6-8 + 11 complete, Phases 9-10 pending)
 
-Last activity: 2026-02-04 - Phase 11 complete (2 plans executed, verified)
+Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v1.1-beta published
 
 ## Performance Metrics
 
@@ -135,9 +135,10 @@ None - Phase 11 complete and verified
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Phase 11 complete (all 2 plans executed, verified)
-Resume action: Plan Phase 9 (Code Signing & Notarization)
-Resume file: None
+Stopped at: Phase 11 UAT complete (7/7 passed), README messaging updated, GitHub pre-release v1.1-beta published with unsigned build
+Resume action: Execute Phase 9 (Code Signing & Notarization) — 2 plans exist (09-01, 09-02), 0 executed
+Resume file: .planning/phases/09-code-signing-notarization/09-01-PLAN.md
+Notes: Apple Developer enrollment may still be pending. 1 todo pending (MIT attribution in app UI).
 
 ---
 

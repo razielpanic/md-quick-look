@@ -1,3 +1,9 @@
+#some of my stuff
+rp-docs/
+
+# Build artifacts
+*.zip
+
 # macOS
 .DS_Store
 .AppleDouble
