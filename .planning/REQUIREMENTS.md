@@ -16,20 +16,20 @@ Requirements for first public release on GitHub. Professional polish and distrib
 
 ### App Icon
 
-- [ ] **ICON-01**: Design beautiful app icon (1024x1024 master)
-- [ ] **ICON-02**: Generate all required icon sizes for macOS
-- [ ] **ICON-03**: Integrate icon into Assets.xcassets
-- [ ] **ICON-04**: Verify icon appears in Finder, Dock, About window
+- [x] **ICON-01**: Design beautiful app icon (1024x1024 master)
+- [x] **ICON-02**: Generate all required icon sizes for macOS
+- [x] **ICON-03**: Integrate icon into Assets.xcassets
+- [x] **ICON-04**: Verify icon appears in Finder, Dock, About window
 
 ### App UI (SwiftUI)
 
-- [ ] **UI-01**: Create About window with app version
-- [ ] **UI-02**: Add GitHub repository link to About window
-- [ ] **UI-03**: Add credits/attribution to About window
-- [ ] **UI-04**: Create Preferences window (minimal/placeholder)
-- [ ] **UI-05**: Add first-launch welcome message or status indicator
-- [ ] **UI-06**: Verify extension status can be displayed
-- [ ] **UI-07**: Test UI in both light and dark appearance modes
+- [x] **UI-01**: Create About window with app version
+- [x] **UI-02**: Add GitHub repository link to About window
+- [x] **UI-03**: Add credits/attribution to About window
+- [x] **UI-04**: Create Preferences window (minimal/placeholder)
+- [x] **UI-05**: Add first-launch welcome message or status indicator
+- [x] **UI-06**: Verify extension status can be displayed
+- [x] **UI-07**: Test UI in both light and dark appearance modes
 
 ### Code Signing & Notarization
 
@@ -51,13 +51,13 @@ Requirements for first public release on GitHub. Professional polish and distrib
 
 ### Documentation
 
-- [ ] **DOCS-01**: Write README with hero screenshot
-- [ ] **DOCS-02**: Add installation instructions to README
-- [ ] **DOCS-03**: Add troubleshooting section to README
-- [ ] **DOCS-04**: Create demo GIF showing "spacebar → preview" magic moment
-- [ ] **DOCS-05**: Capture 2-3 feature screenshots (markdown rendering examples)
-- [ ] **DOCS-06**: Add LICENSE file (MIT or Apache 2.0)
-- [ ] **DOCS-07**: Ensure README is scannable (under 10-12 screens)
+- [x] **DOCS-01**: Write README with hero screenshot
+- [x] **DOCS-02**: Add installation instructions to README
+- [x] **DOCS-03**: Add troubleshooting section to README
+- [x] **DOCS-04**: Create demo GIF showing "spacebar → preview" magic moment
+- [x] **DOCS-05**: Capture 2-3 feature screenshots (markdown rendering examples)
+- [x] **DOCS-06**: Add LICENSE file (MIT or Apache 2.0)
+- [x] **DOCS-07**: Ensure README is scannable (under 10-12 screens)
 
 ## v1.2+ Requirements
 
@@ -105,10 +105,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAMING-02 | Phase 6 | Complete |
 | NAMING-03 | Phase 6 | Complete |
 | NAMING-04 | Phase 6 | Complete |
-| ICON-01 | Phase 7 | Pending |
-| ICON-02 | Phase 7 | Pending |
-| ICON-03 | Phase 7 | Pending |
-| ICON-04 | Phase 7 | Pending |
+| ICON-01 | Phase 7 | Complete |
+| ICON-02 | Phase 7 | Complete |
+| ICON-03 | Phase 7 | Complete |
+| ICON-04 | Phase 7 | Complete |
 | UI-01 | Phase 8 | Complete |
 | UI-02 | Phase 8 | Complete |
 | UI-03 | Phase 8 | Complete |
@@ -128,13 +128,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIST-04 | Phase 10 | Pending |
 | DIST-05 | Phase 10 | Pending |
 | DIST-06 | Phase 10 | Pending |
-| DOCS-01 | Phase 11 | Pending |
-| DOCS-02 | Phase 11 | Pending |
-| DOCS-03 | Phase 11 | Pending |
-| DOCS-04 | Phase 11 | Pending |
-| DOCS-05 | Phase 11 | Pending |
-| DOCS-06 | Phase 11 | Pending |
-| DOCS-07 | Phase 11 | Pending |
+| DOCS-01 | Phase 11 | Complete |
+| DOCS-02 | Phase 11 | Complete |
+| DOCS-03 | Phase 11 | Complete |
+| DOCS-04 | Phase 11 | Complete |
+| DOCS-05 | Phase 11 | Complete |
+| DOCS-06 | Phase 11 | Complete |
+| DOCS-07 | Phase 11 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 34 total
@@ -143,4 +143,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-04 after Phase 11 completion*
