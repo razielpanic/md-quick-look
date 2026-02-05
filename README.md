@@ -1,4 +1,4 @@
-<img src="docs/app-icon.png" alt="MD Quick Look icon" width="64" align="left">
+<img src="docs/app-icon-256.png" alt="MD Quick Look icon" width="64" align="left">
 
 # MD Quick Look
 
