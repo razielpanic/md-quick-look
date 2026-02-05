@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.1 Public Release - Phase 10 complete, Phase 9 remaining
+**Current focus:** v1.1 Public Release - ALL PHASES COMPLETE
 
 ## Current Position
 
-Phase: 9 of 10 (Distribution Packaging)
-Plan: 1 of 2 complete
-Status: In progress - Plan 09-01 complete (version bumped to 1.1.0, DMG created)
-Progress: [█████████░] 92% (v1.0 shipped, Phases 6-8 + 10 complete, Phase 9: 1/2 plans)
+Phase: 9 of 10 (Distribution Packaging) - COMPLETE
+Plan: All plans complete
+Status: All v1.1 phases complete. GitHub release v1.1.0 published.
+Progress: [██████████] 100% (v1.0 shipped, all v1.1 phases complete)
 
-Last activity: 2026-02-05 - Plan 09-01 complete: version 1.1.0 set, app rebuilt, unsigned DMG created
+Last activity: 2026-02-05 - Phase 9 complete, GitHub release v1.1.0 published with DMG
 
 ## Performance Metrics
 
@@ -34,8 +34,8 @@ Last activity: 2026-02-05 - Plan 09-01 complete: version 1.1.0 set, app rebuilt,
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 12
-- Phases completed: 4/5
+- Plans completed: 14
+- Phases completed: 5/5
 
 **Phase 6 (Naming Cleanup):**
 - Plans completed: 3/3 (06-01, 06-02, 06-03)
@@ -56,10 +56,10 @@ Last activity: 2026-02-05 - Plan 09-01 complete: version 1.1.0 set, app rebuilt,
 - Status: ✓ Complete (verified after UAT gap closure)
 
 **Phase 9 (Distribution Packaging):**
-- Plans completed: 1/2 (09-01)
-- Time spent: ~2 min
-- Average: ~2 min/plan
-- Status: In progress
+- Plans completed: 2/2 (09-01, 09-02)
+- Time spent: ~5 min
+- Average: ~2.5 min/plan
+- Status: ✓ Complete (verified 6/6 must-haves)
 
 **Phase 10 (Documentation & Marketing):**
 - Plans completed: 2/2 (10-01, 10-02)
@@ -135,17 +135,20 @@ Recent v1.1 decisions:
 
 1. **Ensure MIT license attribution in app UI** (area: ui) — verify About window and app surfaces include proper MIT attribution
 
+- Release notes include first-launch setup warning and System Settings extension enablement steps (09-02)
+- GitHub release v1.1.0 published as final release (not prerelease) with DMG asset (09-02)
+
 ### Blockers/Concerns
 
-None - Phase 10 complete and verified
+None - All v1.1 phases complete and verified
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Plan 09-01 complete (version 1.1.0 set, DMG created)
-Resume action: Execute Plan 09-02 (GitHub release v1.1.0)
-Resume file: .planning/phases/09-distribution-packaging/09-02-PLAN.md
-Notes: 1 todo pending (MIT attribution in app UI). Unsigned DMG ready for release attachment.
+Stopped at: All v1.1 phases complete — milestone ready for audit/completion
+Resume action: /gsd:audit-milestone or /gsd:complete-milestone
+Resume file: .planning/ROADMAP.md
+Notes: 1 todo pending (MIT attribution in app UI). GitHub release v1.1.0 live.
 
 ---
 

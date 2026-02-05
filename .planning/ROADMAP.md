@@ -126,8 +126,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Version bump to 1.1.0, rebuild app, create unsigned DMG
-- [ ] 09-02-PLAN.md — Release notes and GitHub release v1.1.0 publication
+- [x] 09-01-PLAN.md — Version bump to 1.1.0, rebuild app, create unsigned DMG
+- [x] 09-02-PLAN.md — Release notes and GitHub release v1.1.0 publication
 
 #### Phase 10: Documentation & Marketing
 **Goal**: Comprehensive, engaging documentation that shows users the value and guides installation
@@ -162,9 +162,9 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 7. App Icon Design | v1.1 | 2/2 | Complete | 2026-02-03 |
 | 8. SwiftUI Host App UI | v1.1 | 5/5 | Complete | 2026-02-03 |
-| 9. Distribution Packaging | v1.1 | 0/2 | Not started | - |
+| 9. Distribution Packaging | v1.1 | 2/2 | Complete | 2026-02-05 |
 | 10. Documentation & Marketing | v1.1 | 2/2 | Complete | 2026-02-04 |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-05 (Phase 9 planned — 2 plans in 2 waves)*
+*Last updated: 2026-02-05 (Phase 9 complete — v1.1.0 released on GitHub)*
