@@ -111,7 +111,7 @@ Phase 1 maps to requirements SYSINT-01 and SYSINT-03 from REQUIREMENTS.md.
 ### Build Verification
 
 **Build artifacts verified:**
-- Build directory exists: /Users/razielpanic/Projects/md-quick-look/build/
+- Build directory exists: ./build/
 - Built app exists: build/Build/Products/Release/md-quick-look.app
 - Extension embedded: build/Build/Products/Release/MDQuickLook.appex
 - Installed app: /Applications/md-quick-look.app (1.6MB binary, Feb 1 00:05)

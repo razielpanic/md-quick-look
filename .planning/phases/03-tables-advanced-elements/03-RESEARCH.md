@@ -498,7 +498,7 @@ Things that couldn't be fully resolved:
 ## Sources
 
 ### Primary (HIGH confidence)
-- swift-markdown source code (Table.swift, TableCell.swift, TableRow.swift, TableHead.swift, TableBody.swift, MarkupVisitor.swift, HTMLFormatter.swift) - Read directly from `/Users/razielpanic/Projects/md-quick-look/build/SourcePackages/checkouts/swift-markdown/`
+- swift-markdown source code (Table.swift, TableCell.swift, TableRow.swift, TableHead.swift, TableBody.swift, MarkupVisitor.swift, HTMLFormatter.swift) - Read directly from `./build/SourcePackages/checkouts/swift-markdown/`
 - [Apple Text Layout Programming Guide: Using Text Tables](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Articles/TextTables.html) - Complete programmatic table creation documentation
 - NSTextTable API (properties: numberOfColumns, collapsesBorders, hidesEmptyCells, layoutAlgorithm)
 - NSTextTableBlock API (init with table/row/column/span, setWidth/setBorderColor methods)

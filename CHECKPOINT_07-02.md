@@ -192,7 +192,7 @@ To verify the icon is loading correctly:
 
 ## Files Modified
 
-- `/Users/razielpanic/Projects/md-spotlighter/MDQuickLook/MDQuickLook.xcodeproj/project.pbxproj`
+- `MDQuickLook/MDQuickLook.xcodeproj/project.pbxproj`
 
 ## Success Criteria Met
 

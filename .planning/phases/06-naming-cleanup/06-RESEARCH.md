@@ -200,7 +200,7 @@ handler(NSError(domain: "MDQuickLook", code: -1, userInfo: [...]))
 ### Verified: git mv Two-Step Rename (for case changes)
 ```bash
 # Safe rename preserving history on case-insensitive filesystems
-cd /Users/razielpanic/Projects/md-quick-look
+cd .
 git mv md-quick-look/md-quick-look.xcodeproj md-quick-look/temp.xcodeproj
 git mv md-quick-look/temp.xcodeproj md-quick-look/MDQuickLook.xcodeproj
 # Repeat for other directories needing case-change renames
