@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 
 ## Current Position
 
-Phase: 10 of 10 (Documentation & Marketing) - COMPLETE
-Plan: All plans complete
-Status: Phase 10 verified. Phase 9 (Distribution Packaging) still pending.
-Progress: [█████████░] 90% (v1.0 shipped, Phases 6-8 + 10 complete, Phase 9 pending)
+Phase: 9 of 10 (Distribution Packaging)
+Plan: 1 of 2 complete
+Status: In progress - Plan 09-01 complete (version bumped to 1.1.0, DMG created)
+Progress: [█████████░] 92% (v1.0 shipped, Phases 6-8 + 10 complete, Phase 9: 1/2 plans)
 
-Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v1.1-beta published
+Last activity: 2026-02-05 - Plan 09-01 complete: version 1.1.0 set, app rebuilt, unsigned DMG created
 
 ## Performance Metrics
 
@@ -54,6 +54,12 @@ Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v
 - Time spent: ~25 min
 - Average: ~5 min/plan
 - Status: ✓ Complete (verified after UAT gap closure)
+
+**Phase 9 (Distribution Packaging):**
+- Plans completed: 1/2 (09-01)
+- Time spent: ~2 min
+- Average: ~2 min/plan
+- Status: In progress
 
 **Phase 10 (Documentation & Marketing):**
 - Plans completed: 2/2 (10-01, 10-02)
@@ -105,6 +111,9 @@ Recent v1.1 decisions:
 - Three-tier troubleshooting structure - Gatekeeper, extension discovery, Finder relaunch covers 95% of user issues (10-01)
 - Three feature images instead of two - Column view, dark mode, light mode shows browsing and preview progression (10-02)
 - Descriptive alt text for accessibility - Context-aware descriptions instead of generic "markdown rendering" (10-02)
+- Version 1.1.0 with build number 2 - CFBundleShortVersionString and MARKETING_VERSION for marketing version, CFBundleVersion and CURRENT_PROJECT_VERSION for build (09-01)
+- DMG files excluded from git - Release artifacts only, added *.dmg to .gitignore alongside *.zip (09-01)
+- create-dmg handles DMG layout automatically - Applications symlink, icon, window settings configured by tool (09-01)
 
 ### v1.1 Roadmap Structure
 
@@ -133,10 +142,10 @@ None - Phase 10 complete and verified
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Phase 9 (Code Signing & Notarization) removed from roadmap, phases renumbered
-Resume action: Execute Phase 9 (Distribution Packaging) — plans TBD
-Resume file: .planning/ROADMAP.md
-Notes: 1 todo pending (MIT attribution in app UI).
+Stopped at: Plan 09-01 complete (version 1.1.0 set, DMG created)
+Resume action: Execute Plan 09-02 (GitHub release v1.1.0)
+Resume file: .planning/phases/09-distribution-packaging/09-02-PLAN.md
+Notes: 1 todo pending (MIT attribution in app UI). Unsigned DMG ready for release attachment.
 
 ---
 
