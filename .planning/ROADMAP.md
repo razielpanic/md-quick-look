@@ -113,20 +113,21 @@ Plans:
 - [x] 08-05-PLAN.md — Add Settings scene for menu access (gap closure)
 
 #### Phase 9: Distribution Packaging
-**Goal**: Professional DMG distribution package available on GitHub Releases
+**Goal**: Professional unsigned DMG distribution package available on GitHub Releases
 **Depends on**: Phase 8 (needs working app to package)
 **Requirements**: DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06
 **Success Criteria** (what must be TRUE):
   1. Professional DMG created with app icon and layout
-  2. DMG is signed and notarized
-  3. DMG installation verified on clean Mac (app installs and launches correctly)
-  4. GitHub release v1.1 exists with semantic version tag
-  5. Signed DMG is attached to GitHub release as downloadable asset
+  2. DMG is unsigned with Gatekeeper bypass instructions (signing deferred)
+  3. DMG installation verified (app installs and launches correctly)
+  4. GitHub release v1.1.0 exists with semantic version tag
+  5. Unsigned DMG is attached to GitHub release as downloadable asset
   6. Release notes describe v1.1 changes and installation instructions
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 09-01: TBD
+- [ ] 09-01-PLAN.md — Version bump to 1.1.0, rebuild app, create unsigned DMG
+- [ ] 09-02-PLAN.md — Release notes and GitHub release v1.1.0 publication
 
 #### Phase 10: Documentation & Marketing
 **Goal**: Comprehensive, engaging documentation that shows users the value and guides installation
@@ -161,9 +162,9 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 7. App Icon Design | v1.1 | 2/2 | Complete | 2026-02-03 |
 | 8. SwiftUI Host App UI | v1.1 | 5/5 | Complete | 2026-02-03 |
-| 9. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
+| 9. Distribution Packaging | v1.1 | 0/2 | Not started | - |
 | 10. Documentation & Marketing | v1.1 | 2/2 | Complete | 2026-02-04 |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-05 (Phase 9 removed, renumbered)*
+*Last updated: 2026-02-05 (Phase 9 planned — 2 plans in 2 waves)*
