@@ -26,11 +26,15 @@
 - **Instant rendering** - under 1 second for typical files
 
 <p align="center">
-  <img src="docs/feature-light.png" alt="Markdown rendering in light mode" width="600">
+  <img src="docs/feature-column.png" alt="Browsing markdown files in Finder column view" width="600">
 </p>
 
 <p align="center">
-  <img src="docs/feature-dark.png" alt="Markdown rendering in dark mode" width="600">
+  <img src="docs/feature-dark.png" alt="Quick Look preview floating over desktop in dark mode" width="600">
+</p>
+
+<p align="center">
+  <img src="docs/feature-light.png" alt="Quick Look preview floating over desktop in light mode" width="600">
 </p>
 
 ## See It in Action
