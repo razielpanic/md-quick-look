@@ -40,21 +40,35 @@
 4. **Launch the app once** to register the Quick Look extension
 5. Select any `.md` file in Finder and press **Space** to preview
 
-## macOS Security Note
+## Important: First Launch Setup
 
-This is an unsigned release. macOS Gatekeeper will show a warning on first launch.
+This is an unsigned release. **The app will not open normally on first launch** — macOS Gatekeeper blocks unsigned apps by default. You must do one of the following before the app will run:
 
-**To open (recommended):**
-1. Right-click **MD Quick Look.app** in Applications
-2. Select **Open**
-3. Click **Open** in the confirmation dialog
+### Option A: Right-click to Open (recommended)
 
-**Alternative (Terminal):**
+1. Open **Finder** and navigate to **Applications**
+2. **Right-click** (or Control-click) on **MD Quick Look.app**
+3. Select **Open** from the context menu
+4. Click **Open** in the confirmation dialog that appears
+
+### Option B: Remove quarantine via Terminal
+
 ```bash
 xattr -dr com.apple.quarantine /Applications/MD\ Quick\ Look.app
 ```
 
-After this one-time step, the app launches normally.
+After either step, the app will open normally from now on.
+
+### Enable the Quick Look Extension
+
+After the app launches for the first time, you need to enable the extension:
+
+1. Open **System Settings**
+2. Go to **Extensions** → **Quick Look**
+3. Toggle **MD Quick Look** to **on**
+4. Open a new Finder window, select any `.md` file, and press **Space**
+
+> **Tip:** The app includes a direct link to the Extensions settings pane — click "Open System Settings" in the app window.
 
 ## Requirements
 
