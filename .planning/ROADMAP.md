@@ -2,12 +2,12 @@
 
 ## Overview
 
-v1.1 transforms the working Quick Look extension (v1.0) into a polished, publicly distributable macOS application via GitHub. The journey spans six phases: clean up all naming artifacts from development, design a professional app icon, build SwiftUI host app UI (About/Preferences windows), configure code signing and notarization for secure distribution, package into a signed DMG for GitHub release, and create comprehensive documentation with screenshots and demo GIFs showing the "spacebar to preview" magic moment.
+v1.1 transforms the working Quick Look extension (v1.0) into a polished, publicly distributable macOS application via GitHub. The journey spans five phases: clean up all naming artifacts from development, design a professional app icon, build SwiftUI host app UI (About/Preferences windows), package into a DMG for GitHub release, and create comprehensive documentation with screenshots and demo GIFs showing the "spacebar to preview" magic moment.
 
 ## Milestones
 
 - ✅ **v1.0 Initial Release** - Phases 1-5 (shipped 2026-02-02)
-- 🚧 **v1.1 Public Release (GitHub)** - Phases 6-11 (in progress)
+- 🚧 **v1.1 Public Release (GitHub)** - Phases 6-10 (in progress)
 
 ## Phases
 
@@ -112,27 +112,9 @@ Plans:
 - [x] 08-04-PLAN.md — Fix visual styling and System Settings URL (gap closure)
 - [x] 08-05-PLAN.md — Add Settings scene for menu access (gap closure)
 
-#### Phase 9: Code Signing & Notarization
-**Goal**: App is signed and notarized for secure distribution without security warnings
-**Depends on**: Phase 8 (needs working app to sign)
-**Requirements**: SIGN-01, SIGN-02, SIGN-03, SIGN-04, SIGN-05, SIGN-06
-**Success Criteria** (what must be TRUE):
-  1. Apple Developer account is set up and active
-  2. App builds with code signing and hardened runtime enabled
-  3. Quick Look extension (.appex) is signed with Developer ID
-  4. Host app (.app) is signed with Developer ID
-  5. App successfully notarizes via xcrun notarytool without errors
-  6. Notarization ticket is stapled to app bundle
-  7. Signed app launches on clean Mac without security warnings
-**Plans**: 2 plans
-
-Plans:
-- [ ] 09-01-PLAN.md — Configure Xcode project for Developer ID code signing
-- [ ] 09-02-PLAN.md — Sign, notarize, and staple for distribution
-
-#### Phase 10: Distribution Packaging
+#### Phase 9: Distribution Packaging
 **Goal**: Professional DMG distribution package available on GitHub Releases
-**Depends on**: Phase 9 (must sign app before packaging)
+**Depends on**: Phase 8 (needs working app to package)
 **Requirements**: DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06
 **Success Criteria** (what must be TRUE):
   1. Professional DMG created with app icon and layout
@@ -144,11 +126,11 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 09-01: TBD
 
-#### Phase 11: Documentation & Marketing
+#### Phase 10: Documentation & Marketing
 **Goal**: Comprehensive, engaging documentation that shows users the value and guides installation
-**Depends on**: Phase 10 (needs screenshots of signed app, working installation flow)
+**Depends on**: Phase 9 (needs screenshots of app, working installation flow)
 **Requirements**: DOCS-01, DOCS-02, DOCS-03, DOCS-04, DOCS-05, DOCS-06, DOCS-07
 **Success Criteria** (what must be TRUE):
   1. README includes hero screenshot showing markdown preview in Finder
@@ -161,13 +143,13 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [x] 11-01-PLAN.md — LICENSE file, docs directory, and complete README with all sections
-- [x] 11-02-PLAN.md — Screenshot and demo GIF capture (hero, column view, light/dark mode, demo GIF)
+- [x] 10-01-PLAN.md — LICENSE file, docs directory, and complete README with all sections
+- [x] 10-02-PLAN.md — Screenshot and demo GIF capture (hero, column view, light/dark mode, demo GIF)
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
+Phases execute in numeric order: 6 → 7 → 8 → 9 → 10
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -179,10 +161,9 @@ Phases execute in numeric order: 6 → 7 → 8 → 9 → 10 → 11
 | 6. Naming Cleanup | v1.1 | 3/3 | Complete | 2026-02-02 |
 | 7. App Icon Design | v1.1 | 2/2 | Complete | 2026-02-03 |
 | 8. SwiftUI Host App UI | v1.1 | 5/5 | Complete | 2026-02-03 |
-| 9. Code Signing & Notarization | v1.1 | 0/2 | Not started | - |
-| 10. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
-| 11. Documentation & Marketing | v1.1 | 2/2 | Complete | 2026-02-04 |
+| 9. Distribution Packaging | v1.1 | 0/TBD | Not started | - |
+| 10. Documentation & Marketing | v1.1 | 2/2 | Complete | 2026-02-04 |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-04 (Phase 11 complete)*
+*Last updated: 2026-02-05 (Phase 9 removed, renumbered)*

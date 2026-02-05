@@ -6,7 +6,7 @@ tags: [screenshots, demo, visual-assets, github, readme, marketing]
 
 # Dependency graph
 requires:
-  - phase: 11-01-foundation-documentation
+  - phase: 10-01-foundation-documentation
     provides: README with placeholder image references
   - phase: 08-swiftui-host-app-ui
     provides: Working app to capture in screenshots
@@ -50,7 +50,7 @@ duration: <1min
 completed: 2026-02-04
 ---
 
-# Phase 11 Plan 02: Screenshots & Demo GIF Summary
+# Phase 10 Plan 02: Screenshots & Demo GIF Summary
 
 **Visual asset suite captured: hero screenshot (331KB), three feature screenshots showing column view and dark/light modes (3.4MB total), and spacebar-to-preview demo GIF (932KB) with README image references updated**
 

@@ -1,7 +1,7 @@
 ---
 status: complete
 phase: 11-documentation-marketing
-source: [11-01-SUMMARY.md, 11-02-SUMMARY.md]
+source: [10-01-SUMMARY.md, 10-02-SUMMARY.md]
 started: 2026-02-04T12:00:00Z
 updated: 2026-02-04T12:30:00Z
 ---

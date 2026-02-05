@@ -5,14 +5,14 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.1 Public Release - Phase 11 complete, Phases 9-10 remaining
+**Current focus:** v1.1 Public Release - Phase 10 complete, Phase 9 remaining
 
 ## Current Position
 
-Phase: 11 of 11 (Documentation & Marketing) - COMPLETE
+Phase: 10 of 10 (Documentation & Marketing) - COMPLETE
 Plan: All plans complete
-Status: Phase 11 verified. Phases 9 and 10 still pending.
-Progress: [█████████░] 82% (v1.0 shipped, Phases 6-8 + 11 complete, Phases 9-10 pending)
+Status: Phase 10 verified. Phase 9 (Distribution Packaging) still pending.
+Progress: [█████████░] 90% (v1.0 shipped, Phases 6-8 + 10 complete, Phase 9 pending)
 
 Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v1.1-beta published
 
@@ -35,7 +35,7 @@ Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v
 
 **v1.1 Progress:**
 - Plans completed: 12
-- Phases completed: 4/6
+- Phases completed: 4/5
 
 **Phase 6 (Naming Cleanup):**
 - Plans completed: 3/3 (06-01, 06-02, 06-03)
@@ -55,8 +55,8 @@ Last activity: 2026-02-04 - Phase 11 UAT passed, README sharpened, pre-release v
 - Average: ~5 min/plan
 - Status: ✓ Complete (verified after UAT gap closure)
 
-**Phase 11 (Documentation & Marketing):**
-- Plans completed: 2/2 (11-01, 11-02)
+**Phase 10 (Documentation & Marketing):**
+- Plans completed: 2/2 (10-01, 10-02)
 - Time spent: ~5 min
 - Average: ~2.5 min/plan
 - Status: ✓ Complete (verified)
@@ -98,31 +98,29 @@ Recent v1.1 decisions:
 - SwiftUI Settings scene for standard macOS behavior - Automatic Settings menu item and Cmd+, shortcut (08-05)
 - VStack over Form for settings views - Clean macOS utility app aesthetic without iOS-style chrome (08-04)
 - Direct Extensions pane deep linking - com.apple.ExtensionsPreferences for precise System Settings navigation (08-04)
-- MIT License with 2026 copyright - Standard permissive license for open source Swift/macOS projects (11-01)
-- GitHub repo razielpanic/md-quick-look - Matches renamed project from Phase 6 (11-01)
-- macOS 26 (Tahoe) minimum requirement - Documented in README badges and requirements (11-01)
-- Manual DMG installation only - Simpler for v1.1 GitHub release, no Homebrew cask yet (11-01)
-- Three-tier troubleshooting structure - Gatekeeper, extension discovery, Finder relaunch covers 95% of user issues (11-01)
-- Three feature images instead of two - Column view, dark mode, light mode shows browsing and preview progression (11-02)
-- Descriptive alt text for accessibility - Context-aware descriptions instead of generic "markdown rendering" (11-02)
+- MIT License with 2026 copyright - Standard permissive license for open source Swift/macOS projects (10-01)
+- GitHub repo razielpanic/md-quick-look - Matches renamed project from Phase 6 (10-01)
+- macOS 26 (Tahoe) minimum requirement - Documented in README badges and requirements (10-01)
+- Manual DMG installation only - Simpler for v1.1 GitHub release, no Homebrew cask yet (10-01)
+- Three-tier troubleshooting structure - Gatekeeper, extension discovery, Finder relaunch covers 95% of user issues (10-01)
+- Three feature images instead of two - Column view, dark mode, light mode shows browsing and preview progression (10-02)
+- Descriptive alt text for accessibility - Context-aware descriptions instead of generic "markdown rendering" (10-02)
 
 ### v1.1 Roadmap Structure
 
-**6 phases derived from requirements:**
+**5 phases derived from requirements:**
 1. Phase 6: Naming Cleanup (4 requirements) - Remove "spotlighter" references
 2. Phase 7: App Icon Design (4 requirements) - Professional icon for all contexts
 3. Phase 8: SwiftUI Host App UI (7 requirements) - About/Preferences windows
-4. Phase 9: Code Signing & Notarization (6 requirements) - Secure distribution
-5. Phase 10: Distribution Packaging (6 requirements) - DMG and GitHub release
-6. Phase 11: Documentation & Marketing (7 requirements) - README, screenshots, demo GIF
+4. Phase 9: Distribution Packaging (6 requirements) - DMG and GitHub release
+5. Phase 10: Documentation & Marketing (7 requirements) - README, screenshots, demo GIF
 
-**Coverage:** 34/34 v1.1 requirements mapped (100%)
+**Coverage:** 28/28 v1.1 requirements mapped (100%)
 
 **Key dependencies:**
 - Icon before UI (About window needs icon)
-- UI before signing (need working app to sign)
-- Signing before DMG (must sign app before packaging)
-- DMG before docs (README needs screenshots of signed app)
+- UI before packaging (need working app to package)
+- DMG before docs (README needs screenshots of app)
 
 ### Pending Todos
 
@@ -130,15 +128,15 @@ Recent v1.1 decisions:
 
 ### Blockers/Concerns
 
-None - Phase 11 complete and verified
+None - Phase 10 complete and verified
 
 ## Session Continuity
 
-Last session: 2026-02-04
-Stopped at: Phase 11 UAT complete (7/7 passed), README messaging updated, GitHub pre-release v1.1-beta published with unsigned build
-Resume action: Execute Phase 9 (Code Signing & Notarization) — 2 plans exist (09-01, 09-02), 0 executed
-Resume file: .planning/phases/09-code-signing-notarization/09-01-PLAN.md
-Notes: Apple Developer enrollment may still be pending. 1 todo pending (MIT attribution in app UI).
+Last session: 2026-02-05
+Stopped at: Phase 9 (Code Signing & Notarization) removed from roadmap, phases renumbered
+Resume action: Execute Phase 9 (Distribution Packaging) — plans TBD
+Resume file: .planning/ROADMAP.md
+Notes: 1 todo pending (MIT attribution in app UI).
 
 ---
 
