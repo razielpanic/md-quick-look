@@ -126,7 +126,7 @@ Recent v1.1 decisions:
 
 ### Pending Todos
 
-None
+1. **Ensure MIT license attribution in app UI** (area: ui) — verify About window and app surfaces include proper MIT attribution
 
 ### Blockers/Concerns
 
