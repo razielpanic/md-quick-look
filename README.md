@@ -1,3 +1,5 @@
+<img src="docs/app-icon.png" alt="MD Quick Look icon" width="64" align="left">
+
 # MD Quick Look
 
 > Finder is for browsing, not editing. See your markdown rendered — just press spacebar.
