@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** v1.1 Public Release - Phase 9 (Code Signing & Notarization)
+**Current focus:** v1.1 Public Release - Phase 11 (Documentation & Marketing)
 
 ## Current Position
 
-Phase: 9 of 11 (Code Signing & Notarization)
-Plan: Ready to plan Phase 9
-Status: Phase 8 complete (verified after gap closure), ready to plan Phase 9
-Progress: [███████░░░] 73% (v1.0 shipped, Phases 6-8 complete)
+Phase: 11 of 11 (Documentation & Marketing)
+Plan: 1 of 3 (11-01 complete)
+Status: In progress - 11-01 complete, ready for 11-02 (Screenshots & Demo GIF)
+Progress: [█████████░] 91% (v1.0 shipped, Phases 6-10 complete, Phase 11 in progress)
 
-Last activity: 2026-02-03 - Phase 8 complete (all 5 plans executed, verified)
+Last activity: 2026-02-04 - Completed 11-01-PLAN.md (LICENSE, README, docs/ directory)
 
 ## Performance Metrics
 
@@ -34,7 +34,7 @@ Last activity: 2026-02-03 - Phase 8 complete (all 5 plans executed, verified)
 | 5. Documentation Sync | 2/2 | 1 min | <1 min |
 
 **v1.1 Progress:**
-- Plans completed: 10
+- Plans completed: 11
 - Phases completed: 3/6
 
 **Phase 6 (Naming Cleanup):**
@@ -54,6 +54,12 @@ Last activity: 2026-02-03 - Phase 8 complete (all 5 plans executed, verified)
 - Time spent: ~25 min
 - Average: ~5 min/plan
 - Status: ✓ Complete (verified after UAT gap closure)
+
+**Phase 11 (Documentation & Marketing):**
+- Plans completed: 1/3 (11-01)
+- Time spent: 1 min
+- Average: 1 min/plan
+- Status: In progress (11-01 complete)
 
 **Timeline:**
 - Project start: 2026-01-19
@@ -92,6 +98,11 @@ Recent v1.1 decisions:
 - SwiftUI Settings scene for standard macOS behavior - Automatic Settings menu item and Cmd+, shortcut (08-05)
 - VStack over Form for settings views - Clean macOS utility app aesthetic without iOS-style chrome (08-04)
 - Direct Extensions pane deep linking - com.apple.ExtensionsPreferences for precise System Settings navigation (08-04)
+- MIT License with 2026 copyright - Standard permissive license for open source Swift/macOS projects (11-01)
+- GitHub repo razielpanic/md-quick-look - Matches renamed project from Phase 6 (11-01)
+- macOS 26 (Tahoe) minimum requirement - Documented in README badges and requirements (11-01)
+- Manual DMG installation only - Simpler for v1.1 GitHub release, no Homebrew cask yet (11-01)
+- Three-tier troubleshooting structure - Gatekeeper, extension discovery, Finder relaunch covers 95% of user issues (11-01)
 
 ### v1.1 Roadmap Structure
 
@@ -117,13 +128,14 @@ None
 
 ### Blockers/Concerns
 
-None - Phase 8 complete and verified
+None - Plan 11-01 complete, ready for 11-02
 
 ## Session Continuity
 
-Last session: 2026-02-03
-Stopped at: Phase 8 complete (all 5 plans executed, verified)
-Resume action: Plan Phase 9 (Code Signing & Notarization)
+Last session: 2026-02-04
+Stopped at: Completed 11-01-PLAN.md
+Resume action: Execute 11-02 (Screenshots & Demo GIF) or plan remaining Phase 11 plans
+Resume file: None
 
 ---
 
