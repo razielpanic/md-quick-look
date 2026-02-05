@@ -1,5 +1,33 @@
 # Project Milestones: md-quick-look
 
+## v1.1 Public Release (GitHub) (Shipped: 2026-02-05)
+
+**Delivered:** Polished, publicly distributable macOS app with professional UI, app icon, unsigned DMG on GitHub Releases, and comprehensive documentation.
+
+**Phases completed:** 6-10 (14 plans total)
+
+**Key accomplishments:**
+
+- Complete naming cleanup — removed all "spotlighter" references, established "MD Quick Look" branding with com.rocketpop.MDQuickLook bundle IDs
+- Professional app icon — geometric star/octothorpe design with purple gradient, all macOS icon sizes generated via ImageMagick
+- Full SwiftUI host app UI — About window with version and GitHub link, Preferences with extension status, first-launch welcome with setup guidance
+- GitHub distribution — unsigned DMG (3.5MB) published as GitHub release v1.1.0 with Gatekeeper bypass instructions
+- Comprehensive documentation — README with hero screenshot, demo GIF, installation guide, troubleshooting section, and MIT license
+
+**Stats:**
+
+- 14 plans across 5 phases
+- 240 lines of Swift (codebase total)
+- 28 requirements shipped (SIGN-01–06 deferred by design)
+- 4 days (2026-02-02 → 2026-02-05)
+- 115 commits
+
+**Git range:** `feat(06-01)` → `docs(09-02)`
+
+**What's next:** v1.2 App Store preparation or v2.0 advanced features (syntax highlighting, image rendering, YAML front matter, task lists)
+
+---
+
 ## v1.0 Initial Release (Shipped: 2026-02-02)
 
 **Delivered:** Working Quick Look extension that renders markdown files with essential formatting in Finder.
