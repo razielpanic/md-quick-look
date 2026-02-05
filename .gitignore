@@ -3,6 +3,7 @@ rp-docs/
 
 # Build artifacts
 *.zip
+*.dmg
 
 # macOS
 .DS_Store
