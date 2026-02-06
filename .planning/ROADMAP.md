@@ -28,7 +28,9 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
   3. List values in front matter (e.g., `tags: [a, b, c]`) display as comma-separated inline text, not raw YAML syntax
   4. Files without front matter render exactly as before (no regression)
   5. Edge cases handled: empty front matter block, Windows line endings, missing closing delimiter all produce reasonable output without crashes
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 11-01-PLAN.md -- YAML extraction, parsing, styled rendering, and visual verification
 
 ### Phase 12: Layout & Sizing
 **Goal**: The extension adapts its rendering to the available width, producing readable output whether in a spacebar popup, narrow Finder preview pane, or fullscreen Quick Look
@@ -80,7 +82,7 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 11. YAML Front Matter | v1.2 | 0/TBD | Not started | - |
+| 11. YAML Front Matter | v1.2 | 0/1 | Planned | - |
 | 12. Layout & Sizing | v1.2 | 0/TBD | Not started | - |
 | 13. Table Rendering | v1.2 | 0/TBD | Not started | - |
 | 14. Task List Checkboxes | v1.2 | 0/TBD | Not started | - |
