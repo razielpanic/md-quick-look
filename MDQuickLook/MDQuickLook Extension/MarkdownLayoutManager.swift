@@ -15,6 +15,10 @@ extension NSAttributedString.Key {
 /// Custom layout manager for drawing blockquote decorations
 class MarkdownLayoutManager: NSLayoutManager {
 
+    // MARK: - Properties
+
+    var widthTier: WidthTier = .normal
+
     // MARK: - Helper Methods
 
     /// Merges adjacent or overlapping ranges
@@ -88,10 +92,18 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             guard !unionRect.isNull else { continue }
 
+            // Get tier-specific values
+            let (bgXOffset, bgWidthPadding, barXOffset): (CGFloat, CGFloat, CGFloat) = {
+                switch widthTier {
+                case .narrow: return (4, 8, 2)
+                case .normal: return (12, 24, 4)
+                }
+            }()
+
             // Draw full-width background first (behind border)
-            let bgRect = NSRect(x: origin.x + 12,  // Start after border
+            let bgRect = NSRect(x: origin.x + bgXOffset,
                                y: origin.y + unionRect.minY,
-                               width: textContainer.containerSize.width - 24,
+                               width: textContainer.containerSize.width - bgWidthPadding,
                                height: unionRect.height)
 
             NSColor.quaternarySystemFill.setFill()
@@ -99,7 +111,7 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             // Draw continuous vertical bar on top
             let barWidth: CGFloat = 4
-            let barX = origin.x + 4
+            let barX = origin.x + barXOffset
             let barRect = NSRect(x: barX,
                                 y: origin.y + unionRect.minY,
                                 width: barWidth,
@@ -136,10 +148,18 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             guard !unionRect.isNull else { return }
 
+            // Get tier-specific values
+            let (bgXOffset, bgWidthPadding): (CGFloat, CGFloat) = {
+                switch self.widthTier {
+                case .narrow: return (4, 8)
+                case .normal: return (8, 16)
+                }
+            }()
+
             // Draw single unified background
-            let bgRect = NSRect(x: origin.x + 8,
+            let bgRect = NSRect(x: origin.x + bgXOffset,
                                y: origin.y + unionRect.minY,
-                               width: textContainer.containerSize.width - 16,
+                               width: textContainer.containerSize.width - bgWidthPadding,
                                height: unionRect.height)
 
             NSColor.secondarySystemFill.setFill()
@@ -172,22 +192,29 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             guard !unionRect.isNull else { return }
 
+            // Get tier-specific values
+            let (bgXOffset, bgWidthPadding, verticalPadding, cornerRadius): (CGFloat, CGFloat, CGFloat, CGFloat) = {
+                switch self.widthTier {
+                case .narrow: return (3, 6, 6, 4)
+                case .normal: return (6, 12, 12, 6)
+                }
+            }()
+
             // Draw rounded background with insets and vertical padding
-            let verticalPadding: CGFloat = 12
-            let bgRect = NSRect(x: origin.x + 6,
+            let bgRect = NSRect(x: origin.x + bgXOffset,
                                y: origin.y + unionRect.minY - verticalPadding,
-                               width: textContainer.containerSize.width - 12,
+                               width: textContainer.containerSize.width - bgWidthPadding,
                                height: unionRect.height + verticalPadding * 2)
 
-            let path = NSBezierPath(roundedRect: bgRect, xRadius: 6, yRadius: 6)
+            let path = NSBezierPath(roundedRect: bgRect, xRadius: cornerRadius, yRadius: cornerRadius)
             NSColor.tertiarySystemFill.setFill()
             path.fill()
 
             // Draw bottom separator line (below the padded background)
             let separatorY = origin.y + unionRect.maxY + verticalPadding
             let separatorPath = NSBezierPath()
-            separatorPath.move(to: NSPoint(x: origin.x + 6, y: separatorY))
-            separatorPath.line(to: NSPoint(x: origin.x + textContainer.containerSize.width - 6, y: separatorY))
+            separatorPath.move(to: NSPoint(x: origin.x + bgXOffset, y: separatorY))
+            separatorPath.line(to: NSPoint(x: origin.x + textContainer.containerSize.width - bgXOffset, y: separatorY))
             separatorPath.lineWidth = 1.0
             NSColor.separatorColor.setStroke()
             separatorPath.stroke()
