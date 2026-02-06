@@ -40,13 +40,26 @@ class MarkdownRenderer {
     func render(markdown: String) -> NSAttributedString {
         os_log("MarkdownRenderer: Starting render, input length: %d", log: .renderer, type: .info, markdown.count)
 
-        // Pre-process markdown to handle images (convert to placeholders)
-        let preprocessedMarkdown = preprocessBlockquoteSoftBreaks(in: preprocessImages(in: markdown))
+        // Extract YAML front matter FIRST (before any other preprocessing)
+        let (frontMatter, bodyMarkdown) = extractYAMLFrontMatter(from: markdown)
+
+        // Pre-process body markdown to handle images (convert to placeholders)
+        let preprocessedMarkdown = preprocessBlockquoteSoftBreaks(in: preprocessImages(in: bodyMarkdown))
 
         // Check if document contains GFM tables
         if hasGFMTables(in: preprocessedMarkdown) {
             os_log("MarkdownRenderer: Document contains tables, using hybrid rendering", log: .renderer, type: .info)
-            return renderWithTables(markdown: preprocessedMarkdown)
+            let bodyContent = renderWithTables(markdown: preprocessedMarkdown)
+
+            // Prepend front matter if present
+            if !frontMatter.isEmpty {
+                let result = NSMutableAttributedString()
+                result.append(renderFrontMatter(frontMatter))
+                result.append(bodyContent)
+                return result
+            }
+
+            return bodyContent
         }
 
         os_log("MarkdownRenderer: No tables found, using standard rendering", log: .renderer, type: .info)
@@ -87,6 +100,14 @@ class MarkdownRenderer {
         applyBaseStyles(to: nsAttributedString)
 
         os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, nsAttributedString.length)
+
+        // Prepend front matter if present
+        if !frontMatter.isEmpty {
+            let result = NSMutableAttributedString()
+            result.append(renderFrontMatter(frontMatter))
+            result.append(nsAttributedString)
+            return result
+        }
 
         return nsAttributedString
     }
@@ -714,6 +735,203 @@ class MarkdownRenderer {
             let placeholder = "IMAGEPLACEHOLDERSTART\(filename)IMAGEPLACEHOLDEREND"
             result = (result as NSString).replacingCharacters(in: match.range, with: placeholder) as String
         }
+
+        return result
+    }
+
+    // MARK: - YAML Front Matter
+
+    /// Extracts YAML front matter from markdown content
+    /// - Parameter markdown: The markdown content to process
+    /// - Returns: Tuple of (parsed key-value pairs, body markdown without front matter)
+    private func extractYAMLFrontMatter(from markdown: String) -> ([(key: String, value: String)], String) {
+        os_log("MarkdownRenderer: Extracting YAML front matter", log: .renderer, type: .debug)
+
+        // Normalize line endings (Windows CRLF -> Unix LF)
+        let normalized = markdown.replacingOccurrences(of: "\r\n", with: "\n")
+
+        // Pattern: ^---\n(.+?)\n---\n(.*)
+        // Matches front matter between --- delimiters at start of document
+        let pattern = "^---\\n(.+?)\\n---\\n(.*)"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators]) else {
+            os_log("MarkdownRenderer: Failed to create front matter regex", log: .renderer, type: .error)
+            return ([], markdown)
+        }
+
+        let nsString = normalized as NSString
+        let fullRange = NSRange(location: 0, length: nsString.length)
+
+        guard let match = regex.firstMatch(in: normalized, options: [], range: fullRange),
+              match.numberOfRanges >= 3 else {
+            os_log("MarkdownRenderer: No front matter found", log: .renderer, type: .debug)
+            return ([], markdown)
+        }
+
+        // Extract the YAML content (between delimiters)
+        let yamlRange = match.range(at: 1)
+        let yamlContent = nsString.substring(with: yamlRange)
+
+        // Extract the body markdown (after front matter)
+        let bodyRange = match.range(at: 2)
+        let bodyMarkdown = nsString.substring(with: bodyRange)
+
+        os_log("MarkdownRenderer: Found front matter block, parsing key-value pairs", log: .renderer, type: .info)
+
+        // Parse key-value pairs
+        let keyValues = parseYAMLKeyValues(yamlContent)
+
+        return (keyValues, bodyMarkdown)
+    }
+
+    /// Parses YAML key-value pairs from front matter content
+    /// - Parameter yaml: The raw YAML content between delimiters
+    /// - Returns: Array of (key, value) tuples preserving original order
+    private func parseYAMLKeyValues(_ yaml: String) -> [(key: String, value: String)] {
+        var result: [(key: String, value: String)] = []
+
+        let lines = yaml.components(separatedBy: "\n")
+
+        for line in lines {
+            // Skip empty lines and comments
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            if trimmed.isEmpty || trimmed.hasPrefix("#") {
+                continue
+            }
+
+            // Split on first colon only (values may contain colons)
+            guard let colonIndex = line.firstIndex(of: ":") else {
+                continue
+            }
+
+            let key = String(line[..<colonIndex]).trimmingCharacters(in: .whitespaces)
+            var value = String(line[line.index(after: colonIndex)...]).trimmingCharacters(in: .whitespaces)
+
+            // Handle list values: [item1, item2, item3]
+            if value.hasPrefix("[") && value.hasSuffix("]") {
+                // Remove brackets
+                value = String(value.dropFirst().dropLast())
+
+                // Split by comma, trim each item, strip quotes
+                let items = value.components(separatedBy: ",").map { item -> String in
+                    var trimmed = item.trimmingCharacters(in: .whitespaces)
+                    // Strip surrounding quotes (both " and ')
+                    if (trimmed.hasPrefix("\"") && trimmed.hasSuffix("\"")) ||
+                       (trimmed.hasPrefix("'") && trimmed.hasSuffix("'")) {
+                        trimmed = String(trimmed.dropFirst().dropLast())
+                    }
+                    return trimmed
+                }
+
+                // Rejoin with comma-space
+                value = items.joined(separator: ", ")
+            } else {
+                // Strip surrounding quotes from regular values
+                if (value.hasPrefix("\"") && value.hasSuffix("\"")) ||
+                   (value.hasPrefix("'") && value.hasSuffix("'")) {
+                    value = String(value.dropFirst().dropLast())
+                }
+            }
+
+            result.append((key: key, value: value))
+        }
+
+        os_log("MarkdownRenderer: Parsed %d key-value pairs from front matter", log: .renderer, type: .info, result.count)
+
+        return result
+    }
+
+    /// Renders YAML front matter as a styled attributed string
+    /// - Parameter frontMatter: Array of (key, value) tuples
+    /// - Returns: NSAttributedString with styled front matter section
+    private func renderFrontMatter(_ frontMatter: [(key: String, value: String)]) -> NSAttributedString {
+        guard !frontMatter.isEmpty else {
+            return NSAttributedString()
+        }
+
+        let result = NSMutableAttributedString()
+
+        // Key styling: bold, 12pt, primary label color
+        let keyFont = NSFont.boldSystemFont(ofSize: 12)
+        let keyAttributes: [NSAttributedString.Key: Any] = [
+            .font: keyFont,
+            .foregroundColor: NSColor.labelColor
+        ]
+
+        // Value styling: regular, 12pt, secondary label color
+        let valueFont = NSFont.systemFont(ofSize: 12)
+        let valueAttributes: [NSAttributedString.Key: Any] = [
+            .font: valueFont,
+            .foregroundColor: NSColor.secondaryLabelColor
+        ]
+
+        // Paragraph style with indentation and tab stops
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.headIndent = 12
+        paragraphStyle.firstLineHeadIndent = 12
+        paragraphStyle.tailIndent = -12
+        paragraphStyle.paragraphSpacing = 2
+
+        // Multi-column layout for 4+ pairs
+        let useMultiColumn = frontMatter.count >= 4
+
+        if useMultiColumn {
+            // Two-column layout with tab stops
+            paragraphStyle.tabStops = [
+                NSTextTab(textAlignment: .left, location: 120),  // First value column
+                NSTextTab(textAlignment: .left, location: 300)   // Second key column
+            ]
+
+            // Process pairs two at a time
+            for i in stride(from: 0, to: frontMatter.count, by: 2) {
+                let pair1 = frontMatter[i]
+
+                // First column
+                let keyString1 = NSAttributedString(string: pair1.key, attributes: keyAttributes)
+                result.append(keyString1)
+                result.append(NSAttributedString(string: "\t"))  // Tab to value column
+                let valueString1 = NSAttributedString(string: pair1.value, attributes: valueAttributes)
+                result.append(valueString1)
+
+                // Second column (if exists)
+                if i + 1 < frontMatter.count {
+                    let pair2 = frontMatter[i + 1]
+                    result.append(NSAttributedString(string: "\t"))  // Tab to second key column
+                    let keyString2 = NSAttributedString(string: pair2.key, attributes: keyAttributes)
+                    result.append(keyString2)
+                    result.append(NSAttributedString(string: "\t"))  // Tab to second value (wraps naturally)
+                    let valueString2 = NSAttributedString(string: pair2.value, attributes: valueAttributes)
+                    result.append(valueString2)
+                }
+
+                result.append(NSAttributedString(string: "\n"))
+            }
+        } else {
+            // Single-column layout
+            paragraphStyle.tabStops = [
+                NSTextTab(textAlignment: .left, location: 120)  // Value column
+            ]
+
+            for pair in frontMatter {
+                let keyString = NSAttributedString(string: pair.key, attributes: keyAttributes)
+                result.append(keyString)
+                result.append(NSAttributedString(string: "\t"))  // Tab to value column
+                let valueString = NSAttributedString(string: pair.value, attributes: valueAttributes)
+                result.append(valueString)
+                result.append(NSAttributedString(string: "\n"))
+            }
+        }
+
+        // Apply paragraph style to entire front matter section
+        let fullRange = NSRange(location: 0, length: result.length)
+        result.addAttribute(.paragraphStyle, value: paragraphStyle, range: fullRange)
+
+        // Apply front matter marker for background drawing
+        result.addAttribute(.frontMatterMarker, value: true, range: fullRange)
+
+        // Add separator newline after front matter
+        result.append(NSAttributedString(string: "\n"))
+
+        os_log("MarkdownRenderer: Rendered front matter section with %d pairs", log: .renderer, type: .info, frontMatter.count)
 
         return result
     }

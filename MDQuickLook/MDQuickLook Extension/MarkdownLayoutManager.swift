@@ -9,6 +9,7 @@ extension OSLog {
 extension NSAttributedString.Key {
     static let blockquoteMarker = NSAttributedString.Key("com.rocketpop.blockquoteMarker")
     static let codeBlockMarker = NSAttributedString.Key("com.rocketpop.codeBlockMarker")
+    static let frontMatterMarker = NSAttributedString.Key("com.rocketpop.frontMatterMarker")
 }
 
 /// Custom layout manager for drawing blockquote decorations
@@ -145,6 +146,52 @@ class MarkdownLayoutManager: NSLayoutManager {
             bgRect.fill()
 
             os_log("MarkdownLayoutManager: Drew code block background at y=%f height=%f",
+                   log: .layoutManager, type: .debug,
+                   origin.y + unionRect.minY, unionRect.height)
+        }
+
+        // Find front matter ranges and draw rounded background with separator
+        textStorage.enumerateAttribute(.frontMatterMarker,
+                                      in: charRange,
+                                      options: []) { value, range, _ in
+            guard value != nil else { return }
+
+            let glyphRange = self.glyphRange(forCharacterRange: range, actualCharacterRange: nil)
+
+            // Track the union of all line rects to create continuous background
+            var unionRect = NSRect.null
+
+            // Enumerate each line fragment in this range
+            self.enumerateLineFragments(forGlyphRange: glyphRange) { lineRect, usedRect, container, lineGlyphRange, stop in
+                if unionRect.isNull {
+                    unionRect = lineRect
+                } else {
+                    unionRect = unionRect.union(lineRect)
+                }
+            }
+
+            guard !unionRect.isNull else { return }
+
+            // Draw rounded background with insets
+            let bgRect = NSRect(x: origin.x + 6,
+                               y: origin.y + unionRect.minY,
+                               width: textContainer.containerSize.width - 12,
+                               height: unionRect.height)
+
+            let path = NSBezierPath(roundedRect: bgRect, xRadius: 6, yRadius: 6)
+            NSColor.tertiarySystemFill.setFill()
+            path.fill()
+
+            // Draw bottom separator line
+            let separatorY = origin.y + unionRect.maxY
+            let separatorPath = NSBezierPath()
+            separatorPath.move(to: NSPoint(x: origin.x + 6, y: separatorY))
+            separatorPath.line(to: NSPoint(x: origin.x + textContainer.containerSize.width - 6, y: separatorY))
+            separatorPath.lineWidth = 1.0
+            NSColor.separatorColor.setStroke()
+            separatorPath.stroke()
+
+            os_log("MarkdownLayoutManager: Drew front matter background at y=%f height=%f",
                    log: .layoutManager, type: .debug,
                    origin.y + unionRect.minY, unionRect.height)
         }
