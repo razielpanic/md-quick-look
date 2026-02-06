@@ -59,17 +59,19 @@ All v1.0 + v1.1 requirements shipped and validated:
 - ✓ Unsigned DMG distribution on GitHub Releases — v1.1
 - ✓ Release notes and documentation for end users — v1.1
 
-### Active
+### Active — v1.2 Rendering Polish & Features
 
-Future milestones (candidates):
-
-- [ ] Code signing and notarization (App Store prerequisite)
+- [ ] Quick Look window sizing and content layout defaults
 - [ ] Preview pane rendering optimization (narrow column view context)
 - [ ] Table rendering improvements for small spaces
-- [ ] Syntax highlighting in code blocks
-- [ ] Render actual images (local files)
 - [ ] Display YAML front matter as formatted metadata
 - [ ] Render GFM task lists with checkboxes
+
+### Future (candidates)
+
+- [ ] Code signing and notarization (App Store prerequisite)
+- [ ] Syntax highlighting in code blocks
+- [ ] Render actual images (local files)
 - [ ] Homebrew Cask formula
 
 ### Out of Scope
@@ -130,4 +132,4 @@ Future milestones (candidates):
 | create-dmg for packaging | Automated DMG layout with Applications symlink | ✓ Good - Professional installer |
 
 ---
-*Last updated: 2026-02-05 after v1.1 milestone*
+*Last updated: 2026-02-05 after v1.2 milestone started*

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** Planning next milestone
+**Current focus:** v1.2 Rendering Polish & Features
 
 ## Current Position
 
-Phase: 10 of 10 — all phases complete
-Plan: All plans complete
-Status: v1.1 milestone archived. Ready for next milestone.
-Progress: [██████████] 100% (v1.0 + v1.1 shipped)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v1.2
+Progress: [░░░░░░░░░░] 0%
 
-Last activity: 2026-02-05 — v1.1 milestone archived
+Last activity: 2026-02-05 — Milestone v1.2 started
 
 ## Performance Metrics
 
@@ -44,15 +44,15 @@ See PROJECT.md Key Decisions table for full log.
 
 ### Blockers/Concerns
 
-None — milestone complete
+None
 
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: v1.1 milestone archived
-Resume action: /gsd:new-milestone
+Stopped at: Milestone v1.2 started — entering research
+Resume action: /gsd:new-milestone (continue research → requirements → roadmap)
 Resume file: .planning/PROJECT.md
-Notes: Start next milestone with `/gsd:new-milestone`. Use `/clear` first for fresh context window.
+Notes: v1.2 scope: window sizing, preview pane, table small spaces, YAML front matter, task list checkboxes.
 
 ---
 
