@@ -41,6 +41,7 @@ See PROJECT.md Key Decisions table for full log.
 ### Pending Todos
 
 1. **Ensure MIT license attribution in app UI** (area: ui) — verify About window and app surfaces include proper MIT attribution
+2. **Add Preferences toggle for YAML front matter display** (area: ui) — show/hide machine-targeted metadata via Settings, requires App Group for host↔extension sharing
 
 ### Blockers/Concerns
 
