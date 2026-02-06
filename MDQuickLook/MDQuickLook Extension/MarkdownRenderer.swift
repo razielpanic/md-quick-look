@@ -866,39 +866,44 @@ class MarkdownRenderer {
 
         // Paragraph style with indentation and tab stops
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.headIndent = 12
-        paragraphStyle.firstLineHeadIndent = 12
-        paragraphStyle.tailIndent = -12
-        paragraphStyle.paragraphSpacing = 2
+        paragraphStyle.headIndent = 20
+        paragraphStyle.firstLineHeadIndent = 20
+        paragraphStyle.tailIndent = -20
+        paragraphStyle.paragraphSpacing = 4
+        paragraphStyle.paragraphSpacingBefore = 4
 
         // Multi-column layout for 4+ pairs
         let useMultiColumn = frontMatter.count >= 4
 
         if useMultiColumn {
-            // Two-column layout with tab stops
+            // Two-column layout with tab stops:
+            // Tab 1 (120pt): first column value
+            // Tab 2 (280pt): second column key
+            // Tab 3 (400pt): second column value
             paragraphStyle.tabStops = [
                 NSTextTab(textAlignment: .left, location: 120),  // First value column
-                NSTextTab(textAlignment: .left, location: 300)   // Second key column
+                NSTextTab(textAlignment: .left, location: 280),  // Second key column
+                NSTextTab(textAlignment: .left, location: 400)   // Second value column
             ]
 
             // Process pairs two at a time
             for i in stride(from: 0, to: frontMatter.count, by: 2) {
                 let pair1 = frontMatter[i]
 
-                // First column
+                // First column: key \t value
                 let keyString1 = NSAttributedString(string: pair1.key, attributes: keyAttributes)
                 result.append(keyString1)
                 result.append(NSAttributedString(string: "\t"))  // Tab to value column
                 let valueString1 = NSAttributedString(string: pair1.value, attributes: valueAttributes)
                 result.append(valueString1)
 
-                // Second column (if exists)
+                // Second column: \t key \t value (if exists)
                 if i + 1 < frontMatter.count {
                     let pair2 = frontMatter[i + 1]
                     result.append(NSAttributedString(string: "\t"))  // Tab to second key column
                     let keyString2 = NSAttributedString(string: pair2.key, attributes: keyAttributes)
                     result.append(keyString2)
-                    result.append(NSAttributedString(string: "\t"))  // Tab to second value (wraps naturally)
+                    result.append(NSAttributedString(string: "\t"))  // Tab to second value column
                     let valueString2 = NSAttributedString(string: pair2.value, attributes: valueAttributes)
                     result.append(valueString2)
                 }

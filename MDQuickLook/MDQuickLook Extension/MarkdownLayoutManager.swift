@@ -172,18 +172,19 @@ class MarkdownLayoutManager: NSLayoutManager {
 
             guard !unionRect.isNull else { return }
 
-            // Draw rounded background with insets
+            // Draw rounded background with insets and vertical padding
+            let verticalPadding: CGFloat = 6
             let bgRect = NSRect(x: origin.x + 6,
-                               y: origin.y + unionRect.minY,
+                               y: origin.y + unionRect.minY - verticalPadding,
                                width: textContainer.containerSize.width - 12,
-                               height: unionRect.height)
+                               height: unionRect.height + verticalPadding * 2)
 
             let path = NSBezierPath(roundedRect: bgRect, xRadius: 6, yRadius: 6)
             NSColor.tertiarySystemFill.setFill()
             path.fill()
 
-            // Draw bottom separator line
-            let separatorY = origin.y + unionRect.maxY
+            // Draw bottom separator line (below the padded background)
+            let separatorY = origin.y + unionRect.maxY + verticalPadding
             let separatorPath = NSBezierPath()
             separatorPath.move(to: NSPoint(x: origin.x + 6, y: separatorY))
             separatorPath.line(to: NSPoint(x: origin.x + textContainer.containerSize.width - 6, y: separatorY))
