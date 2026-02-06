@@ -7,6 +7,12 @@ extension OSLog {
     static let renderer = OSLog(subsystem: "com.rocketpop.MDQuickLook", category: "renderer")
 }
 
+/// Width tier for adaptive rendering
+enum WidthTier {
+    case narrow   // Finder preview pane (~260px)
+    case normal   // Quick Look popup, fullscreen
+}
+
 /// Custom markdown renderer that transforms PresentationIntent attributes into visual styling
 class MarkdownRenderer {
 
@@ -32,12 +38,45 @@ class MarkdownRenderer {
 
     private let bodyFontSize: CGFloat = 14.0
 
+    // MARK: - Width Tier Awareness
+
+    private var widthTier: WidthTier = .normal
+
+    private var currentHeadingSizes: [Int: CGFloat] {
+        switch widthTier {
+        case .narrow:
+            return [1: 20.0, 2: 17.0, 3: 15.0, 4: 14.0, 5: 13.0, 6: 12.0]
+        case .normal:
+            return [1: 32.0, 2: 26.0, 3: 22.0, 4: 18.0, 5: 16.0, 6: 14.0]
+        }
+    }
+
+    private var currentHeadingSpacing: [Int: CGFloat] {
+        switch widthTier {
+        case .narrow:
+            return [1: 6.0, 2: 5.0, 3: 4.0, 4: 3.0, 5: 2.0, 6: 2.0]
+        case .normal:
+            return [1: 12.0, 2: 10.0, 3: 8.0, 4: 6.0, 5: 4.0, 6: 4.0]
+        }
+    }
+
+    private var currentBodyFontSize: CGFloat {
+        widthTier == .narrow ? 12.0 : 14.0
+    }
+
+    private var currentCodeFontSize: CGFloat {
+        widthTier == .narrow ? 11.0 : 13.0
+    }
+
     // MARK: - Public API
 
     /// Renders markdown string to styled NSAttributedString
-    /// - Parameter markdown: The markdown content to render
+    /// - Parameters:
+    ///   - markdown: The markdown content to render
+    ///   - widthTier: The width tier for adaptive rendering (default: .normal)
     /// - Returns: NSAttributedString with visual styling applied
-    func render(markdown: String) -> NSAttributedString {
+    func render(markdown: String, widthTier: WidthTier = .normal) -> NSAttributedString {
+        self.widthTier = widthTier
         os_log("MarkdownRenderer: Starting render, input length: %d", log: .renderer, type: .info, markdown.count)
 
         // Extract YAML front matter FIRST (before any other preprocessing)
@@ -178,7 +217,7 @@ class MarkdownRenderer {
         let lines = markdown.split(separator: "\n", omittingEmptySubsequences: false)
         var currentLine = 1
 
-        let tableRenderer = TableRenderer()
+        let tableRenderer = TableRenderer(widthTier: widthTier)
 
         for table in tables {
             guard let sourceRange = table.sourceRange else { continue }
@@ -260,7 +299,7 @@ class MarkdownRenderer {
 
         // Replace placeholders with rendered tables
         let result = NSMutableAttributedString(attributedString: renderedWithPlaceholders)
-        let tableRenderer = TableRenderer()
+        let tableRenderer = TableRenderer(widthTier: widthTier)
 
         for (placeholder, table) in placeholderMap {
             let fullRange = NSRange(location: 0, length: result.length)
@@ -530,20 +569,28 @@ class MarkdownRenderer {
             }
         }
 
-        // Create list paragraph style (same as in applyListItemAttributes)
+        // Create list paragraph style (same as in applyListItemAttributes, tier-aware)
         let listParagraphStyle = NSMutableParagraphStyle()
-        listParagraphStyle.firstLineHeadIndent = 20
-        listParagraphStyle.headIndent = 30
-        listParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
-        listParagraphStyle.paragraphSpacing = 0  // CRITICAL: zero spacing to prevent gaps
-        listParagraphStyle.lineSpacing = 2
+        if widthTier == .narrow {
+            listParagraphStyle.firstLineHeadIndent = 10
+            listParagraphStyle.headIndent = 18
+            listParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 18)]
+            listParagraphStyle.paragraphSpacing = 0  // CRITICAL: zero spacing to prevent gaps
+            listParagraphStyle.lineSpacing = 1
+        } else {
+            listParagraphStyle.firstLineHeadIndent = 20
+            listParagraphStyle.headIndent = 30
+            listParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
+            listParagraphStyle.paragraphSpacing = 0  // CRITICAL: zero spacing to prevent gaps
+            listParagraphStyle.lineSpacing = 2
+        }
 
         // Insert prefixes in reverse order to maintain indices
         for item in listItems.reversed() {
             let prefixString = NSAttributedString(
                 string: item.prefix,
                 attributes: [
-                    .font: NSFont.systemFont(ofSize: bodyFontSize),
+                    .font: NSFont.systemFont(ofSize: currentBodyFontSize),
                     .foregroundColor: NSColor.labelColor,
                     .paragraphStyle: listParagraphStyle  // Apply list paragraph style to prevent gaps
                 ]
@@ -562,14 +609,14 @@ class MarkdownRenderer {
         // Set base text color
         nsAttributedString.addAttribute(.foregroundColor, value: NSColor.labelColor, range: fullRange)
 
-        // Create default paragraph style with spacing
+        // Create default paragraph style with spacing (tier-aware)
         let defaultParagraphStyle = NSMutableParagraphStyle()
-        defaultParagraphStyle.paragraphSpacing = 8  // Add spacing between paragraphs
+        defaultParagraphStyle.paragraphSpacing = widthTier == .narrow ? 4 : 8
 
         // Ensure all text has at least the base font and paragraph spacing
         nsAttributedString.enumerateAttribute(.font, in: fullRange, options: []) { value, range, _ in
             if value == nil {
-                nsAttributedString.addAttribute(.font, value: NSFont.systemFont(ofSize: bodyFontSize), range: range)
+                nsAttributedString.addAttribute(.font, value: NSFont.systemFont(ofSize: currentBodyFontSize), range: range)
             }
         }
 
@@ -639,8 +686,8 @@ class MarkdownRenderer {
     }
 
     private func applyHeadingAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange, level: Int) {
-        guard let fontSize = headingSizes[level],
-              let spacing = headingSpacing[level] else {
+        guard let fontSize = currentHeadingSizes[level],
+              let spacing = currentHeadingSpacing[level] else {
             os_log("MarkdownRenderer: Unknown heading level %d", log: .renderer, type: .error, level)
             return
         }
@@ -658,26 +705,33 @@ class MarkdownRenderer {
     }
 
     private func applyCodeBlockAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
-        // Apply monospace font (SF Mono)
-        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+        // Apply monospace font (SF Mono) with tier-aware sizing
+        let font = NSFont.monospacedSystemFont(ofSize: currentCodeFontSize, weight: .regular)
         nsAttributedString.addAttribute(.font, value: font, range: range)
 
         // Add marker for LayoutManager to draw uniform background
         nsAttributedString.addAttribute(.codeBlockMarker, value: true, range: range)
 
-        // Create paragraph style with indentation and spacing
+        // Create paragraph style with indentation and spacing (tier-aware)
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.headIndent = 10
-        paragraphStyle.firstLineHeadIndent = 10
-        paragraphStyle.paragraphSpacing = 8
-        paragraphStyle.paragraphSpacingBefore = 8
+        if widthTier == .narrow {
+            paragraphStyle.headIndent = 6
+            paragraphStyle.firstLineHeadIndent = 6
+            paragraphStyle.paragraphSpacing = 4
+            paragraphStyle.paragraphSpacingBefore = 4
+        } else {
+            paragraphStyle.headIndent = 10
+            paragraphStyle.firstLineHeadIndent = 10
+            paragraphStyle.paragraphSpacing = 8
+            paragraphStyle.paragraphSpacingBefore = 8
+        }
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
     }
 
     private func applyInlineCodeAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
-        // Apply monospace font (SF Mono)
-        let font = NSFont.monospacedSystemFont(ofSize: 13, weight: .regular)
+        // Apply monospace font (SF Mono) with tier-aware sizing
+        let font = NSFont.monospacedSystemFont(ofSize: currentCodeFontSize, weight: .regular)
         nsAttributedString.addAttribute(.font, value: font, range: range)
 
         // Apply same background as code blocks for consistent styling
@@ -685,14 +739,21 @@ class MarkdownRenderer {
     }
 
     private func applyListItemAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange, ordinal: Int) {
-        // Create paragraph style with indentation for lists
+        // Create paragraph style with indentation for lists (tier-aware)
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.firstLineHeadIndent = 20  // Indent for bullet/number
-        paragraphStyle.headIndent = 30           // Indent for wrapped text
-        paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
-        // Use minimal spacing for list items - newlines provide separation
-        paragraphStyle.paragraphSpacing = 0
-        paragraphStyle.lineSpacing = 2  // Small spacing for wrapped lines within item
+        if widthTier == .narrow {
+            paragraphStyle.firstLineHeadIndent = 10  // Indent for bullet/number
+            paragraphStyle.headIndent = 18           // Indent for wrapped text
+            paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 18)]
+            paragraphStyle.paragraphSpacing = 0
+            paragraphStyle.lineSpacing = 1  // Small spacing for wrapped lines within item
+        } else {
+            paragraphStyle.firstLineHeadIndent = 20  // Indent for bullet/number
+            paragraphStyle.headIndent = 30           // Indent for wrapped text
+            paragraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 30)]
+            paragraphStyle.paragraphSpacing = 0
+            paragraphStyle.lineSpacing = 2  // Small spacing for wrapped lines within item
+        }
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
     }
@@ -700,12 +761,19 @@ class MarkdownRenderer {
     private func applyBlockQuoteAttributes(to nsAttributedString: NSMutableAttributedString, range: NSRange) {
         // Background is now drawn by LayoutManager for uniform appearance
 
-        // Create paragraph style with indentation
+        // Create paragraph style with indentation (tier-aware)
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.headIndent = 20
-        paragraphStyle.firstLineHeadIndent = 20
-        paragraphStyle.paragraphSpacing = 8
-        paragraphStyle.paragraphSpacingBefore = 8
+        if widthTier == .narrow {
+            paragraphStyle.headIndent = 12
+            paragraphStyle.firstLineHeadIndent = 12
+            paragraphStyle.paragraphSpacing = 4
+            paragraphStyle.paragraphSpacingBefore = 4
+        } else {
+            paragraphStyle.headIndent = 20
+            paragraphStyle.firstLineHeadIndent = 20
+            paragraphStyle.paragraphSpacing = 8
+            paragraphStyle.paragraphSpacingBefore = 8
+        }
 
         nsAttributedString.addAttribute(.paragraphStyle, value: paragraphStyle, range: range)
 
@@ -850,42 +918,59 @@ class MarkdownRenderer {
 
         let result = NSMutableAttributedString()
 
+        // Width tier-aware configuration
+        let fontSize: CGFloat = widthTier == .narrow ? 10 : 12
+        let maxDisplayedFields = widthTier == .narrow ? 5 : Int.max
+        let spacerHeight: CGFloat = widthTier == .narrow ? 4 : 8
+
         // Add top spacer inside the front matter content for visual padding
         let spacerStyle = NSMutableParagraphStyle()
         spacerStyle.paragraphSpacing = 0
         spacerStyle.paragraphSpacingBefore = 0
-        spacerStyle.minimumLineHeight = 8
-        spacerStyle.maximumLineHeight = 8
+        spacerStyle.minimumLineHeight = spacerHeight
+        spacerStyle.maximumLineHeight = spacerHeight
         result.append(NSAttributedString(string: "\n", attributes: [
             .font: NSFont.systemFont(ofSize: 1),
             .paragraphStyle: spacerStyle
         ]))
 
-        // Key styling: bold, 12pt, primary label color
-        let keyFont = NSFont.boldSystemFont(ofSize: 12)
+        // Key styling: bold, tier-aware size, primary label color
+        let keyFont = NSFont.boldSystemFont(ofSize: fontSize)
         let keyAttributes: [NSAttributedString.Key: Any] = [
             .font: keyFont,
             .foregroundColor: NSColor.labelColor
         ]
 
-        // Value styling: regular, 12pt, secondary label color
-        let valueFont = NSFont.systemFont(ofSize: 12)
+        // Value styling: regular, tier-aware size, secondary label color
+        let valueFont = NSFont.systemFont(ofSize: fontSize)
         let valueAttributes: [NSAttributedString.Key: Any] = [
             .font: valueFont,
             .foregroundColor: NSColor.secondaryLabelColor
         ]
 
-        // Paragraph style with indentation and tab stops
+        // Paragraph style with indentation and tab stops (tier-aware)
         let paragraphStyle = NSMutableParagraphStyle()
-        paragraphStyle.headIndent = 20
-        paragraphStyle.firstLineHeadIndent = 20
-        paragraphStyle.tailIndent = -20
-        paragraphStyle.paragraphSpacing = 4
-        paragraphStyle.paragraphSpacingBefore = 4
+        if widthTier == .narrow {
+            paragraphStyle.headIndent = 8
+            paragraphStyle.firstLineHeadIndent = 8
+            paragraphStyle.tailIndent = -8
+            paragraphStyle.paragraphSpacing = 2
+            paragraphStyle.paragraphSpacingBefore = 2
+        } else {
+            paragraphStyle.headIndent = 20
+            paragraphStyle.firstLineHeadIndent = 20
+            paragraphStyle.tailIndent = -20
+            paragraphStyle.paragraphSpacing = 4
+            paragraphStyle.paragraphSpacingBefore = 4
+        }
         paragraphStyle.lineBreakMode = .byTruncatingTail
 
-        // Multi-column layout for 4+ pairs
-        let useMultiColumn = frontMatter.count >= 4
+        // Determine displayed fields (cap at maxDisplayedFields)
+        let displayedFields = Array(frontMatter.prefix(maxDisplayedFields))
+        let hiddenCount = frontMatter.count - displayedFields.count
+
+        // Multi-column layout for 4+ pairs (but always single-column in narrow mode)
+        let useMultiColumn = displayedFields.count >= 4 && widthTier != .narrow
 
         if useMultiColumn {
             // Two-column layout with tab stops:
@@ -899,8 +984,8 @@ class MarkdownRenderer {
             ]
 
             // Process pairs two at a time
-            for i in stride(from: 0, to: frontMatter.count, by: 2) {
-                let pair1 = frontMatter[i]
+            for i in stride(from: 0, to: displayedFields.count, by: 2) {
+                let pair1 = displayedFields[i]
 
                 // First column: key \t value
                 let keyString1 = NSAttributedString(string: pair1.key, attributes: keyAttributes)
@@ -910,8 +995,8 @@ class MarkdownRenderer {
                 result.append(valueString1)
 
                 // Second column: \t key \t value (if exists)
-                if i + 1 < frontMatter.count {
-                    let pair2 = frontMatter[i + 1]
+                if i + 1 < displayedFields.count {
+                    let pair2 = displayedFields[i + 1]
                     result.append(NSAttributedString(string: "\t"))  // Tab to second key column
                     let keyString2 = NSAttributedString(string: pair2.key, attributes: keyAttributes)
                     result.append(keyString2)
@@ -923,12 +1008,13 @@ class MarkdownRenderer {
                 result.append(NSAttributedString(string: "\n"))
             }
         } else {
-            // Single-column layout
+            // Single-column layout (tier-aware tab stop)
+            let tabLocation: CGFloat = widthTier == .narrow ? 80 : 120
             paragraphStyle.tabStops = [
-                NSTextTab(textAlignment: .left, location: 120)  // Value column
+                NSTextTab(textAlignment: .left, location: tabLocation)  // Value column
             ]
 
-            for pair in frontMatter {
+            for pair in displayedFields {
                 let keyString = NSAttributedString(string: pair.key, attributes: keyAttributes)
                 result.append(keyString)
                 result.append(NSAttributedString(string: "\t"))  // Tab to value column
@@ -936,6 +1022,15 @@ class MarkdownRenderer {
                 result.append(valueString)
                 result.append(NSAttributedString(string: "\n"))
             }
+        }
+
+        // Add "+N more" indicator if fields were hidden
+        if hiddenCount > 0 {
+            let moreText = NSAttributedString(string: "+\(hiddenCount) more\n", attributes: [
+                .font: NSFont.systemFont(ofSize: fontSize),
+                .foregroundColor: NSColor.tertiaryLabelColor
+            ])
+            result.append(moreText)
         }
 
         // Apply paragraph style to entire front matter section
@@ -1014,10 +1109,10 @@ class MarkdownRenderer {
             let filenameRange = match.range(at: 1)
             let filename = (nsAttributedString.string as NSString).substring(with: filenameRange)
 
-            // Create SF Symbol attachment for photo icon
+            // Create SF Symbol attachment for photo icon (tier-aware size)
             let attachment = NSTextAttachment()
             if let symbolImage = NSImage(systemSymbolName: "photo", accessibilityDescription: "Image") {
-                let config = NSImage.SymbolConfiguration(pointSize: bodyFontSize, weight: .regular)
+                let config = NSImage.SymbolConfiguration(pointSize: currentBodyFontSize, weight: .regular)
                 attachment.image = symbolImage.withSymbolConfiguration(config)
             }
 
@@ -1032,7 +1127,7 @@ class MarkdownRenderer {
             // Add placeholder text in gray with [Image: filename] format
             let placeholderText = "[Image: \(filename)]"
             let textAttributes: [NSAttributedString.Key: Any] = [
-                .font: NSFont.systemFont(ofSize: bodyFontSize),
+                .font: NSFont.systemFont(ofSize: currentBodyFontSize),
                 .foregroundColor: NSColor.secondaryLabelColor
             ]
             styledString.append(NSAttributedString(string: placeholderText, attributes: textAttributes))

@@ -10,7 +10,17 @@ extension OSLog {
 /// Renders ExtractedTable to NSAttributedString using NSTextTable and NSTextTableBlock
 class TableRenderer {
 
-    private let bodyFontSize: CGFloat = 14.0
+    var widthTier: WidthTier = .normal
+
+    private var bodyFontSize: CGFloat {
+        widthTier == .narrow ? 12.0 : 14.0
+    }
+
+    /// Initializes TableRenderer with width tier
+    /// - Parameter widthTier: The width tier for adaptive rendering (default: .normal)
+    init(widthTier: WidthTier = .normal) {
+        self.widthTier = widthTier
+    }
 
     /// Renders an extracted table to NSAttributedString with proper cell structure and styling
     /// - Parameter table: The extracted table data
@@ -118,18 +128,28 @@ class TableRenderer {
             }
         }
 
-        // Add padding (6pt each side = 12pt total) plus breathing room (20pt)
-        // Apply min/max constraints
-        let minColumnWidth: CGFloat = 60.0
-        let maxColumnWidth: CGFloat = 300.0
+        // Add padding plus breathing room (tier-aware)
+        // Apply min/max constraints (tier-aware)
+        let (minColumnWidth, maxColumnWidth, breathingRoom): (CGFloat, CGFloat, CGFloat)
+        if widthTier == .narrow {
+            minColumnWidth = 40.0
+            maxColumnWidth = 150.0
+            breathingRoom = 10.0
+        } else {
+            minColumnWidth = 60.0
+            maxColumnWidth = 300.0
+            breathingRoom = 20.0
+        }
+
+        let cellPadding: CGFloat = widthTier == .narrow ? 6.0 : 12.0  // 3pt or 6pt each side
 
         for i in 0..<columnCount {
-            columnWidths[i] += 12.0 + 20.0  // padding + breathing room
+            columnWidths[i] += cellPadding + breathingRoom
             columnWidths[i] = min(max(columnWidths[i], minColumnWidth), maxColumnWidth)
         }
 
-        // Cap total table width
-        let maxTableWidth: CGFloat = 800.0
+        // Cap total table width (tier-aware)
+        let maxTableWidth: CGFloat = widthTier == .narrow ? 400.0 : 800.0
         let totalWidth = columnWidths.reduce(0, +)
         if totalWidth > maxTableWidth {
             // Scale all columns proportionally to fit
@@ -164,9 +184,10 @@ class TableRenderer {
         let columnWidth = columnWidths[safe: column] ?? 100.0
         block.setContentWidth(columnWidth, type: .absoluteValueType)
 
-        // Configure padding: 6pt on all edges for balanced density/readability
+        // Configure padding (tier-aware): 3pt in narrow mode, 6pt in normal mode
+        let cellPadding: CGFloat = widthTier == .narrow ? 3.0 : 6.0
         for edge: NSRectEdge in [.minX, .minY, .maxX, .maxY] {
-            block.setWidth(6.0, type: .absoluteValueType, for: .padding, edge: edge)
+            block.setWidth(cellPadding, type: .absoluteValueType, for: .padding, edge: edge)
         }
 
         // Header separator: bottom border on header cells only
