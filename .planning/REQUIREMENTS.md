@@ -25,12 +25,12 @@ Requirements for v1.2 Rendering Polish & Features milestone. Each maps to roadma
 
 ### YAML Front Matter
 
-- [ ] **YAML-01**: YAML front matter detected between `---` delimiters at file start
-- [ ] **YAML-02**: Front matter stripped from body before markdown parsing
-- [ ] **YAML-03**: Key-value pairs displayed as styled section (bold keys, normal values)
-- [ ] **YAML-04**: List values rendered as comma-separated inline text
-- [ ] **YAML-05**: Front matter section visually distinct from body content
-- [ ] **YAML-06**: Handles edge cases (empty front matter, Windows line endings, no closing delimiter)
+- [x] **YAML-01**: YAML front matter detected between `---` delimiters at file start
+- [x] **YAML-02**: Front matter stripped from body before markdown parsing
+- [x] **YAML-03**: Key-value pairs displayed as styled section (bold keys, normal values)
+- [x] **YAML-04**: List values rendered as comma-separated inline text
+- [x] **YAML-05**: Front matter section visually distinct from body content
+- [x] **YAML-06**: Handles edge cases (empty front matter, Windows line endings, no closing delimiter)
 
 ### Task List Checkboxes
 
@@ -81,12 +81,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| YAML-01 | Phase 11 | Pending |
-| YAML-02 | Phase 11 | Pending |
-| YAML-03 | Phase 11 | Pending |
-| YAML-04 | Phase 11 | Pending |
-| YAML-05 | Phase 11 | Pending |
-| YAML-06 | Phase 11 | Pending |
+| YAML-01 | Phase 11 | Complete |
+| YAML-02 | Phase 11 | Complete |
+| YAML-03 | Phase 11 | Complete |
+| YAML-04 | Phase 11 | Complete |
+| YAML-05 | Phase 11 | Complete |
+| YAML-06 | Phase 11 | Complete |
 | LAYOUT-01 | Phase 12 | Pending |
 | LAYOUT-02 | Phase 12 | Pending |
 | LAYOUT-03 | Phase 12 | Pending |
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-05 after roadmap creation*
+*Last updated: 2026-02-06 after Phase 11 completion*

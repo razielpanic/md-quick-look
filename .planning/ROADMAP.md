@@ -10,7 +10,7 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
 
 ## Phases
 
-- [ ] **Phase 11: YAML Front Matter** - Detect, extract, and display YAML metadata blocks before markdown parsing
+- [x] **Phase 11: YAML Front Matter** - Detect, extract, and display YAML metadata blocks before markdown parsing
 - [ ] **Phase 12: Layout & Sizing** - Detect available width and adapt fonts, padding, and text layout to context
 - [ ] **Phase 13: Table Rendering** - Scale table widths, columns, and padding to fit available container space
 - [ ] **Phase 14: Task List Checkboxes** - Render GFM task list items with SF Symbol checkboxes
@@ -30,7 +30,7 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
   5. Edge cases handled: empty front matter block, Windows line endings, missing closing delimiter all produce reasonable output without crashes
 **Plans:** 1 plan
 Plans:
-- [ ] 11-01-PLAN.md -- YAML extraction, parsing, styled rendering, and visual verification
+- [x] 11-01-PLAN.md -- YAML extraction, parsing, styled rendering, and visual verification
 
 ### Phase 12: Layout & Sizing
 **Goal**: The extension adapts its rendering to the available width, producing readable output whether in a spacebar popup, narrow Finder preview pane, or fullscreen Quick Look
@@ -82,7 +82,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 11. YAML Front Matter | v1.2 | 0/1 | Planned | - |
+| 11. YAML Front Matter | v1.2 | 1/1 | Complete | 2026-02-06 |
 | 12. Layout & Sizing | v1.2 | 0/TBD | Not started | - |
 | 13. Table Rendering | v1.2 | 0/TBD | Not started | - |
 | 14. Task List Checkboxes | v1.2 | 0/TBD | Not started | - |
