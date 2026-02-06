@@ -1,1020 +1,649 @@
-# Architecture Research: Host App UI for Quick Look Extension
+# Architecture Research: v1.2 Rendering Polish & Features
 
-**Domain:** macOS Quick Look Extension Host App UI (About, Preferences, Status)
-**Milestone:** v1.1 - Public Release (GitHub)
-**Researched:** 2026-02-02
-**Confidence:** HIGH
+**Domain:** Quick Look Extension Rendering Pipeline Modifications
+**Milestone:** v1.2 - Rendering Polish & Features
+**Researched:** 2026-02-05
+**Confidence:** HIGH (existing codebase well-understood), MEDIUM (Quick Look sizing APIs)
 
 ## Executive Summary
 
-This research focuses on adding user-facing UI to the existing MD Quick Look host app for v1.1. The extension (MDQuickLook.appex) already works and renders markdown previews. Now we need to add:
+This research maps how five new features integrate with the existing 240-line Swift extension architecture. The key finding is that three features (YAML front matter, task list checkboxes, Quick Look window sizing) require modifications at the **preprocessing/parsing layer** -- before `AttributedString(markdown:)` is called -- because Apple's native markdown parser does NOT support YAML front matter or task list checkboxes. The two remaining features (preview pane detection, table rendering in narrow spaces) operate at the **layout/view layer** and depend on understanding view geometry at render time.
 
-1. **About window** - Shown when app launches
-2. **Preferences window** - Accessible via menu (Cmd+,)
-3. **Status indicator** - Shows extension is active
+**Critical architectural constraint:** `AttributedString(markdown:)` does not parse task list checkboxes (`- [ ]` / `- [x]`). The existing `swift-markdown` library (already a dependency) DOES parse them via `ListItem.checkbox`. This means task list rendering must follow the same hybrid approach used for tables: parse with `swift-markdown`, extract task list data, render custom attributed string segments.
 
-**Architecture decision:** Pure SwiftUI using App scenes (Window, Settings) targeting macOS 13+. No AppKit unless absolutely necessary. This matches the "very Mac-assed" aesthetic and is appropriate for macOS 26+ target.
-
-**Key insight:** Host app and extension are **independent**. The app doesn't control the extension at runtime. It just contains it and provides user-facing UI for settings/information.
+**Recommendation:** Build features in dependency order: (1) window sizing first (affects all rendering), (2) preview pane detection (informs table and layout decisions), (3) YAML front matter (independent preprocessing), (4) task list checkboxes (extends existing swift-markdown integration), (5) table narrow-space improvements (depends on pane detection).
 
 ---
 
-## Standard Architecture
+## Current Architecture Map
 
-### System Overview
+### Component Inventory (Extension Target)
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    MD Quick Look v1.1                        │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │         Host Application (md-quick-look.app)         │  │
-│  │                  SwiftUI App Lifecycle                 │  │
-│  ├───────────────────────────────────────────────────────┤  │
-│  │                                                         │  │
-│  │  Scene 1: About Window (Window scene)                  │  │
-│  │  ┌─────────────────────────────────────────────────┐   │  │
-│  │  │  AboutWindow.swift (SwiftUI View)               │   │  │
-│  │  │  - App icon, version, description                │   │  │
-│  │  │  - GitHub link                                    │   │  │
-│  │  │  - Extension status indicator (optional)          │   │  │
-│  │  └─────────────────────────────────────────────────┘   │  │
-│  │                                                         │  │
-│  │  Scene 2: Settings (Settings scene)                    │  │
-│  │  ┌─────────────────────────────────────────────────┐   │  │
-│  │  │  SettingsView.swift (SwiftUI View)              │   │  │
-│  │  │  - Placeholder content for v1.1                  │   │  │
-│  │  │  - Future: theme, font size, etc.                │   │  │
-│  │  └─────────────────────────────────────────────────┘   │  │
-│  │                                                         │  │
-│  │  Optional: Extension Status Check                      │  │
-│  │  ┌─────────────────────────────────────────────────┐   │  │
-│  │  │  ExtensionStatus.swift (ObservableObject)       │   │  │
-│  │  │  - Runs: qlmanage -m                             │   │  │
-│  │  │  - Parses: looks for bundle ID in output         │   │  │
-│  │  │  - Returns: enabled/disabled/unknown             │   │  │
-│  │  └─────────────────────────────────────────────────┘   │  │
-│  │                                                         │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                          │                                   │
-│                          │ (contains)                        │
-│                          ↓                                   │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │    Quick Look Extension (MDQuickLook.appex)           │  │
-│  │    - PreviewViewController.swift (existing)            │  │
-│  │    - MarkdownRenderer.swift (existing)                 │  │
-│  │    - TableRenderer.swift (existing)                    │  │
-│  │    - MarkdownLayoutManager.swift (existing)            │  │
-│  │    [UNCHANGED - already working]                       │  │
-│  └───────────────────────────────────────────────────────┘  │
-│                                                               │
-├─────────────────────────────────────────────────────────────┤
-│                     macOS System Layer                        │
-├─────────────────────────────────────────────────────────────┤
-│  ┌──────────────┐  ┌──────────────┐  ┌─────────────────┐   │
-│  │   Finder     │  │  Quick Look  │  │ System Settings │   │
-│  │   (user)     │→ │    Server    │  │   Extensions    │   │
-│  │              │  │ (quicklookd) │  │                 │   │
-│  └──────────────┘  └──────────────┘  └─────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
+MDQuickLook Extension/
+  PreviewViewController.swift   -- QLPreviewingController entry point
+  MarkdownRenderer.swift        -- Core rendering pipeline
+  TableExtractor.swift          -- swift-markdown MarkupVisitor for tables
+  TableRenderer.swift           -- NSTextTable-based table layout
+  MarkdownLayoutManager.swift   -- Custom background/border drawing
 ```
 
-### Component Responsibilities
+### Current Data Flow
 
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| **App.swift** | App lifecycle, scene configuration | SwiftUI @main App struct |
-| **AboutWindow.swift** | Display app info, version, GitHub link | SwiftUI View in Window scene |
-| **SettingsView.swift** | Preferences UI (placeholder for v1.1) | SwiftUI View in Settings scene |
-| **ExtensionStatus.swift** | Check if extension is enabled | ObservableObject running qlmanage -m |
-| **MDQuickLook.appex** | Markdown preview rendering | Existing implementation (UNCHANGED) |
+```
+File URL (from quicklookd)
+    |
+    v
+PreviewViewController.preparePreviewOfFile()
+    |
+    v
+Read file contents (String)
+    |
+    v
+MarkdownRenderer.render(markdown:)
+    |
+    +---> preprocessImages()           -- Replace ![alt](url) with markers
+    +---> preprocessBlockquoteSoftBreaks()  -- Hard breaks in blockquotes
+    |
+    +---> hasGFMTables()?
+    |       |
+    |       YES --> renderWithTables()
+    |       |         +---> TableExtractor (swift-markdown visitor)
+    |       |         +---> Split document by source ranges
+    |       |         +---> TableRenderer for table segments
+    |       |         +---> renderNonTableSegment() for non-table parts
+    |       |
+    |       NO --> Standard pipeline
+    |
+    +---> AttributedString(markdown:)  -- Apple's native parser
+    +---> insertBlockBoundaryNewlines()
+    +---> ensureIntraBlockNewlines()
+    +---> NSMutableAttributedString conversion
+    +---> applyBlockStyles()           -- Headings, code blocks, lists, blockquotes
+    +---> insertListPrefixes()         -- Bullet/number insertion
+    +---> applyInlineStyles()          -- Inline code, strikethrough
+    +---> applyLinkStyles()
+    +---> applyImagePlaceholderStyles()
+    +---> applyBaseStyles()
+    |
+    v
+NSAttributedString (final styled output)
+    |
+    v
+PreviewViewController creates NSScrollView + NSTextView
+    +---> NSTextStorage
+    +---> MarkdownLayoutManager (custom drawBackground)
+    +---> NSTextContainer
+    +---> NSTextView (isEditable: false, isSelectable: true)
+    |
+    v
+handler(nil)  -- Preview complete
+```
+
+### Key Architectural Patterns Already Established
+
+1. **Preprocessing pattern:** Raw markdown string is modified before parsing (images, blockquote breaks). New preprocessing steps slot in here naturally.
+
+2. **Hybrid rendering pattern:** Tables use swift-markdown's AST to extract structured data, then render outside `AttributedString(markdown:)`. Task lists will use the same pattern.
+
+3. **Custom attribute markers:** `.blockquoteMarker` and `.codeBlockMarker` custom `NSAttributedString.Key` values tell `MarkdownLayoutManager` where to draw backgrounds/borders. New visual elements can follow this pattern.
+
+4. **Source range splitting:** Tables split the document into table and non-table segments by line number. This approach can extend to YAML front matter (always at document start).
 
 ---
 
-## Recommended Project Structure
+## Feature 1: Quick Look Window Sizing
+
+### Integration Point: PreviewViewController
+
+**What changes:** PreviewViewController needs to set `preferredContentSize` to suggest window dimensions to the Quick Look system.
+
+**How it works:** `NSViewController.preferredContentSize` is a `CGSize` property inherited by PreviewViewController. The Quick Look system (quicklookd) reads this to determine the initial window size for the spacebar popup. The property is settable and the system uses it as a hint.
+
+**Current state:** PreviewViewController creates its view with a hardcoded frame `NSRect(x: 0, y: 0, width: 800, height: 600)` in `loadView()`. It does NOT set `preferredContentSize`. The Quick Look system currently determines sizing on its own.
+
+**Modification needed:**
 
 ```
-md-quick-look/
-├── md-quick-look/                    # Host app target
-│   ├── App.swift                      # NEW: @main SwiftUI App entry
-│   ├── Views/
-│   │   ├── AboutWindow.swift          # NEW: About window content
-│   │   └── SettingsView.swift         # NEW: Settings/Preferences
-│   ├── Models/
-│   │   └── ExtensionStatus.swift      # NEW (optional): Status checker
-│   ├── Resources/
-│   │   ├── Assets.xcassets            # App icon (update)
-│   │   └── Credits.rtf                # Optional: simple About credits
-│   ├── Info.plist                     # Update: ensure regular activation policy
-│   └── main.swift                     # REMOVE: replace with App.swift
-│
-├── MDQuickLook/                       # Extension target
-│   ├── PreviewViewController.swift    # EXISTING - no changes
-│   ├── MarkdownRenderer.swift         # EXISTING - no changes
-│   ├── TableRenderer.swift            # EXISTING - no changes
-│   ├── MarkdownLayoutManager.swift    # EXISTING - no changes
-│   ├── TableExtractor.swift           # EXISTING - no changes
-│   └── Info.plist                     # EXISTING - no changes
-│
-└── Shared/ (optional)                 # Only if settings need sharing
-    └── Constants.swift                # Shared bundle IDs, app group
+PreviewViewController (MODIFY)
+  loadView()                    -- Update initial frame size
+  preparePreviewOfFile()        -- Set preferredContentSize after content is rendered
 ```
 
-### Structure Rationale
+**Architecture approach:**
+- Set `preferredContentSize` in `preparePreviewOfFile()` after content is laid out
+- Calculate content height from the laid-out text view to suggest appropriate height
+- Width should be a sensible default (e.g., 720-800pt) that works well for markdown
+- Height should be capped at a reasonable maximum but reflect actual content height for short documents
 
-- **App.swift:** Modern SwiftUI lifecycle replaces `main.swift` with `NSApplication.shared.run()`. Declares Window and Settings scenes.
-- **Views/:** SwiftUI views separated from app logic. Easy to preview, test, and iterate.
-- **Models/:** Business logic for checking extension status. Separation of concerns.
-- **Resources/:** Assets like app icon. Credits.rtf is optional alternative to custom About window.
-- **main.swift removal:** Pure SwiftUI apps use @main on App struct, not standalone main.swift.
-- **Extension unchanged:** v1.1 doesn't modify rendering logic. UI is purely host app.
+**Confidence:** MEDIUM -- `preferredContentSize` is a standard NSViewController property. The Quick Look system's exact behavior regarding whether it respects this hint fully, partially, or ignores it in certain contexts (preview pane) is not fully documented. Testing required.
+
+**No new components needed.** Modification only to PreviewViewController.
+
+### Sources
+
+- [NSViewController.preferredContentSize](https://developer.apple.com/documentation/appkit/nsviewcontroller/preferredcontentsize) -- Apple Developer Documentation
+- [QLMarkdown](https://github.com/sbarex/QLMarkdown) -- Reference implementation offers "Quick Look window" size customization option
 
 ---
 
-## Architectural Patterns
+## Feature 2: Preview Pane Detection
 
-### Pattern 1: SwiftUI App with Multiple Scenes (RECOMMENDED)
+### Integration Point: PreviewViewController (view geometry)
 
-**What:** Modern macOS 13+ pattern using declarative scenes. Define Window scene for About, Settings scene for Preferences.
+**What changes:** The extension needs to detect whether it is rendering in Finder's narrow preview pane (column view sidebar, ~200-300pt wide) versus the full Quick Look popup window (~600-800pt wide) to adjust layout accordingly.
 
-**When to use:** Always for macOS 13+ apps. Native menu integration, window management, minimal code.
+**Critical finding:** There is NO public Quick Look API to directly query "am I in a preview pane?" The Quick Look system does not expose this context to extensions.
 
-**Trade-offs:**
-- **Pros:** Automatic "Settings..." menu item (Cmd+,), native window behavior, less boilerplate
-- **Cons:** Requires macOS 13+ (not an issue - targeting macOS 26+)
+**Available detection approach:** The extension's view is sized by the Quick Look system before and during rendering. The view's bounds/frame width at render time reflects the available space. The extension can read `self.view.bounds.size.width` in `preparePreviewOfFile()` or override `viewDidLayout()` to detect narrow contexts.
 
-**Example:**
+**Architecture approach:**
+
+```
+PreviewViewController (MODIFY)
+  preparePreviewOfFile()   -- Read view.bounds.width
+  viewDidLayout()          -- OPTIONAL: respond to resize events
+
+  Width-based heuristic:
+    width < 400pt  -->  "narrow" context (preview pane)
+    width >= 400pt -->  "full" context (Quick Look popup)
+```
+
+**What this enables:**
+- Pass a `isNarrowContext: Bool` or `availableWidth: CGFloat` to MarkdownRenderer
+- MarkdownRenderer can adjust font sizes, margins, or skip certain decorations
+- TableRenderer can switch to a more compact layout or scrollable container
+- NSTextContainer width already tracks the text view via `widthTracksTextView = true`
+
+**Data flow change:**
+
+```
+Current:  MarkdownRenderer().render(markdown: string) -> NSAttributedString
+Proposed: MarkdownRenderer().render(markdown: string, availableWidth: CGFloat) -> NSAttributedString
+```
+
+Or alternatively, set a property on MarkdownRenderer before calling render. The `availableWidth` parameter propagates to TableRenderer when tables need rendering.
+
+**Confidence:** MEDIUM -- The width-based heuristic is the standard community approach. There is no documented Apple API for context detection. The threshold value (400pt) will need empirical testing across different Finder configurations (column view, list view preview column, icon view). The view may also be resized AFTER initial render (user resizing Quick Look popup), but `autoresizingMask` on existing views should handle that for the text flow. Table layout may not reflow dynamically.
+
+**No new components needed.** Modifications to PreviewViewController and MarkdownRenderer signatures.
+
+### Sources
+
+- [QLMarkdown issue #76](https://github.com/sbarex/QLMarkdown/issues/76) -- Discussion of preview column behavior
+- [smittytone/PreviewMarkdown](https://github.com/smittytone/PreviewMarkdown) -- Reference implementation handles Finder preview pane
+
+---
+
+## Feature 3: Table Rendering in Narrow Spaces
+
+### Integration Points: TableRenderer, MarkdownRenderer
+
+**What changes:** TableRenderer currently uses fixed layout algorithm with content-based column widths (60pt min, 300pt max per column, 800pt max total). In a narrow preview pane (~200-300pt), tables overflow or get truncated.
+
+**Current table sizing logic (TableRenderer):**
+
 ```swift
-import SwiftUI
-
-@main
-struct MDQuickLookApp: App {
-    var body: some Scene {
-        // About window - shown when app launches
-        Window("About MD Quick Look", id: "about") {
-            AboutWindow()
-        }
-        .windowResizability(.contentSize)
-        .windowStyle(.hiddenTitleBar)
-        .defaultPosition(.center)
-        .commands {
-            // Replace default About menu item
-            CommandGroup(replacing: .appInfo) {
-                Button("About MD Quick Look") {
-                    NSApp.sendAction(Selector(("showAboutWindow:")), to: nil, from: nil)
-                }
-            }
-        }
-
-        // Settings window - automatic Cmd+, handling
-        Settings {
-            SettingsView()
-        }
-    }
-}
+let maxTableWidth: CGFloat = 800.0      // Hard cap
+let minColumnWidth: CGFloat = 60.0      // Per-column minimum
+let maxColumnWidth: CGFloat = 300.0     // Per-column maximum
+nsTable.layoutAlgorithm = .fixedLayoutAlgorithm
 ```
 
-**File location:** `md-quick-look/App.swift`
-**Lines of code:** ~30-50
+**Modifications needed:**
 
-### Pattern 2: Extension Status Detection via qlmanage
+```
+TableRenderer (MODIFY)
+  render(_ table:)                      -- Accept availableWidth parameter
+  measureColumnWidths()                 -- Scale constraints to available width
+  renderCell()                          -- Adjust padding for narrow context
 
-**What:** Run `qlmanage -m` command to check if extension is registered with Quick Look server. Parse output for bundle identifier.
-
-**When to use:** To show accurate status in About window ("Extension active ✓" vs "Enable in System Settings").
-
-**Trade-offs:**
-- **Pros:** Accurate real-time status, no private APIs
-- **Cons:** Requires shell command execution, parsing text output
-
-**Example:**
-```swift
-import Foundation
-
-@MainActor
-class ExtensionStatus: ObservableObject {
-    @Published var isEnabled: Bool = false
-    @Published var isChecking: Bool = false
-
-    private let bundleID = "com.yourdomain.md-quick-look.MDQuickLook"
-
-    func check() async {
-        isChecking = true
-        defer { isChecking = false }
-
-        let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/qlmanage")
-        process.arguments = ["-m"]
-
-        let pipe = Pipe()
-        process.standardOutput = pipe
-
-        do {
-            try process.run()
-            process.waitUntilExit()
-
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            if let output = String(data: data, encoding: .utf8) {
-                // Look for bundle identifier in qlmanage output
-                isEnabled = output.contains(bundleID)
-            } else {
-                isEnabled = false
-            }
-        } catch {
-            isEnabled = false
-        }
-    }
-}
+MarkdownRenderer (MODIFY)
+  renderWithTables()                    -- Pass availableWidth to TableRenderer
+  renderWithSourceRanges()              -- Pass availableWidth to TableRenderer
 ```
 
-**File location:** `md-quick-look/Models/ExtensionStatus.swift`
-**Lines of code:** ~40-60
+**Architecture approach:**
 
-**Alternative:** Skip status checking for v1.1 MVP. Just show "Launch app once to register extension" message. Status checking can be added in v1.2.
+Option A (recommended): **Parameterize existing constraints**
+- `TableRenderer.render(_ table: ExtractedTable, availableWidth: CGFloat)`
+- Scale `maxTableWidth`, `maxColumnWidth`, and padding based on `availableWidth`
+- In narrow context: reduce padding from 6pt to 3pt, reduce min column width, use proportional instead of absolute widths
+- Keep `fixedLayoutAlgorithm` but adjust the total width constraint
 
-### Pattern 3: Custom About Window (Full Control)
+Option B (complex, not recommended): **Horizontal scroll for tables**
+- Wrap table in a nested NSScrollView with horizontal scrolling
+- More complex, breaks the single-NSTextView architecture
+- Only consider if Option A produces unreadable results
 
-**What:** Create custom SwiftUI view for About window with app icon, version, description, GitHub link.
+**No new components needed.** Modifications to TableRenderer and MarkdownRenderer method signatures.
 
-**When to use:** When you need interactive elements (clickable GitHub link) or custom layout beyond Credits.rtf.
-
-**Trade-offs:**
-- **Custom Window Pros:** Full design control, buttons/links, dynamic content
-- **Credits.rtf Pros:** Zero code, automatic system About panel (but no interactivity)
-
-**Example:**
-```swift
-import SwiftUI
-
-struct AboutWindow: View {
-    @StateObject private var extensionStatus = ExtensionStatus()
-
-    var body: some View {
-        VStack(spacing: 20) {
-            // App icon
-            Image(nsImage: NSImage(named: "AppIcon") ?? NSImage())
-                .resizable()
-                .frame(width: 128, height: 128)
-
-            // App name
-            Text("MD Quick Look")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-
-            // Version
-            Text("Version \(appVersion)")
-                .foregroundStyle(.secondary)
-
-            // Description
-            Text("Beautiful markdown previews in Finder")
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-
-            // Extension status (optional)
-            HStack {
-                Image(systemName: extensionStatus.isEnabled ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                    .foregroundStyle(extensionStatus.isEnabled ? .green : .orange)
-                Text(extensionStatus.isEnabled ? "Extension Active" : "Enable in System Settings")
-                    .foregroundStyle(.secondary)
-            }
-            .task {
-                await extensionStatus.check()
-            }
-
-            // GitHub link
-            Link("View on GitHub", destination: URL(string: "https://github.com/user/md-quick-look")!)
-                .buttonStyle(.link)
-        }
-        .padding(40)
-        .frame(width: 400)
-    }
-
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-    }
-}
-```
-
-**File location:** `md-quick-look/Views/AboutWindow.swift`
-**Lines of code:** ~60-80
-
-### Pattern 4: Settings Scene with Placeholder
-
-**What:** Use SwiftUI Settings scene for automatic Preferences integration. Start with placeholder, expand in future versions.
-
-**When to use:** Always for macOS apps. System adds "Settings..." menu item automatically.
-
-**Trade-offs:**
-- **Pros:** Zero boilerplate, native menu integration, standard keyboard shortcut (Cmd+,)
-- **Cons:** Settings window has specific behavior (singleton, can't programmatically close)
-
-**Example:**
-```swift
-import SwiftUI
-
-struct SettingsView: View {
-    var body: some View {
-        Form {
-            Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Preferences coming in a future update")
-                        .foregroundStyle(.secondary)
-
-                    Text("Planned settings:")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-                        .padding(.top, 4)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Label("Theme customization", systemImage: "paintpalette")
-                        Label("Font size options", systemImage: "textformat.size")
-                        Label("Code block styling", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                }
-            } header: {
-                Text("General")
-            }
-        }
-        .formStyle(.grouped)
-        .frame(width: 450, height: 200)
-    }
-}
-```
-
-**File location:** `md-quick-look/Views/SettingsView.swift`
-**Lines of code:** ~30-40 (placeholder)
-
-**Future expansion (v1.2+):** Add real settings with @AppStorage for theme selection, font size, etc. Extension reads via UserDefaults.
+**Confidence:** HIGH -- TableRenderer already has the sizing infrastructure. Parameterizing the constants is a straightforward modification.
 
 ---
 
-## Data Flow
+## Feature 4: YAML Front Matter Display
 
-### App Launch Flow
+### Integration Points: MarkdownRenderer (preprocessing), NEW component
 
-```
-User double-clicks md-quick-look.app
-    ↓
-App.swift @main struct initializes
-    ↓
-SwiftUI creates Window scene for About
-    ↓
-About window appears centered on screen
-    ↓
-(Optional) ExtensionStatus.check() runs async
-    ↓
-Status displayed: "Extension Active ✓" or "Enable in System Settings"
-    ↓
-User clicks GitHub link or closes window
-    ↓
-App remains running (can reopen via Dock)
-    OR
-App quits if applicationShouldTerminateAfterLastWindowClosed = true
-```
+**What changes:** Detect YAML front matter at the document start (`---` delimiters), extract it, and render it as a formatted metadata block above the markdown content.
 
-### Extension Registration Flow (macOS System)
+**Critical finding:** Neither `AttributedString(markdown:)` nor `swift-markdown` support YAML front matter natively. swift-markdown's issue #73 (open since 2022) confirms this: front matter gets incorrectly parsed as a ThematicBreak followed by a Heading. The recommended approach is to strip YAML before parsing.
+
+**Architecture approach:**
 
 ```
-User launches app first time
-    ↓
-macOS scans app bundle
-    ↓
-Discovers MDQuickLook.appex in PlugIns/
-    ↓
-Reads Info.plist → QLSupportedContentTypes
-    ↓
-Registers with Quick Look server (quicklookd)
-    ↓
-Extension appears in System Settings > Extensions > Quick Look
-    ↓
-User enables extension (may be automatic)
-    ↓
-Extension active for .md files in Finder
+NEW: FrontMatterExtractor (simple utility, not a full component)
+  - Detect `---` at line 0
+  - Find closing `---`
+  - Extract YAML string between delimiters
+  - Return (yamlString: String?, remainingMarkdown: String)
+
+NEW: FrontMatterRenderer (or inline in MarkdownRenderer)
+  - Parse key-value pairs from YAML (simple regex or line splitting)
+  - Render as styled NSAttributedString block (table or key: value list)
+  - Visual: light background, monospace keys, regular values
 ```
 
-**Key insight:** Extension registration is **automatic**. Host app doesn't need code to "install" extension. Just launching the app once triggers macOS discovery.
+**Pipeline position:** Front matter extraction must happen FIRST, before all other preprocessing. It strips the YAML from the markdown string so downstream parsers never see it.
 
-### Settings Access Flow (When User Presses Cmd+,)
-
-```
-User presses Cmd+, (or selects "Settings..." from menu)
-    ↓
-SwiftUI Settings scene activates
-    ↓
-SettingsView appears in singleton window
-    ↓
-User views placeholder content
-    ↓
-User closes window (Settings scene remains available)
-```
-
-### Extension Preview Flow (EXISTING - UNCHANGED)
+**Modified data flow:**
 
 ```
-User selects .md file in Finder
-    ↓
-User presses Spacebar
-    ↓
-Finder requests preview from quicklookd
-    ↓
-quicklookd loads MDQuickLook.appex
-    ↓
-PreviewViewController.preparePreviewOfFile() called
-    ↓
-MarkdownRenderer generates preview
-    ↓
-Preview displayed in Quick Look window
+Raw markdown string
+    |
+    v
+NEW: Extract front matter          <-- NEW STEP (position 0)
+    |
+    +---> YAML string (if present)
+    +---> Remaining markdown (YAML stripped)
+    |
+    v
+preprocessImages()                 -- Existing step (now on clean markdown)
+preprocessBlockquoteSoftBreaks()   -- Existing step
+    |
+    v
+[... rest of existing pipeline ...]
+    |
+    v
+NEW: Prepend front matter block    <-- Prepend to final NSAttributedString
+    |
+    v
+Final NSAttributedString
 ```
 
-**No interaction with host app during preview.** Extension runs independently.
+**YAML parsing complexity decision:**
+
+Option A (recommended): **Simple line-based parsing, no Yams dependency**
+- Split YAML block by lines
+- Parse `key: value` pairs with string splitting
+- Handle multi-line values by detecting indentation
+- Sufficient for typical front matter (title, date, author, tags)
+- Zero new dependencies
+
+Option B (overkill): **Add Yams SPM dependency**
+- Full YAML parser (handles nested structures, arrays, etc.)
+- Adds a C library dependency (LibYAML) to the extension sandbox
+- Only justified if complex YAML structures need faithful rendering
+- Risk: C library may have sandbox compatibility issues
+
+**Recommendation:** Option A. Front matter in markdown files is typically flat key-value pairs. A simple parser handles 95% of real-world cases. The `PreviewMarkdown` reference app from smittytone also uses a custom approach rather than a full YAML library.
+
+**Visual rendering approach:**
+- Custom `NSAttributedString.Key.frontMatterMarker` for MarkdownLayoutManager
+- Light background rectangle (like code blocks) with distinct color
+- Key in bold, value in regular weight
+- Or: render as a simple two-column table using existing NSTextTable infrastructure
+
+**New components:** FrontMatterExtractor (utility function or small struct, ~30-50 lines). Could be a static method on MarkdownRenderer rather than a separate file -- depends on complexity.
+
+**Confidence:** HIGH for extraction approach (well-established pattern), MEDIUM for visual rendering (needs design iteration).
+
+### Sources
+
+- [swift-markdown issue #73](https://github.com/swiftlang/swift-markdown/issues/73) -- YAML front matter not supported, recommended workaround
+- [smittytone/PreviewMarkdown](https://github.com/smittytone/PreviewMarkdown) -- Reference app supports YAML front matter display
+- [Yams](https://github.com/jpsim/Yams) -- Full Swift YAML parser (considered but not recommended)
 
 ---
 
-## Integration Points
+## Feature 5: Task List Checkboxes
 
-### Host App ↔ Extension Communication
+### Integration Points: MarkdownRenderer, TableExtractor pattern, MarkdownLayoutManager
 
-| Integration Type | Pattern | Notes |
-|------------------|---------|-------|
-| **No direct communication** | Standard approach | Extension runs in separate process managed by quicklookd |
-| **Shared settings (future)** | UserDefaults with app group | Requires app group entitlement, not needed for v1.1 |
-| **Version sync** | Bundle.main.infoDictionary | Extension can read host app version if needed |
+**What changes:** Render GFM task list items (`- [ ] unchecked`, `- [x] checked`) with visual checkbox indicators instead of raw brackets.
 
-**Critical:** Host app and extension are **decoupled**. App can't send messages to running extension. For v1.1, there's no shared state.
+**Critical finding:** `AttributedString(markdown:)` does NOT support task list checkboxes. The `[ ]` and `[x]` markers are stripped or parsed as regular text. However, the `swift-markdown` library (already a project dependency for table extraction) DOES parse them: `ListItem.checkbox` returns `.checked`, `.unchecked`, or `nil`.
 
-### Host App ↔ macOS System
+**This means task lists require the same hybrid rendering approach as tables:** parse with `swift-markdown` to detect task lists, then render checkbox visuals separately.
 
-| Integration Point | Pattern | Notes |
-|-------------------|---------|-------|
-| **Extension registration** | Automatic on first launch | macOS scans .app/Contents/PlugIns/ |
-| **System Settings UI** | Automatic | macOS generates Extensions pane |
-| **Status detection** | `qlmanage -m` command | Parse output for bundle ID |
-| **About panel** | Custom Window scene or Credits.rtf | SwiftUI or system About |
-| **Settings menu** | Settings scene | SwiftUI adds menu item automatically |
+**Architecture decision -- two viable approaches:**
 
-### Extension ↔ Quick Look Server (EXISTING)
+### Approach A: Extend TableExtractor Pattern (Recommended)
 
-| Integration Point | Pattern | Notes |
-|-------------------|---------|-------|
-| **Preview requests** | QLPreviewingController protocol | Existing implementation in PreviewViewController |
-| **File access** | Sandbox with user-selected file access | Extension reads .md file passed by quicklookd |
+Create a `TaskListExtractor` (MarkupVisitor) analogous to `TableExtractor`. Extract task list items from the AST, then render them with checkbox visuals.
 
----
+```
+NEW: TaskListExtractor (MarkupVisitor)
+  - Visits ListItem nodes
+  - Returns items where checkbox != nil
+  - Captures: checkbox state, text content, source range
 
-## UI Architecture Details
+MarkdownRenderer (MODIFY)
+  - Check for task lists alongside table check
+  - Extract task list source ranges
+  - Render task list items with checkbox prefix
+```
 
-### SwiftUI vs AppKit Decision
+**Checkbox visual rendering via NSTextAttachment:**
 
-**Recommendation:** Pure SwiftUI for host app UI
-
-| Aspect | SwiftUI | AppKit | Chosen |
-|--------|---------|--------|--------|
-| About window | Window scene | NSWindow + NSWindowController | **SwiftUI** |
-| Settings window | Settings scene | NSPreferencePane or custom | **SwiftUI** |
-| Status checking | @Published + Process | NSTask | **SwiftUI** |
-| Complexity | Low (declarative) | High (imperative) | **SwiftUI** |
-| macOS 26 support | Native, modern | Native, legacy | **SwiftUI** |
-| Learning curve | Lower for first-timer | Higher | **SwiftUI** |
-
-**Rationale:**
-- No AppKit APIs needed for About/Settings UI
-- SwiftUI provides automatic menu integration
-- Simpler codebase, easier to maintain
-- Modern, declarative approach
-- Matches macOS 26+ target (no legacy support needed)
-
-**When to use AppKit:**
-- Only if specific AppKit API is required (none for v1.1)
-- Example: Custom NSView subclass for advanced drawing (not needed)
-
-### Window Activation Policy
-
-**Recommendation:** NSApplicationActivationPolicyRegular (default)
-
-| Policy | Dock Icon | Menu Bar | Use Case |
-|--------|-----------|----------|----------|
-| **Regular** | ✓ Yes | ✓ Yes | Standard apps (CHOOSE THIS) |
-| Accessory | ✗ No | ✗ No | Background/menu bar apps |
-| Prohibited | ✗ No | ✗ No | Daemons only |
-
-**Why Regular:**
-- User expects to see app in Dock when launched
-- About/Settings windows are user-facing
-- Can quit via Cmd+Q or app menu
-- Standard behavior for Quick Look host apps
-
-**How to ensure Regular policy:**
-- Don't set LSUIElement in Info.plist (or set to false)
-- Don't set LSBackgroundOnly
-- Default is Regular
-
-### Launch Behavior Options
-
-**Option A: Show About window, stay open**
 ```swift
-@main
-struct MDQuickLookApp: App {
-    var body: some Scene {
-        Window("About MD Quick Look", id: "about") {
-            AboutWindow()
-        }
-        .defaultPosition(.center)
-
-        Settings {
-            SettingsView()
-        }
-    }
+// SF Symbol checkbox images
+let checkboxImage: NSImage
+if checkbox == .checked {
+    checkboxImage = NSImage(systemSymbolName: "checkmark.square.fill",
+                           accessibilityDescription: "Checked")!
+} else {
+    checkboxImage = NSImage(systemSymbolName: "square",
+                           accessibilityDescription: "Unchecked")!
 }
 
-// No applicationShouldTerminateAfterLastWindowClosed
-// App stays running when window closes
+let attachment = NSTextAttachment()
+attachment.image = checkboxImage
+// Insert as prefix before list item text, replacing the bullet
 ```
 
-**Option B: Show About window, quit when closed**
-```swift
-@main
-struct MDQuickLookApp: App {
-    @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
+This follows the exact same pattern as `applyImagePlaceholderStyles()` which already uses NSTextAttachment with SF Symbols for image placeholders.
 
-    var body: some Scene {
-        Window("About MD Quick Look", id: "about") {
-            AboutWindow()
-        }
+### Approach B: Preprocessing Substitution (Simpler but Less Robust)
 
-        Settings {
-            SettingsView()
-        }
-    }
-}
+Replace `- [ ]` and `- [x]` patterns in the raw markdown string BEFORE `AttributedString(markdown:)` parsing, substituting Unicode checkbox characters or placeholder markers.
 
-class AppDelegate: NSObject, NSApplicationDelegate {
-    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return true  // Quit when About window closes
-    }
+```
+preprocessTaskLists(in markdown: String) -> String
+  - Regex: replace "- [ ] " with "- UNCHECKEDPLACEHOLDER "
+  - Regex: replace "- [x] " with "- CHECKEDPLACEHOLDER "
+  - After AttributedString parsing, replace placeholders with SF Symbol attachments
+```
+
+Simpler but fragile: regex may match false positives in code blocks or other contexts. The swift-markdown AST approach (Approach A) is more precise.
+
+### Recommendation: Approach A
+
+Task list extraction follows the established hybrid rendering pattern. It reuses the existing swift-markdown infrastructure. Source range tracking allows precise document splitting, same as tables.
+
+**However**, there is an important complexity consideration: if a document has BOTH tables AND task lists, the source range splitting logic in `renderWithSourceRanges()` needs to handle both types of "special" segments. This suggests a refactor toward a more general "segment" abstraction:
+
+```
+enum DocumentSegment {
+    case markdown(String)           // Regular markdown
+    case table(ExtractedTable)      // Table segment
+    case taskListItem(...)          // Task list item segment
 }
 ```
 
-**Recommendation for v1.1:** Option A (stay open). Simpler, allows reopening About from Dock without relaunching.
+This refactor is optional but recommended if the code starts to get complex with multiple special segment types.
+
+**Modified components:**
+
+```
+NEW: TaskListExtractor.swift (~40-60 lines, similar to TableExtractor)
+MODIFY: MarkdownRenderer.swift
+  - hasTaskLists() detection (alongside hasGFMTables)
+  - Task list items rendered with SF Symbol checkbox + list text
+  - Possibly refactor renderWithTables to renderWithSpecialSegments
+MODIFY: MarkdownLayoutManager.swift (OPTIONAL)
+  - Only if task list items need custom background drawing
+  - Likely NOT needed -- checkbox attachment handles the visual
+```
+
+**Confidence:** HIGH for swift-markdown checkbox API (verified in source code: `ListItem.checkbox` returns `Checkbox.checked` or `Checkbox.unchecked`). MEDIUM for integration complexity with existing hybrid pipeline (may require refactoring the table/non-table split logic).
+
+### Sources
+
+- [swift-markdown ListItem.checkbox](https://swiftinit.org/docs/swift-markdown/markdown/listitem.checkbox) -- API documentation
+- [ListItem.swift source](verified in local build/SourcePackages) -- `Checkbox` enum with `.checked` and `.unchecked` cases
+- [NSTextAttachment](https://developer.apple.com/documentation/uikit/nstextattachment) -- Image attachment in attributed strings
+- [SF Symbols](https://developer.apple.com/sf-symbols/) -- `checkmark.square.fill` and `square` symbols
 
 ---
 
-## Anti-Patterns
+## Component Modification Summary
 
-### Anti-Pattern 1: Trying to Control Extension from Host App
+### Files Modified (Existing)
 
-**What people do:** Add "Start Extension" or "Stop Extension" buttons in host app. Try to send messages to running extension.
+| File | Modifications | Features Affected |
+|------|--------------|-------------------|
+| **PreviewViewController.swift** | Set `preferredContentSize`, read `view.bounds.width`, pass width to renderer | Window sizing, Preview pane detection |
+| **MarkdownRenderer.swift** | Add `availableWidth` parameter, front matter extraction/prepending, task list detection and rendering, pass width to TableRenderer | All 5 features |
+| **TableRenderer.swift** | Accept `availableWidth` parameter, scale constraints dynamically | Table narrow rendering |
+| **MarkdownLayoutManager.swift** | Add `frontMatterMarker` background drawing (if front matter uses custom background) | YAML front matter |
 
-**Why it's wrong:**
-- Extension runs in separate process controlled by quicklookd, not host app
-- No IPC channel between app and extension
-- Extension lifecycle is system-managed
+### New Files
 
-**Do this instead:**
-- Host app only provides UI and settings storage
-- Extension reads settings independently when it runs
-- Direct users to System Settings for enable/disable
+| File | Purpose | Lines (est.) | Dependencies |
+|------|---------|-------------|--------------|
+| **TaskListExtractor.swift** | MarkupVisitor to extract task list items from swift-markdown AST | 40-60 | swift-markdown (existing) |
 
-### Anti-Pattern 2: Using LSUIElement to Hide from Dock
+### Files Unchanged
 
-**What people do:** Set `LSUIElement=true` in Info.plist thinking extension is "background only."
-
-**Why it's wrong:**
-- User can't find app to open Settings/About
-- No menu bar when LSUIElement=true
-- Confusing UX ("where did I install this?")
-
-**Do this instead:**
-- Use Regular activation policy (default)
-- App appears in Dock normally
-- User launches to see About/Settings
-- Extension works whether app is running or not
-
-### Anti-Pattern 3: Complex Extension Status Detection
-
-**What people do:** Poll System Settings state continuously, use private APIs, create extension-to-app communication channel.
-
-**Why it's wrong:**
-- Private APIs = App Store rejection
-- Polling wastes CPU/battery
-- Over-engineered for simple status check
-
-**Do this instead:**
-- Run `qlmanage -m` once when About window appears
-- Parse output for bundle ID (simple string search)
-- Show enabled/disabled state
-- Link to System Settings if disabled
-
-### Anti-Pattern 4: Mixing AppKit Without Reason
-
-**What people do:** Use NSHostingController to embed SwiftUI in AppKit windows when pure SwiftUI works.
-
-**Why it's wrong:**
-- Unnecessary complexity
-- More code to maintain
-- Bridge layer can have bugs
-
-**Do this instead:**
-- Pure SwiftUI for macOS 13+ apps
-- Only use AppKit if specific API is unavailable in SwiftUI
-
-### Anti-Pattern 5: View-Based Extension Controller (Not Relevant for v1.1 but Worth Noting)
-
-**What people do:** Use old QLPreviewingController pattern with storyboards for extension.
-
-**Why it's wrong:**
-- Extension already uses modern approach (QLPreviewingController with programmatic UI)
-- v1.1 doesn't touch extension code
-
-**Already avoided:** Extension uses PreviewViewController programmatically, no storyboards.
+| File | Reason |
+|------|--------|
+| **TableExtractor.swift** | Table extraction logic unchanged. Only TableRenderer's sizing changes. |
 
 ---
 
-## File-by-File Implementation Guide
+## Data Flow Changes (v1.2)
 
-### 1. App.swift (NEW)
-
-**Purpose:** SwiftUI app entry point, scene configuration
-
-**Responsibilities:**
-- Define Window scene for About
-- Define Settings scene for Preferences
-- Configure window appearance
-- Optional: AppDelegate for lifecycle hooks
-
-**Code structure:**
-```swift
-import SwiftUI
-
-@main
-struct MDQuickLookApp: App {
-    // Optional: for advanced lifecycle control
-    // @NSApplicationDelegateAdaptor private var appDelegate: AppDelegate
-
-    var body: some Scene {
-        Window("About MD Quick Look", id: "about") {
-            AboutWindow()
-        }
-        .windowResizability(.contentSize)
-        .defaultPosition(.center)
-
-        Settings {
-            SettingsView()
-        }
-    }
-}
 ```
-
-**Lines of code:** ~20-30 (basic), ~40-50 (with AppDelegate)
-
-### 2. AboutWindow.swift (NEW)
-
-**Purpose:** About window UI
-
-**Responsibilities:**
-- Display app icon
-- Show app name and version
-- Show description
-- GitHub link
-- Optional: extension status
-
-**Code structure:**
-```swift
-import SwiftUI
-
-struct AboutWindow: View {
-    var body: some View {
-        VStack(spacing: 20) {
-            // Icon, name, version, description, link
-        }
-        .padding(40)
-        .frame(width: 400)
-    }
-
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-    }
-}
-
-#Preview {
-    AboutWindow()
-}
+File URL (from quicklookd)
+    |
+    v
+PreviewViewController.preparePreviewOfFile()
+    |
+    +---> Read view.bounds.width            <-- NEW: detect context
+    |
+    v
+Read file contents (String)
+    |
+    v
+MarkdownRenderer.render(markdown:, availableWidth:)    <-- MODIFIED signature
+    |
+    +---> extractFrontMatter()              <-- NEW: position 0
+    |       +---> yamlString (if present)
+    |       +---> cleanMarkdown (YAML stripped)
+    |
+    +---> preprocessImages()                -- Existing (on clean markdown)
+    +---> preprocessBlockquoteSoftBreaks()  -- Existing
+    |
+    +---> hasGFMTables() OR hasTaskLists()? <-- MODIFIED: check both
+    |       |
+    |       YES --> renderWithSpecialSegments()  <-- MODIFIED/REFACTORED
+    |       |         +---> TableExtractor
+    |       |         +---> TaskListExtractor        <-- NEW
+    |       |         +---> Split by source ranges
+    |       |         +---> TableRenderer(availableWidth:)  <-- MODIFIED
+    |       |         +---> Task list items with SF Symbol checkboxes  <-- NEW
+    |       |         +---> renderNonTableSegment() for regular parts
+    |       |
+    |       NO --> Standard pipeline (unchanged)
+    |
+    +---> [existing style application pipeline]
+    |
+    +---> Prepend front matter block        <-- NEW: position last
+    |
+    v
+NSAttributedString (final styled output)
+    |
+    v
+PreviewViewController
+    +---> Set preferredContentSize          <-- NEW
+    +---> Create NSScrollView + NSTextView (existing)
+    |
+    v
+handler(nil)
 ```
-
-**Lines of code:** ~40-60 (without status), ~80-100 (with status)
-
-### 3. SettingsView.swift (NEW)
-
-**Purpose:** Settings/Preferences UI
-
-**Responsibilities:**
-- Show placeholder content for v1.1
-- Future: theme selection, font size, etc.
-
-**Code structure:**
-```swift
-import SwiftUI
-
-struct SettingsView: View {
-    var body: some View {
-        Form {
-            Section("General") {
-                Text("Preferences coming soon")
-            }
-        }
-        .formStyle(.grouped)
-        .frame(width: 450, height: 200)
-    }
-}
-
-#Preview {
-    SettingsView()
-}
-```
-
-**Lines of code:** ~20-30 (placeholder)
-
-### 4. ExtensionStatus.swift (NEW - OPTIONAL)
-
-**Purpose:** Check extension activation status
-
-**Responsibilities:**
-- Run `qlmanage -m`
-- Parse output for bundle ID
-- Publish status (enabled/disabled)
-
-**Code structure:**
-```swift
-import Foundation
-
-@MainActor
-class ExtensionStatus: ObservableObject {
-    @Published var isEnabled: Bool = false
-    @Published var isChecking: Bool = false
-
-    func check() async {
-        // Run qlmanage, parse output
-    }
-}
-```
-
-**Lines of code:** ~40-60
-
-**For v1.1 MVP:** This is optional. Can skip and add in v1.2 if desired.
-
-### 5. main.swift (REMOVE)
-
-**Current content:**
-```swift
-import AppKit
-NSApplication.shared.run()
-```
-
-**Action:** Delete this file. SwiftUI App struct with @main replaces it.
-
-### 6. Info.plist (UPDATE)
-
-**Ensure these keys:**
-```xml
-<key>CFBundleIdentifier</key>
-<string>com.yourdomain.md-quick-look</string>
-
-<key>CFBundleName</key>
-<string>MD Quick Look</string>
-
-<!-- Don't set LSUIElement - let it default to false (Regular policy) -->
-```
-
-**Lines to change:** 1-2 (update app name if needed)
-
-### 7. Assets.xcassets (UPDATE)
-
-**Add/update:** AppIcon with 1024x1024 image for About window display.
 
 ---
 
-## Build Configuration
+## Build Order (Dependency-Driven)
 
-### Xcode Target Structure (v1.1)
+### Phase 1: Quick Look Window Sizing
+**Depends on:** Nothing (standalone)
+**Enables:** Better default display for all content
+**Scope:** PreviewViewController only
+**Risk:** Low
+**Rationale:** Foundation change that affects user experience of all other features. Build first so all subsequent testing happens with proper sizing.
 
-```
-Project: md-quick-look
-├── Target: md-quick-look (Application)
-│   ├── Product: md-quick-look.app
-│   ├── Bundle ID: com.yourdomain.md-quick-look
-│   ├── Deployment: macOS 26.0+
-│   ├── Sources:
-│   │   ├── App.swift (NEW)
-│   │   ├── Views/AboutWindow.swift (NEW)
-│   │   ├── Views/SettingsView.swift (NEW)
-│   │   └── Models/ExtensionStatus.swift (NEW - optional)
-│   ├── Resources:
-│   │   ├── Assets.xcassets (UPDATE)
-│   │   └── Info.plist (UPDATE)
-│   └── Embedded Content:
-│       └── MDQuickLook.appex
-│
-└── Target: MDQuickLook (App Extension)
-    ├── Product: MDQuickLook.appex
-    ├── Bundle ID: com.yourdomain.md-quick-look.MDQuickLook
-    └── [UNCHANGED - no modifications for v1.1]
-```
+### Phase 2: Preview Pane Detection
+**Depends on:** Phase 1 (sizing infrastructure)
+**Enables:** Narrow-context awareness for Phase 3 and Phase 5
+**Scope:** PreviewViewController, MarkdownRenderer signature
+**Risk:** Medium (heuristic threshold needs testing)
+**Rationale:** Must detect context before adapting layout. Tables (Phase 3) and potentially all rendering need width information.
 
-### Build Order
+### Phase 3: Table Rendering in Narrow Spaces
+**Depends on:** Phase 2 (availableWidth parameter)
+**Enables:** Readable tables in preview pane
+**Scope:** TableRenderer, MarkdownRenderer
+**Risk:** Low (parameterizing existing constants)
+**Rationale:** Direct consumer of width detection. Improves existing feature rather than adding new parsing.
 
-1. **Extension builds** (dependency)
-2. **Extension embedded** in app PlugIns/
-3. **App builds** with new SwiftUI files
-4. **Signing** (both targets)
+### Phase 4: YAML Front Matter
+**Depends on:** Nothing (could run in parallel with Phases 1-3)
+**Enables:** Metadata display
+**Scope:** MarkdownRenderer (new preprocessing step), possibly MarkdownLayoutManager
+**Risk:** Low (well-understood extraction pattern)
+**Rationale:** Independent preprocessing step. No interaction with table/task list logic. Could be built at any point, placed here because it does not depend on width detection.
 
-No changes to extension build process for v1.1.
-
----
-
-## Phase-Specific Recommendations for v1.1
-
-### Recommended Implementation Order
-
-**Phase 1: SwiftUI App Foundation**
-- Remove main.swift
-- Create App.swift with Window scene
-- Create minimal AboutWindow.swift
-- Build and verify app launches showing About window
-
-**Phase 2: About Window Content**
-- Add app icon to AboutWindow
-- Format version string from Bundle
-- Add description text
-- Test appearance in light/dark mode
-
-**Phase 3: Settings Scene**
-- Add Settings scene to App.swift
-- Create SettingsView.swift with placeholder
-- Verify "Settings..." menu item appears
-- Test Cmd+, keyboard shortcut
-
-**Phase 4: Polish (Optional)**
-- Add GitHub link to AboutWindow
-- Add extension status check (ExtensionStatus.swift)
-- Test status indicator updates
-- Link to System Settings if disabled
-
-**Phase 5: Integration Testing**
-- Build and run
-- Verify extension still works (preview .md file)
-- Verify About window appears on launch
-- Verify Settings accessible via menu
-- Test in light and dark mode
-
-**Rationale:** Build foundation first, add features incrementally, test integration last.
+### Phase 5: Task List Checkboxes
+**Depends on:** Established hybrid rendering pattern (existing from v1.0 tables)
+**Enables:** GFM task list visual rendering
+**Scope:** New TaskListExtractor, MarkdownRenderer modifications
+**Risk:** Medium (integration with existing hybrid pipeline, possible refactor)
+**Rationale:** Most complex integration. Extends the hybrid rendering pattern to a second element type. May require refactoring `renderWithTables()` into a more general segment-based approach. Build last to minimize rework if earlier phases reveal architectural adjustments needed.
 
 ---
 
-## Known Pitfalls (Host App Specific)
+## Architecture Patterns to Follow
 
-### Pitfall 1: Forgetting to Remove main.swift
+### Pattern: Preprocessing Pipeline (for YAML)
 
-**What goes wrong:**
-- Both main.swift and App.swift with @main exist
-- Build error: "Multiple @main entry points"
+Follow the established pattern of `preprocessImages()` and `preprocessBlockquoteSoftBreaks()`:
+1. Operate on raw markdown string
+2. Return modified string
+3. Position in pipeline is ordered (YAML extraction must be first)
+4. Pure function, no side effects beyond string transformation
 
-**Prevention:**
-- Delete main.swift when creating App.swift
-- Or remove NSApplication.shared.run() and use @NSApplicationMain
+### Pattern: MarkupVisitor Extraction (for Task Lists)
 
-### Pitfall 2: LSUIElement Confusion
+Follow the established `TableExtractor` pattern:
+1. Implement `MarkupVisitor` protocol
+2. Walk the AST, collect specific node types
+3. Return structured data with source ranges
+4. MarkdownRenderer uses source ranges to split document
 
-**What goes wrong:**
-- Set LSUIElement=true thinking it makes app lightweight
-- App has no Dock icon, no menu bar
-- User can't access Settings
+### Pattern: Custom NSAttributedString.Key Markers (for Front Matter)
 
-**Prevention:**
-- Don't set LSUIElement in Info.plist
-- Use default Regular activation policy
+Follow the established `.blockquoteMarker` and `.codeBlockMarker` pattern:
+1. Define custom key (e.g., `.frontMatterMarker`)
+2. Apply to attributed string range during rendering
+3. MarkdownLayoutManager reads marker in `drawBackground()` to draw visual decorations
 
-### Pitfall 3: Hardcoded Version String
+### Pattern: NSTextAttachment for Inline Visuals (for Checkboxes)
 
-**What goes wrong:**
-- Show "Version 1.0" hardcoded in AboutWindow
-- Forget to update when releasing v1.1, v1.2
-
-**Prevention:**
-- Read from Bundle: `Bundle.main.infoDictionary?["CFBundleShortVersionString"]`
-- Single source of truth in Info.plist
-
-### Pitfall 4: Blocking Main Thread with qlmanage
-
-**What goes wrong:**
-- Run `qlmanage -m` synchronously in view body
-- UI freezes while command executes
-
-**Prevention:**
-- Use async/await with `.task { await extensionStatus.check() }`
-- Or run in background DispatchQueue
-
-### Pitfall 5: Assuming Extension and App Share State
-
-**What goes wrong:**
-- Try to communicate between app and extension
-- Expect extension to respond to app UI changes in real-time
-
-**Prevention:**
-- Remember: extension runs in separate process
-- No direct communication channel
-- Settings changes only apply to next preview request
+Follow the established image placeholder pattern:
+1. Create `NSTextAttachment` with SF Symbol image
+2. Insert into attributed string at appropriate position
+3. Text attachment flows inline with surrounding text
 
 ---
 
-## Alternatives Considered
+## Anti-Patterns to Avoid
 
-### Alternative 1: Credits.rtf Instead of Custom About Window
+### Anti-Pattern: Dual Parsing for Task Lists
 
-**What:** Add Credits.rtf file to Resources, use system About panel.
+**Wrong:** Parse with `AttributedString(markdown:)` AND `swift-markdown` independently, try to reconcile results.
+**Why bad:** Two parsers may disagree on structure, source ranges won't align, bugs from inconsistency.
+**Instead:** Use `swift-markdown` as the authoritative parser for task list detection, handle task list segments outside `AttributedString(markdown:)`.
 
-**Pros:**
-- Zero code
-- Standard macOS appearance
-- Automatic dark mode
+### Anti-Pattern: Regex-Only Task List Detection
 
-**Cons:**
-- Can't add interactive elements (GitHub link button)
-- Limited layout control
-- Static content only
+**Wrong:** Use regex to find `- [ ]` and `- [x]` patterns in raw markdown.
+**Why bad:** False positives in code blocks, nested lists, or edge cases. Fragile.
+**Instead:** Use `swift-markdown` AST parsing (ListItem.checkbox property) for reliable detection.
 
-**Decision:** Use custom About window for GitHub link and extension status.
+### Anti-Pattern: Adding Yams Dependency for Simple Front Matter
 
-### Alternative 2: AppKit-Based UI
+**Wrong:** Add full YAML parser library for key-value extraction.
+**Why bad:** Adds C library dependency (LibYAML), increases binary size, potential sandbox issues, overkill for typical front matter.
+**Instead:** Simple line-based key:value parsing handles 95% of real-world front matter.
 
-**What:** Use NSWindow, NSViewController for About/Settings.
+### Anti-Pattern: Separate NSScrollView for Narrow Tables
 
-**Pros:**
-- More control over window behavior
-- Access to all AppKit APIs
+**Wrong:** Wrap tables in a nested horizontal NSScrollView for narrow contexts.
+**Why bad:** Breaks single-NSTextView architecture, complex layout management, poor UX (nested scroll views).
+**Instead:** Scale table constraints proportionally to available width. Accept some truncation via `lineBreakMode: .byTruncatingTail` (already implemented).
 
-**Cons:**
-- More code (window controllers, view controllers)
-- Imperative instead of declarative
-- Higher learning curve
+### Anti-Pattern: Hardcoded Preview Pane Width
 
-**Decision:** Use SwiftUI for simpler, modern approach.
+**Wrong:** Assume preview pane is always exactly 250pt wide.
+**Why bad:** Users can resize the preview column in Finder. Column view, list view, and icon view have different defaults.
+**Instead:** Use `view.bounds.width` at render time and apply width-based heuristic with a threshold.
 
-### Alternative 3: No Status Indicator
+---
 
-**What:** Skip extension status checking entirely.
+## Scalability Considerations
 
-**Pros:**
-- Simpler implementation
-- No shell command execution
-- Less code to maintain
+| Concern | Current (v1.1) | v1.2 Impact | Mitigation |
+|---------|----------------|-------------|------------|
+| Special segment types | 1 (tables) | 2 (tables + task lists) | Consider generalizing to DocumentSegment enum if adding more |
+| Preprocessing steps | 2 (images, blockquotes) | 3 (+ YAML extraction) | Pipeline is linear, order matters, document clearly |
+| MarkdownRenderer complexity | ~810 lines | ~950-1050 lines (est.) | Consider splitting into MarkdownRenderer + MarkdownPreprocessor if exceeding 1000 lines |
+| Custom attribute markers | 2 (blockquote, codeBlock) | 3 (+ frontMatter) | Pattern scales well, LayoutManager handles multiple markers |
+| MarkdownLayoutManager cases | 2 (blockquote, codeBlock) | 3 (+ frontMatter) | drawBackground() stays manageable with sequential enumeration |
 
-**Cons:**
-- User might think extension isn't working
-- No feedback on activation state
+---
 
-**Decision:** Include basic status indicator or defer to v1.2.
+## Open Questions
+
+1. **preferredContentSize behavior:** Does the Quick Look system respect `preferredContentSize` from the extension's view controller? Testing needed. Some extensions report the system overriding their preferences.
+
+2. **Preview pane width threshold:** What is the right cutoff between "narrow" and "full" context? Need to test with Finder's column view, list view, and icon view preview panes at various window sizes.
+
+3. **Task list + table interaction:** If a document has both tables AND task lists, the source range splitting logic needs to handle interleaved segments. Need to verify source ranges from both extractors don't overlap or create gaps.
+
+4. **Front matter rendering style:** Should YAML front matter look like a code block (monospace, background), a table (key-value pairs in columns), or a custom card-like element? Design decision deferred to implementation phase.
+
+5. **Dynamic resizing:** If the Quick Look window is resized after initial render, do tables reflow? Current `fixedLayoutAlgorithm` tables do not reflow. Is this acceptable, or should tables use `automaticLayoutAlgorithm`? Testing needed.
 
 ---
 
 ## Sources
 
-**SwiftUI Architecture:**
-- [Create a fully custom About window for a Mac app in SwiftUI](https://nilcoalescing.com/blog/FullyCustomAboutWindowForAMacAppInSwiftUI/)
-- [Presenting The Preferences Window On macOS Using SwiftUI](https://serialcoder.dev/text-tutorials/macos-tutorials/presenting-the-preferences-window-on-macos-using-swiftui/)
-- [SwiftUI on macOS: Settings, defaults and About](https://eclecticlight.co/2024/04/30/swiftui-on-macos-settings-defaults-and-about/)
-- [Apple Developer Documentation: Settings Scene](https://developer.apple.com/documentation/swiftui/settings)
-- [Scenes types in a SwiftUI Mac app](https://nilcoalescing.com/blog/ScenesTypesInASwiftUIMacApp/)
+### HIGH Confidence (verified in source code or official documentation)
 
-**SwiftUI + AppKit Integration:**
-- [Use SwiftUI with AppKit - WWDC22](https://developer.apple.com/videos/play/wwdc2022/10075/)
-- [NSHostingController | Apple Developer Documentation](https://developer.apple.com/documentation/swiftui/nshostingcontroller)
-- [macOS Apprentice, Chapter 18: Using SwiftUI in AppKit](https://www.kodeco.com/books/macos-apprentice/v1.0/chapters/18-using-swiftui-in-appkit)
+- swift-markdown `ListItem.checkbox` API -- verified in local source at `build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift`
+- swift-markdown `TableExtractor` pattern -- verified in local source at `MDQuickLook/MDQuickLook Extension/TableExtractor.swift`
+- `NSViewController.preferredContentSize` -- [Apple Developer Documentation](https://developer.apple.com/documentation/appkit/nsviewcontroller/preferredcontentsize)
+- `AttributedString(markdown:)` does NOT support task list checkboxes -- [Apple Developer Forums](https://developer.apple.com/forums/thread/701223)
 
-**Quick Look Extension Structure:**
-- [PeekX: Quick Look Extension for Folder Preview on macOS](https://github.com/altic-dev/PeekX)
-- [QLMarkdown: macOS Quick Look extension for Markdown files](https://github.com/sbarex/QLMarkdown)
-- [An overview of app extensions and plugins in macOS Sequoia](https://eclecticlight.co/2025/04/23/an-overview-of-app-extensions-and-plugins-in-macos-sequoia/)
+### MEDIUM Confidence (community sources, cross-verified)
 
-**Extension Status Detection:**
-- [qlmanage Man Page - macOS](https://ss64.com/mac/qlmanage.html)
-- [Inside QuickLook previews with qlmanage](https://eclecticlight.co/2018/04/05/inside-quicklook-previews-with-qlmanage/)
-- [macOS Hints: Enable QuickLook in macOS Sonoma and macOS Sequoia](https://www.projectwizards.net/en/blog/2025/01/quicklook)
+- swift-markdown does not support YAML front matter -- [GitHub issue #73](https://github.com/swiftlang/swift-markdown/issues/73)
+- PreviewMarkdown supports YAML front matter via custom extraction -- [GitHub](https://github.com/smittytone/PreviewMarkdown)
+- QLMarkdown offers Quick Look window size customization -- [GitHub](https://github.com/sbarex/QLMarkdown)
+- NSTextAttachment with SF Symbols for inline images -- [Hacking with Swift](https://www.hackingwithswift.com/example-code/system/how-to-insert-images-into-an-attributed-string-with-nstextattachment)
+- [Yams YAML parser for Swift](https://github.com/jpsim/Yams) -- considered but not recommended
 
-**macOS App Lifecycle:**
-- [SwiftUI on macOS: Life Cycle and App Delegate](https://eclecticlight.co/2024/04/17/swiftui-on-macos-life-cycle-and-appdelegate/)
-- [NSApplicationDelegateAdaptor | Apple Developer Documentation](https://developer.apple.com/documentation/swiftui/nsapplicationdelegateadaptor)
-- [LSUIElement | Apple Developer Documentation](https://developer.apple.com/documentation/bundleresources/information-property-list/lsuielement)
-- [A menu bar only macOS app using AppKit](https://www.polpiella.dev/a-menu-bar-only-macos-app-using-appkit/)
+### LOW Confidence (needs validation during implementation)
 
-**About Panel Customization:**
-- [Customizing the macOS About Panel in SwiftUI](https://danielsaidi.com/blog/2023/11/28/customizing-the-macos-about-panel-in-swiftui/)
-- [Credits - Swift macOS](https://gavinw.me/swift-macos/swiftui/credits.html)
-- [Apple Developer Documentation: NSApplication credits](https://developer.apple.com/documentation/appkit/nsapplication/aboutpaneloptionkey/credits)
-- [Customize About panel on macOS in SwiftUI](https://nilcoalescing.com/blog/CustomiseAboutPanelOnMacOSInSwiftUI/)
+- Preview pane detection via `view.bounds.width` heuristic -- community pattern, not officially documented
+- Quick Look system behavior regarding `preferredContentSize` respect -- needs empirical testing
+- NSTextTable reflow behavior in resizable Quick Look windows -- needs testing
 
 ---
-*Architecture research for: macOS Quick Look Extension Host App UI*
-*Researched: 2026-02-02*
-*Milestone: v1.1 - Public Release (GitHub)*
+
+*Architecture research for: v1.2 Rendering Polish & Features*
+*Researched: 2026-02-05*
+*Milestone: v1.2 - Rendering Polish & Features*

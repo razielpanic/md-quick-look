@@ -1,244 +1,191 @@
 # Project Research Summary
 
-**Project:** MD Quick Look v1.1 - Public Release
-**Domain:** macOS Quick Look Extension GitHub Distribution
-**Researched:** 2026-02-02
-**Confidence:** HIGH
+**Project:** MD Quick Look v1.2 -- Rendering Polish & New Markdown Features
+**Domain:** macOS Quick Look extension enhancement
+**Researched:** 2026-02-05
+**Confidence:** HIGH (existing codebase well-understood; all features use built-in APIs)
 
 ## Executive Summary
 
-MD Quick Look v1.1 focuses on transforming an existing, working Quick Look extension (v1.0 with full markdown rendering) into a polished, publicly distributable macOS application via GitHub. Research reveals that successful first-time public releases require three critical pillars: **removal of installation friction** (code signing + notarization eliminates security warnings), **visual proof before documentation** (demo GIFs and screenshots engage users instantly), and **professional polish** aligned with "Very Mac-assed" positioning (custom app icon, About window, clear README).
+MD Quick Look v1.2 is a rendering polish milestone for an existing macOS Quick Look extension that previews markdown files. The five target features -- Quick Look window sizing, preview pane optimization, responsive table rendering, YAML front matter display, and GFM task list checkboxes -- all build on the established NSTextView + NSAttributedString architecture from v1.0/v1.1. Research confirms that **zero new dependencies are needed**. Every feature can be implemented using the existing stack: Swift, AppKit, and the swift-markdown library (already a dependency for table extraction). This is the single most important finding of the research.
 
-The recommended approach prioritizes end-user experience over developer convenience. This means investing in Apple Developer account ($99/year) for notarization (non-negotiable for macOS 10.15+), using DMG distribution over ZIP for better permission handling, and creating comprehensive-but-scannable documentation. The host app should use pure SwiftUI (macOS 13+) for About and Settings windows, avoiding AppKit complexity. The extension itself requires no changes for v1.1.
+The recommended approach is to treat this milestone as two parallel workstreams: a **layout adaptation workstream** (window sizing, preview pane detection, responsive tables) where features have strict ordering dependencies, and a **feature addition workstream** (YAML front matter, task list checkboxes) where features are independent and follow established preprocessing patterns. The layout workstream must come first because preview pane width detection is foundational -- tables cannot be made responsive without knowing the available width. YAML front matter extraction must happen very early in the rendering pipeline (before all other preprocessing) because stripping front matter shifts line numbers and affects source-range-based table/task-list extraction downstream.
 
-Key risks center on first-timer mistakes: shipping unsigned code (destroys trust), assuming technical knowledge in documentation (users don't know what Quick Look is), or using deprecated .qlgenerator format (broken on macOS 15+). The v1.0 extension already uses the modern App Extension API, so the main risk is release mechanics (signing, documentation, visual assets) rather than core functionality.
+The key risks are: (1) `preferredContentSize` breaking auto-resizing of subviews in Quick Look windows (Critical -- may be best to skip setting it entirely), (2) text container width being calculated from the initial 800x600 frame before the Quick Look host resizes the view to its actual dimensions, and (3) YAML front matter stripping desynchronizing source ranges used by the existing table extraction pipeline. All three have clear preventions identified in the pitfalls research. The architecture is well-understood because this is the project's third milestone -- the codebase is small (~240 lines in the extension), the rendering pipeline is documented, and all integration points are mapped.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The v1.1 milestone adds three technology layers to the existing v1.0 Quick Look extension: **SwiftUI host app UI** (About/Settings windows), **icon tooling** (Icon Composer or Image2icon), and **release automation** (gh CLI, create-dmg, notarytool). The existing extension stack (swift-markdown, NSAttributedString rendering, syntax highlighting) remains unchanged.
+All five v1.2 features require **zero new SPM dependencies**. The existing stack provides everything needed.
 
-**Core technologies for v1.1:**
-- **SwiftUI Settings scene** (macOS 11+) — Automatic Preferences menu item and Cmd+, shortcut with TabView for multi-page settings; zero external dependencies
-- **SwiftUI Window scene** (macOS 13+) — Custom About window replacing default Credits.rtf; full control over layout, links, version display
-- **Icon Composer** (macOS 15.3+) — Apple's official tool for multi-layer icons with Liquid Glass effects; exports Xcode-compatible format
-- **gh CLI** (latest) — Official GitHub release creation with simple workflow (`gh release create v1.0 ./app.dmg`); no CI/CD complexity for first release
-- **create-dmg** (Node.js) — Professional DMG generation with background images and proper layout; industry standard for macOS releases
-- **xcrun notarytool** (Xcode 14+) — Required for macOS apps distributed outside App Store; replaced deprecated altool (Nov 2023)
+**Core technologies (no changes from v1.1):**
+- **Swift + AppKit** -- NSViewController, NSTextView, NSTextTable, NSTextAttachment provide all rendering APIs
+- **swift-markdown** (existing dependency) -- `ListItem.checkbox` API for task list detection; `Document(parsing:)` already used for table extraction
+- **NSAttributedString pipeline** -- existing preprocessing/postprocessing pattern extends naturally to front matter and task lists
 
-**Anti-stack (what NOT to use):**
-- SF Symbols for app icon (UI elements only, not app icons; wrong format/design language)
-- altool for notarization (deprecated Nov 2023; must use notarytool)
-- Third-party Settings libraries (sindresorhus/Settings adds dependency when native SwiftUI Settings scene exists since macOS 11)
-- GitHub Actions for v1.1 (adds complexity for first-timer; manual gh CLI is simpler to debug)
-- manual DMG creation with hdiutil (error-prone, time-consuming; create-dmg provides better UX)
+**What NOT to add (and why):**
+- **Yams** (YAML parser): overkill for display-only key-value extraction; adds LibYAML C dependency
+- **WKWebView**: documented Quick Look issues on Sequoia; contradicts existing NSTextView architecture
+- **swift-markdown-ui**: maintenance mode; targets SwiftUI, not NSTextView
 
 ### Expected Features
 
-Research into successful macOS app releases and first-timer guidance reveals a clear hierarchy: **table stakes** (users expect these or product feels incomplete), **differentiators** (competitive advantage for "Very Mac-assed" positioning), and **anti-features** (commonly requested but problematic for first releases).
-
 **Must have (table stakes):**
-- Clear README with app description — First impression; users judge projects by README quality in 2026
-- Installation instructions — Users need step-by-step guidance including "launch app once" requirement for Quick Look extensions
-- Screenshots or demo GIF — Visual proof the app works; text-only READMEs underperform
-- LICENSE file — Without license, code isn't truly open source; users/contributors avoid legally ambiguous projects
-- GitHub Releases page with DMG — Standard distribution for macOS apps; requires notarization for macOS 10.15+
-- App icon — Polished apps have recognizable, professional icons; 1024x1024 master image
-- Code signing + notarization — macOS 10.15+ shows security warnings for unsigned apps; users abandon immediately
-- macOS version compatibility statement — Users need to know if it works on their system before downloading
-- Installation troubleshooting — Quick Look plugins require specific setup (de-quarantine, `qlmanage -r`, common errors)
+- Content fills available width and reflows on resize (already working via autoresizing masks)
+- Tables visible and readable at narrow widths (currently broken -- absolute widths clip in preview pane)
+- YAML front matter stripped from body and displayed as styled metadata block (currently renders as garbled ThematicBreak + Heading)
+- Task list checkboxes render as visual checkboxes, not raw `[ ]` / `[x]` text (currently no checkbox support)
+- No horizontal scrollbar for body text at any width (already implemented)
 
-**Should have (competitive advantage):**
-- Animated demo GIF in README — Shows "magic moment" of spacebar → rendered markdown in 5-10 seconds; much more engaging than screenshots
-- "Very Mac-assed" positioning — Emphasize native feel, polish, "fits right in" messaging in README
-- Before/after comparison — Shows problem → solution visually (plain text view vs. rendered preview)
-- One-line value prop at top — "Beautiful markdown previews in Finder" instantly communicates benefit
-- Clean, scannable README — Comprehensive but not overwhelming; users can find info quickly; keep under 10-12 screens
+**Should have (differentiators):**
+- SF Symbol checkboxes (`checkmark.square.fill` / `square`) matching native macOS appearance
+- Adaptive text insets (smaller padding at narrow widths for more content visibility)
+- Width-aware table column sizing (scale constraints proportionally to container width)
+- Color-coded front matter keys with styled key-value display
+- Dimmed text for checked task list items (`.secondaryLabelColor`)
 
 **Defer (v2+):**
-- Homebrew cask — Add after validation (10+ GitHub stars OR 3+ user requests); manual download sufficient for v1.0
-- CONTRIBUTING.md — Add after first external contributor or "good first issue" request; premature for first release
-- Multi-page documentation site — Overkill for v1.0; creates maintenance burden; README sufficient
-- App Store submission — Review delays release, $99/year cost, Quick Look extension App Store complications; validate on GitHub first
-- Extensive configuration options — End users want "it just works", not settings; adds support burden; defer to post-v1 based on demand
+- Horizontal scroll for individual tables (HIGH complexity, breaks single-NSTextView architecture)
+- Collapsible/interactive front matter (Quick Look is non-interactive)
+- Full YAML parsing with Yams library (only if users report issues with nested YAML)
+- Dynamic table reflow on window resize (current fixed layout does not reflow; acceptable for v1.2)
+- Task progress counting ("3/7 complete")
 
 ### Architecture Approach
 
-The v1.1 architecture is straightforward: pure SwiftUI host app containing the existing Quick Look extension (unchanged). The host app and extension are **independent** — the app doesn't control the extension at runtime, it just contains it and provides user-facing UI. Use App scenes (Window for About, Settings for Preferences) targeting macOS 13+, avoiding AppKit entirely. Extension registration is automatic on first app launch; macOS scans PlugIns/ and registers with quicklookd.
+The existing rendering pipeline has two well-established patterns that all v1.2 features follow: (1) **preprocessing** -- modify raw markdown before `AttributedString(markdown:)` parses it (used for images, blockquote breaks; now extended for YAML stripping and task list markers), and (2) **hybrid rendering** -- use swift-markdown's `Document` AST for structured content that `AttributedString(markdown:)` cannot handle (used for tables; now extended for task list checkboxes). The architecture requires modifying 4 existing files and creating 1 new file.
 
-**Major components:**
-1. **App.swift** — SwiftUI app entry point with Window scene (About) and Settings scene (Preferences); replaces main.swift with NSApplication.shared.run()
-2. **AboutWindow.swift** — SwiftUI view showing app icon, version from Bundle, description, GitHub link, optional extension status via `qlmanage -m` parsing
-3. **SettingsView.swift** — SwiftUI Form with placeholder content for v1.1; future expansion for theme/font settings using @AppStorage for UserDefaults persistence
-4. **ExtensionStatus.swift (optional)** — ObservableObject running `qlmanage -m` to check if extension is enabled; displays "Extension Active ✓" or "Enable in System Settings"
-5. **MDQuickLook.appex** — Existing Quick Look extension (PreviewViewController, MarkdownRenderer, TableRenderer) — UNCHANGED for v1.1
+**Components modified:**
+1. **PreviewViewController.swift** -- read `view.bounds.width` for context detection; optionally set `preferredContentSize`
+2. **MarkdownRenderer.swift** -- add `availableWidth` parameter; add YAML extraction as first preprocessing step; add task list detection alongside table detection; prepend front matter display block
+3. **TableRenderer.swift** -- accept `availableWidth` parameter; scale constraints proportionally
+4. **MarkdownLayoutManager.swift** -- add `frontMatterMarker` custom attribute for background drawing
 
-**Key architectural decisions:**
-- NSApplicationActivationPolicyRegular (default) — App appears in Dock normally; not LSUIElement background app
-- Stay open after About window closes — Simpler than quit-on-close; allows reopening from Dock without relaunch
-- No direct app-to-extension communication — Extension runs in separate quicklookd process; settings shared via UserDefaults app group (future v1.2+)
+**New component:**
+5. **TaskListExtractor.swift** (~40-60 lines) -- MarkupVisitor that extracts `ListItem.checkbox` state and source ranges from swift-markdown AST, analogous to existing `TableExtractor`
 
 ### Critical Pitfalls
 
-Research into first-time macOS releases and Quick Look extension distribution identified 15 pitfalls. The top 5 with highest user impact:
+1. **preferredContentSize breaks auto-resizing** -- Setting this property causes Quick Look subviews to stop tracking window size during manual resize and fullscreen. Prevention: do not set `preferredContentSize` for text content; let the system manage window size. Test all resize scenarios (spacebar, drag-resize, fullscreen toggle).
 
-1. **Unsigned/unnotarized app creates scary warnings** — Without code signing and notarization, users see "macOS can't verify your app" warnings. In macOS Sequoia, right-click workaround is removed. **Prevention:** Sign with Developer ID certificate, enable hardened runtime, submit to notarytool, staple ticket to app bundle, test on clean Mac.
+2. **Text container width calculated from initial 800x600 frame** -- `scrollView.contentSize.width - 40` is computed before the Quick Look host resizes the view to its actual dimensions (~260px for preview pane). Prevention: override `viewDidLayout()` to recalculate text container width from actual bounds; do not call `ensureLayout` in `preparePreviewOfFile`.
 
-2. **Wrong release asset format (ZIP vs DMG)** — ZIP files work but may fail to grant permissions; DMG provides better UX and permission handling. **Prevention:** Use DMG for primary distribution, sign and notarize the DMG itself (not just app inside), name following semantic versioning (MDQuickLook-1.0.0.dmg).
+3. **NSTextTable absolute widths overflow in narrow containers** -- Current `fixedLayoutAlgorithm` with `absoluteValueType` renders tables at measured content width regardless of container. In a 260px preview pane, content is silently clipped. Prevention: switch to percentage-based column widths; cap total table width to available container width.
 
-3. **App icon missing or wrong format** — App displays with generic icon, or icon appears in Finder but not About window, or Xcode rejects during notarization. **Prevention:** Use Icon Composer (macOS 15.3+) for layered icons, provide all required sizes (512x512 through 16x16 at 1x/2x), don't add shadows/corners (Apple applies automatically).
+4. **YAML front matter parsed as ThematicBreak + Heading** -- Neither `AttributedString(markdown:)` nor swift-markdown support YAML front matter. The `---` delimiter is parsed as a horizontal rule. Prevention: pre-strip front matter before ANY parsing; anchor regex to absolute file start with `\A`; pass stripped content consistently to ALL parsers to avoid source range desynchronization.
 
-4. **Installation instructions assume technical knowledge** — README says "install the Quick Look generator" without explaining what Quick Look is or how to verify. **Prevention:** Step-by-step numbered instructions with screenshots, explain "Quick Look = spacebar preview in Finder", troubleshooting section for common issues (extension not appearing, quarantine warnings).
-
-5. **Forgetting to launch app once** — User downloads app, tries spacebar preview, nothing happens. Extension doesn't appear in System Settings. **Prevention:** Make "launch app once" step #1 in installation, app first-launch UI explains extension is installed, include in troubleshooting section.
-
-**Additional pitfalls to avoid:**
-- Bundle identifier mistakes (using "com.example" or "spotlighter" in production)
-- No screenshots in README (visual proof is table stakes in 2026)
-- Version numbering confusion (CFBundleVersion must be integer, CFBundleShortVersionString is semantic version)
-- .qlgenerator deprecated format (broken on macOS 15+; verify using .appex App Extension)
-- No hardened runtime (notarization fails; enable in Build Settings or use `--options=runtime`)
-- Testing only on development Mac (clean Mac test required to catch signing/quarantine issues)
+5. **insertListPrefixes overwrites task list checkboxes** -- `PresentationIntent` has no concept of task lists; all unordered items receive bullet prefixes unconditionally. Prevention: use custom `NSAttributedString.Key` marker from swift-markdown AST to identify task list items; modify `insertListPrefixes` to insert checkbox attachments instead of bullets for marked ranges.
 
 ## Implications for Roadmap
 
-Based on research, v1.1 Public Release naturally splits into **5 phases** with clear dependencies. The order prioritizes removing blockers (icon, signing) before documentation (README needs screenshots of signed app).
+Based on combined research, the v1.2 milestone should have 5 phases with a specific ordering driven by architectural dependencies and pitfall analysis.
 
-### Phase 1: App Icon Design & Integration
-**Rationale:** Icon is required for About window, DMG creation, and GitHub screenshots. Must come first so other phases can reference polished visuals. Icon Composer requires macOS 15.3+; fallback to Image2icon if unavailable.
+### Phase 1: YAML Front Matter Detection and Display
 
-**Delivers:** 1024x1024 master icon, AppIcon.appiconset in Assets.xcassets, all required sizes (512x512 through 16x16 at 1x/2x)
+**Rationale:** Front matter extraction must be the FIRST preprocessing step in the pipeline. It must happen before all other parsing because: (a) the `---` delimiters cause garbled rendering if passed to any markdown parser, and (b) stripping front matter changes line numbers, which affects source-range-based extraction used by tables and task lists. Building this first ensures the rest of the pipeline receives clean markdown.
+**Delivers:** Detection, extraction, and styled display of YAML metadata blocks; clean markdown passed to downstream parsers.
+**Addresses:** Feature 4 (YAML front matter detection and formatted display)
+**Avoids:** Pitfall 4 (ThematicBreak parsing), Pitfall 8 (source range desynchronization), Pitfall 11 (greedy regex), Pitfall 12 (empty front matter whitespace), Pitfall 15 (Windows line endings)
+**Stack:** Swift String/Regex processing, custom `NSAttributedString.Key.frontMatterMarker`, MarkdownLayoutManager background drawing
 
-**Uses:** Icon Composer (primary), Image2icon ($9.99 fallback), or IconGenerator (free fallback)
+### Phase 2: Quick Look Window Sizing and Preview Pane Width Detection
 
-**Avoids:** Pitfall #3 (missing icon), using SF Symbols as app icon (wrong format), adding shadows/corners (Apple applies automatically)
+**Rationale:** Width detection is foundational for phases 3 and 4. Before making tables responsive or adjusting any layout, the extension must know how wide its container is. Window sizing and preview pane detection are tightly coupled -- both involve how the Quick Look host provides view geometry. Combining them avoids redundant testing of resize behavior.
+**Delivers:** `availableWidth` parameter plumbed through the rendering pipeline; `preferredContentSize` assessment (may decide not to set it based on pitfall 1); verified behavior across spacebar popup, Finder column view, and fullscreen.
+**Addresses:** Feature 1 (Quick Look window sizing), Feature 2 (preview pane rendering optimization)
+**Avoids:** Pitfall 1 (preferredContentSize breaks auto-resize), Pitfall 2 (narrow width without notice), Pitfall 6 (text container width from initial frame), Pitfall 7 (hardcoded LayoutManager offsets)
+**Stack:** `NSViewController.preferredContentSize`, `view.bounds.size.width`, `viewDidLayout()` override
 
-### Phase 2: SwiftUI Host App UI
-**Rationale:** About and Settings windows provide user-facing polish required for "Very Mac-assed" positioning. Pure SwiftUI targets macOS 13+ without AppKit complexity. Extension registration is automatic (no code needed), but app needs UI to show it's installed.
+### Phase 3: Table Rendering Improvements
 
-**Delivers:** App.swift with Window/Settings scenes, AboutWindow.swift with icon/version/GitHub link, SettingsView.swift placeholder, optional ExtensionStatus.swift for activation checking
+**Rationale:** Depends on Phase 2 providing the `availableWidth` parameter. Tables are the element most likely to break at narrow widths. The existing TableRenderer has all the infrastructure; this phase parameterizes the hardcoded width constants to accept container width.
+**Delivers:** Tables that scale proportionally to available width; readable table content in Finder preview pane; adaptive padding and column minimums.
+**Addresses:** Feature 3 (table rendering improvements for small/narrow spaces)
+**Avoids:** Pitfall 3 (absolute widths overflow), Pitfall 14 (truncation hides content without indication)
+**Stack:** `NSTextTable` percentage-based widths, `measureColumnWidths` parameterization, adaptive `lineBreakMode`
 
-**Addresses:** Table stakes features (About window, version display, Settings menu integration)
+### Phase 4: GFM Task List Checkboxes
 
-**Implements:** Architecture components #1-4 (App.swift, AboutWindow, SettingsView, ExtensionStatus)
+**Rationale:** Independent of the layout workstream but benefits from having Phase 1 complete (front matter stripping ensures clean markdown for `Document(parsing:)` calls). Follows the established hybrid rendering pattern from table extraction. Placed after tables because it may require refactoring `renderWithTables()` into a more general segment-based approach if both tables and task lists appear in the same document.
+**Delivers:** Visual checkboxes (SF Symbols via NSTextAttachment) for GFM task list items; checked/unchecked visual distinction; proper integration with existing list prefix system.
+**Addresses:** Feature 5 (GFM task list checkboxes)
+**Avoids:** Pitfall 5 (no native AttributedString support), Pitfall 9 (vertical misalignment), Pitfall 10 (insertListPrefixes overwrites), Pitfall 13 (low contrast symbols), Pitfall 16 (mixed list items)
+**Stack:** swift-markdown `ListItem.checkbox`, `NSTextAttachment` with SF Symbols, new `TaskListExtractor.swift`
 
-**Avoids:** Pitfall #8 (no first-launch explanation), using LSUIElement (hides from Dock), AppKit when SwiftUI sufficient
+### Phase 5: Cross-Context Testing and Polish
 
-### Phase 3: Code Signing & Notarization Setup
-**Rationale:** Must notarize before creating DMG or screenshots (test on clean Mac requires signed build). One-time setup (Apple Developer account, certificates) followed by per-release workflow. Hardened runtime and stapling are non-negotiable for macOS 10.15+ distribution.
-
-**Delivers:** Developer ID certificate, notarytool credentials stored, hardened runtime enabled, signed and notarized .app bundle, stapled notarization ticket
-
-**Uses:** xcrun notarytool (Xcode 14+), xcrun stapler, Developer ID Application certificate
-
-**Avoids:** Pitfall #1 (unsigned app), Pitfall #10 (no hardened runtime), using altool (deprecated Nov 2023)
-
-**Research flag:** May need deeper research if first-time code signing issues arise; Apple documentation is comprehensive but error messages are cryptic.
-
-### Phase 4: Distribution Packaging & GitHub Release
-**Rationale:** DMG creation requires signed app (Phase 3). GitHub release requires DMG asset. create-dmg handles professional layout with minimal config. gh CLI simplifies release creation without CI/CD complexity.
-
-**Delivers:** MDQuickLook-1.0.0.dmg (signed and notarized), GitHub Release v1.0.0 with DMG asset, release notes, semantic version Git tag
-
-**Uses:** create-dmg (Node.js), gh CLI, semantic versioning (CFBundleShortVersionString = 1.0.0, CFBundleVersion = incremental integer)
-
-**Addresses:** Table stakes features (GitHub Releases with DMG, release notes, version compatibility statement)
-
-**Avoids:** Pitfall #2 (wrong asset format - using ZIP instead of DMG), Pitfall #7 (version numbering confusion), Pitfall #14 (no release notes)
-
-### Phase 5: Documentation & Marketing Materials
-**Rationale:** README is last because it needs screenshots of signed app running on clean Mac. Demo GIF requires fully functional installation flow. Documentation is most visible part of release but depends on all prior phases.
-
-**Delivers:** README.md with value prop, demo GIF (spacebar → preview), 2-3 screenshots, installation steps, troubleshooting section, LICENSE file (MIT or Apache 2.0)
-
-**Addresses:** Table stakes features (clear README, screenshots/GIF, installation instructions, troubleshooting, LICENSE), differentiators (demo GIF, before/after comparison, "Very Mac-assed" positioning)
-
-**Avoids:** Pitfall #5 (unclear instructions), Pitfall #6 (screenshot mistakes), Pitfall #12 (no troubleshooting), Pitfall #13 (no uninstall instructions)
-
-**Research flag:** Well-documented patterns for README structure and screenshots; skip additional research.
+**Rationale:** All features must be tested in combination across Quick Look contexts (spacebar popup, Finder column view preview pane, fullscreen, Spotlight). Edge cases emerge from feature interactions -- e.g., a document with YAML front matter + tables + task lists in a narrow preview pane exercises all four previous phases simultaneously.
+**Delivers:** Verified rendering across all Quick Look presentation contexts; edge case fixes; visual polish (adaptive padding, proportional offsets).
+**Addresses:** Integration testing for all 5 features
+**Avoids:** Regression from feature interactions; untested context combinations
 
 ### Phase Ordering Rationale
 
-- **Icon first** because About window, screenshots, and DMG all reference it; blocking dependency
-- **Host app UI second** because it provides structure for first-launch experience and validates extension integration
-- **Code signing third** because DMG and screenshots require signed build; can't test on clean Mac without it
-- **Distribution fourth** because DMG creation needs signed app; GitHub release depends on DMG asset
-- **Documentation last** because README needs screenshots of installed app; demo GIF requires full installation flow
-
-This order **minimizes rework** (don't write README before screenshots exist) and **surfaces blockers early** (icon design, Apple Developer account) before dependent tasks.
+- **YAML first** because it is a preprocessing step that affects all downstream parsing. If built later, existing table rendering would break when front matter is present.
+- **Width detection before tables** because table responsiveness requires knowing the container width. Building tables first would mean hardcoding another set of assumptions that get replaced.
+- **Task lists after tables** because task lists extend the same hybrid rendering pattern. If both tables and task lists exist in a document, the source-range splitting logic may need refactoring -- better to have tables stable first.
+- **Testing last** because cross-context testing only has value when all features are implemented. Individual phases should include per-feature testing, but the final phase exercises interactions.
 
 ### Research Flags
 
-**Phases likely needing deeper research during planning:**
-- **Phase 3 (Code Signing)** — Apple documentation is comprehensive but first-timer error messages (hardened runtime, entitlements, signing order) can be cryptic; may need troubleshooting research if issues arise.
+Phases likely needing deeper research during planning:
+- **Phase 2 (Window Sizing + Preview Pane):** `preferredContentSize` behavior in Quick Look is poorly documented by Apple. The exact threshold for "narrow" vs "full" context needs empirical testing. The research suggests possibly NOT setting `preferredContentSize` at all due to auto-resize breakage risk. This phase needs hands-on experimentation.
+- **Phase 4 (Task List Checkboxes):** Integration with the existing `insertListPrefixes` method and potential refactoring of `renderWithTables()` into a general segment renderer adds complexity. The NSTextAttachment baseline alignment on macOS requires iterative testing.
 
-**Phases with standard patterns (skip research-phase):**
-- **Phase 1 (Icon)** — Well-documented with Icon Composer guide, multiple fallback tools, clear HIG
-- **Phase 2 (SwiftUI UI)** — Standard SwiftUI patterns; Settings/Window scenes documented extensively
-- **Phase 4 (Distribution)** — create-dmg and gh CLI have clear documentation and examples
-- **Phase 5 (Documentation)** — README structure well-established; numerous successful examples in research sources
+Phases with standard patterns (skip deeper research):
+- **Phase 1 (YAML Front Matter):** Well-documented pattern. String detection + regex extraction + styled rendering. Multiple reference implementations exist (PreviewMarkdown, QLMarkdown). The research already covers edge cases thoroughly.
+- **Phase 3 (Table Improvements):** Straightforward parameterization of existing TableRenderer constants. NSTextTable APIs are stable since macOS 10.4. The research fully specifies what to change.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All tools are official (Apple) or well-established (create-dmg, gh CLI); alternatives documented for each |
-| Features | HIGH | Research based on successful macOS app patterns, first-timer guidance from multiple sources, Quick Look plugin ecosystem analysis |
-| Architecture | HIGH | Pure SwiftUI approach is well-documented for macOS 13+; extension independence confirmed by Apple docs and community examples |
-| Pitfalls | MEDIUM-HIGH | Pitfalls sourced from official Apple docs, real-world GitHub issues, and first-timer mistakes; some pitfalls inferred from patterns rather than explicit sources |
+| Stack | HIGH | Zero new dependencies confirmed. All APIs verified in existing codebase or Apple documentation. |
+| Features | HIGH | Features well-scoped; table stakes and differentiators clearly distinguished. Implementation approaches validated against reference apps (QLMarkdown, PreviewMarkdown). |
+| Architecture | HIGH | Existing codebase is small and well-understood. Integration points mapped precisely. Data flow changes documented. All modification targets identified by file and method. |
+| Pitfalls | HIGH | 16 pitfalls identified with specific code-level analysis. Critical pitfalls verified against Apple Developer Forums, swift-markdown source code, and direct codebase inspection. |
 
 **Overall confidence:** HIGH
 
-The v1.1 milestone has lower technical risk than v1.0 (extension already works) and focuses on well-documented release mechanics. The main uncertainty is first-timer execution (signing workflow, documentation clarity) rather than technical feasibility.
-
 ### Gaps to Address
 
-**Icon design skills:**
-- Research identified tools (Icon Composer, Image2icon) but not design process for first-timers without graphic design experience
-- **Resolution:** Use Figma templates from research sources (macOS Icon Design Template), or ship simple placeholder icon for v1.0 and commission designer for v1.1
-- **Not blocking:** Placeholder icon (single letter "M" on gradient) is acceptable for first release
-
-**Notarization wait times:**
-- Some reports (Jan 2026) of notarization submissions stuck "In Progress" for 24-72+ hours vs. usual 5-10 minutes
-- **Resolution:** Budget extra time for first notarization; if stuck >1 hour, check Apple Developer system status
-- **Not blocking:** Happens during Phase 3; doesn't affect earlier phases
-
-**Bundle identifier final naming:**
-- Research emphasizes choosing carefully (can't change after App Store submission) but project still uses "md-quick-look" internally
-- **Resolution:** Decide final naming (MDQuickLook? MarkdownQuickLook?) in Phase 4 before public release; search/replace across project
-- **Not blocking:** Internal development can continue with current naming; update before first GitHub release
-
-**Homebrew cask timing:**
-- Research suggests deferring to v1.x after validation (10+ stars), but unclear if should be v1.1 or later
-- **Resolution:** Ship v1.0 with manual download; monitor GitHub stars/issues for week; add Homebrew in v1.1 if demand warrants
-- **Not blocking:** Manual download sufficient for initial validation
+- **preferredContentSize Quick Look behavior:** Apple does not document whether the Quick Look host respects, partially respects, or ignores this property. May need to abandon the feature if testing shows it causes more problems than it solves. Mitigate by testing early in Phase 2 and having a "do nothing" fallback.
+- **Preview pane width thresholds:** No official documentation on typical Finder preview pane widths across different view modes (column view, list view, icon view). Need empirical measurements on different screen sizes during Phase 2 implementation.
+- **AttributedString(markdown:) handling of `- [ ]` markers:** Not documented whether Foundation's parser strips, preserves, or mangles checkbox syntax. The preprocessing approach avoids this uncertainty, but it should be validated empirically during Phase 4.
+- **NSTextTable automatic vs fixed layout at narrow widths:** Apple documentation does not explain the behavioral differences in detail. Research recommends staying with fixed layout but parameterizing widths. If results are poor, automatic layout is a fallback.
+- **Task list + table co-existence:** If a document contains both GFM tables and task lists, the source range splitting logic in `renderWithSourceRanges` must handle interleaved segment types. This interaction has not been tested and may require a refactor to a general `DocumentSegment` enum.
 
 ## Sources
 
-### Primary (HIGH confidence)
-- [Apple Developer Documentation: Icon Composer](https://developer.apple.com/icon-composer/)
-- [Apple Developer Documentation: Notarizing macOS Software](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution)
-- [Apple Developer Documentation: SwiftUI Settings Scene](https://developer.apple.com/documentation/swiftui/settings)
-- [GitHub CLI Manual: gh release create](https://cli.github.com/manual/gh_release_create)
-- [create-dmg by sindresorhus](https://github.com/sindresorhus/create-dmg)
-- [QLMarkdown - Reference Quick Look extension](https://github.com/sbarex/QLMarkdown)
-- [PreviewMarkdown - Reference implementation](https://github.com/smittytone/PreviewMarkdown)
+### Primary (HIGH confidence -- verified from source code or official documentation)
 
-### Secondary (MEDIUM confidence)
-- [Custom About Window in SwiftUI](https://nilcoalescing.com/blog/FullyCustomAboutWindowForAMacAppInSwiftUI/)
-- [Presenting Preferences Window in SwiftUI](https://serialcoder.dev/text-tutorials/macos-tutorials/presenting-the-preferences-window-on-macos-using-swiftui/)
-- [Figma macOS Icon Design Template](https://www.figma.com/community/file/1203739127660048027/macos-icon-design-template)
-- [Image2icon - Icon converter](https://img2icnsapp.com/)
-- [macOS distribution guide](https://gist.github.com/rsms/929c9c2fec231f0cf843a1a746a416f5)
-- [Open Source GitHub Repository Pre-Launch Checklist](https://medium.com/binbash-inc/open-source-github-repository-pre-launch-checklist-4a52dbbe4af1)
-- [awesome-readme - Curated examples](https://github.com/matiassingers/awesome-readme)
+- swift-markdown `ListItem.checkbox` API -- verified in local build cache source
+- swift-markdown `tasklist` cmark extension always enabled -- verified in `CommonMarkConverter.swift`
+- swift-markdown issue #73 -- YAML front matter not supported, confirmed
+- `AttributedString(markdown:)` does not support task lists -- Apple Developer Forums thread 701223
+- `NSViewController.preferredContentSize` -- Apple Developer Documentation
+- `NSTextTable` layout algorithms and percentage width types -- stable AppKit APIs since macOS 10.4
+- Current codebase architecture -- direct code inspection of all 5 extension files
 
-### Tertiary (LOW confidence - first-timer guidance patterns)
-- [5 Common Documentation Mistakes](https://medium.com/@AnweshaB/5-common-documentation-mistakes-and-how-to-fix-them-9d095572947c)
-- [Sequoia No Longer Supports QuickLook Generator Plug-ins](https://mjtsai.com/blog/2024/11/05/sequoia-no-longer-supports-quicklook-generator-plug-ins/)
-- [macOS Notarization wait time issues - community reports Jan 2026]
+### Secondary (MEDIUM confidence -- community sources, cross-verified)
+
+- [Apple Developer Forums thread 673369](https://developer.apple.com/forums/thread/673369) -- preferredContentSize caveats in Quick Look
+- [smittytone/PreviewMarkdown](https://github.com/smittytone/PreviewMarkdown) -- reference implementation for YAML front matter display
+- [sbarex/QLMarkdown](https://github.com/sbarex/QLMarkdown) -- reference Quick Look markdown extension
+- [WWDC 2019 Session 719](https://developer.apple.com/videos/play/wwdc2019/719/) -- QLPreviewView contexts
+- [WWDC 2018 Session 237](https://asciiwwdc.com/2018/sessions/237) -- Quick Look extension lifecycle
+- [Jekyll Front Matter docs](https://jekyllrb.com/docs/front-matter/) -- standard front matter fields
+- [Hugo Front Matter docs](https://gohugo.io/content-management/front-matter/) -- standard front matter fields
+- [NSTextAttachment macOS vs iOS](https://bdewey.com/til/2023/08/21/nstextattachment-in-macos-vs-ios/) -- macOS-specific baseline alignment
+
+### Tertiary (LOW confidence -- needs validation during implementation)
+
+- Preview pane detection via `view.bounds.width` heuristic -- community pattern, not officially documented
+- Quick Look system behavior regarding `preferredContentSize` respect -- needs empirical testing
+- NSTextTable reflow behavior in resizable Quick Look windows -- needs testing
+- `AttributedString(markdown:)` handling of `- [ ]` syntax -- needs empirical testing
 
 ---
-*Research completed: 2026-02-02*
+*Research completed: 2026-02-05*
 *Ready for roadmap: yes*

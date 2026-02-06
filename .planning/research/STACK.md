@@ -1,7 +1,7 @@
 # Technology Stack: md-quick-look
 
 **Project:** Quick Look extension for markdown rendering on macOS
-**Researched:** January 2026 (v1.0), February 2026 (v1.1 additions)
+**Researched:** January 2026 (v1.0), February 2026 (v1.1 additions, v1.2 additions)
 **Recommendation Confidence:** HIGH
 
 ## Recommended Stack
@@ -28,7 +28,7 @@
 
 | Component | Technology | Purpose | Why |
 |-----------|-----------|---------|-----|
-| **Text rendering** | NSAttributedString + Core Text | Styled text output | Native macOS, performant, no external dependencies for rendering; direct markdown → NSAttributedString conversion avoids WebKit overhead |
+| **Text rendering** | NSAttributedString + Core Text | Styled text output | Native macOS, performant, no external dependencies for rendering; direct markdown to NSAttributedString conversion avoids WebKit overhead |
 | **Code block syntax highlighting** | *Highlighter library TBD* | Syntax coloring | Quick Look extensions have strict sandboxing; avoid Highlight external tool. Consider lightweight alternatives or build custom for supported languages |
 | **UI framework** | SwiftUI | Extension UI | Modern, native, integrates well with NSAttributedString via NSAttributedString(markdown:) initializer; cleaner than UIKit for Quick Look |
 
@@ -103,6 +103,208 @@ Start with manual keyword highlighting for common languages (JavaScript, Python,
 | **Git** | Version control | Tag releases: `git tag v1.0 && git push --tags`. gh CLI uses tags to create GitHub releases. Already installed on macOS. |
 | **Node.js** | JavaScript runtime | Required for create-dmg (Node.js version). Version 20+. Install via Homebrew or nodejs.org. |
 
+---
+
+## v1.2 Rendering Polish Stack Additions
+
+**Added:** February 2026 for v1.2 milestone
+**Focus:** Quick Look window sizing, preview pane optimization, table improvements, YAML front matter, GFM task list checkboxes
+
+### Feature 1: Quick Look Window Sizing and Content Layout
+
+**No new dependencies required.** Uses existing AppKit APIs.
+
+| API / Component | Source | Purpose | Integration Point |
+|----------------|--------|---------|-------------------|
+| **NSViewController.preferredContentSize** | AppKit (built-in) | Set initial Quick Look window dimensions | Set in `PreviewViewController` before calling completion handler |
+| **NSView.autoresizingMask** | AppKit (built-in) | Ensure content resizes with window | Already in use (`.width`, `.height` on scrollView) |
+| **NSTextContainer.widthTracksTextView** | AppKit (built-in) | Text reflows on window resize | Already in use (`true`) |
+
+**How it works:** `PreviewViewController` subclasses `NSViewController`, which inherits `preferredContentSize` from NSViewController. Setting this property tells the Quick Look host what initial window size is preferred. The Quick Look host may or may not honor it depending on context (spacebar preview vs preview pane).
+
+**Key findings:**
+- `preferredContentSize` sets the initial window dimensions. It is advisory -- the host can ignore it.
+- On macOS Catalina, setting `preferredContentSize` could break autoresizing of subviews. This bug was fixed in Big Sur. Since this project targets macOS 14.0+, this is not a concern. (Source: [Apple Developer Forums thread 673369](https://developer.apple.com/forums/thread/673369))
+- The current code already uses `autoresizingMask = [.width, .height]` on the scroll view, which handles resize correctly.
+- **Recommendation:** Set `preferredContentSize` to a sensible default (e.g., `NSSize(width: 800, height: 600)`) in `loadView()` or early in `preparePreviewOfFile`. The current code already creates the view at 800x600 but does not explicitly set `preferredContentSize`.
+
+**Confidence:** MEDIUM -- preferredContentSize behavior is documented for NSViewController, but Quick Look-specific behavior is poorly documented. Testing on target macOS versions is essential.
+
+### Feature 2: Preview Pane Rendering Optimization
+
+**No new dependencies required.** Uses standard AppKit view lifecycle.
+
+| API / Component | Source | Purpose | Integration Point |
+|----------------|--------|---------|-------------------|
+| **view.bounds.size.width** | AppKit (built-in) | Detect available width at render time | Check in `preparePreviewOfFile` to adjust layout |
+| **NSView.viewDidLayout()** | AppKit (built-in) | React to layout changes after display | Override in `PreviewViewController` for dynamic adjustment |
+| **NSTextContainer.containerSize** | AppKit (built-in) | Control text wrap width | Already in use; adjust based on detected width |
+
+**How it works:** There is NO explicit API to distinguish "Finder preview pane" from "spacebar Quick Look window." Both contexts invoke the same `QLPreviewingController.preparePreviewOfFile(at:completionHandler:)` method. The difference is only the view size the host provides.
+
+**Detection strategy:** Use `view.bounds.size.width` at render time to detect narrow contexts. When width is below a threshold (approximately 300-400pt), apply compact layout adjustments:
+- Reduce `textContainerInset` (e.g., from 20pt to 10pt)
+- Scale down heading font sizes
+- Switch tables to a more compact mode or horizontal scroll
+- Reduce paragraph spacing
+
+**Reactive resizing:** Override `viewDidLayout()` on PreviewViewController to detect if the view is resized after initial render (e.g., user resizes Finder column). This would allow re-adjusting layout dynamically, though for v1.2 a one-time check at render time is likely sufficient.
+
+**Confidence:** HIGH -- This approach is pure standard AppKit. No Quick Look-specific API is needed; the width check is straightforward.
+
+### Feature 3: Table Rendering Improvements for Narrow Spaces
+
+**No new dependencies required.** Enhances existing `TableRenderer` and `NSTextTable` usage.
+
+| API / Component | Source | Purpose | Integration Point |
+|----------------|--------|---------|-------------------|
+| **NSTextTable.layoutAlgorithm** | AppKit (built-in) | Switch between fixed and automatic table layout | Currently uses `.fixedLayoutAlgorithm`; consider `.automaticLayoutAlgorithm` |
+| **NSTextBlock.setContentWidth(_:type:)** | AppKit (built-in) | Set column widths as percentage or absolute | Currently uses `.absoluteValueType`; add `.percentageValueType` option |
+| **NSTextTableBlock padding/border** | AppKit (built-in) | Cell styling | Already in use |
+
+**Current state:** The `TableRenderer` uses `.fixedLayoutAlgorithm` with measured absolute column widths. It has a `maxTableWidth` of 800pt and scales columns proportionally if they exceed it.
+
+**Improvements for narrow spaces:**
+1. **Percentage-based column widths:** Instead of absolute widths, use `.percentageValueType` with `NSTextBlock.setContentWidth()`. This makes tables responsive to container width. Divide 100% across columns based on content measurement ratios.
+2. **Automatic layout algorithm:** Switch from `.fixedLayoutAlgorithm` to `.automaticLayoutAlgorithm` when the available width is narrow. The automatic algorithm lets NSTextTable size columns based on content, similar to CSS `table-layout: auto`. Note: automatic layout may be slower for large tables.
+3. **Line wrapping in cells:** Currently using `.byTruncatingTail` line break mode. For narrow views, switch to `.byWordWrapping` so cell content wraps instead of being truncated.
+4. **Container width awareness:** Pass the available container width to `TableRenderer` so it can adapt column sizing strategy.
+
+**Confidence:** HIGH -- NSTextTable's percentage-based widths and layout algorithms are stable AppKit APIs available since macOS 10.4. The main engineering work is plumbing the container width through to the renderer.
+
+### Feature 4: YAML Front Matter Detection and Display
+
+**No new library required for v1.2 scope.** Use simple regex/string parsing.
+
+| Approach | Dependency | Complexity | Recommendation |
+|----------|-----------|------------|----------------|
+| **Regex stripping + key-value display** | None (Swift stdlib) | Low | **Recommended for v1.2** |
+| **Yams library (full YAML parser)** | jpsim/Yams 6.2.1 | Medium | Defer unless structured parsing needed |
+| **swift-markdown front matter** | Not supported | N/A | Not available (confirmed: [Issue #73](https://github.com/swiftlang/swift-markdown/issues/73)) |
+
+**Why regex, not Yams:**
+- YAML front matter in markdown files is almost always simple key-value pairs (title, date, author, tags)
+- The project only needs to *detect and display* front matter, not parse it into typed objects
+- Adding Yams (which embeds LibYAML, a C library) increases bundle size and complexity for a feature that needs only string extraction
+- If future requirements need structured YAML parsing (e.g., conditional rendering based on metadata), Yams can be added later
+
+**Implementation approach:**
+1. **Detection:** Check if file content starts with `---\n`. If so, find the closing `---\n` (or `...\n`).
+2. **Extraction:** Split content into front matter string and markdown body.
+3. **Parsing for display:** Split front matter lines on first `:` to get key-value pairs. This handles 95%+ of real-world front matter.
+4. **Rendering:** Display as a styled header block (light background, key-value table or formatted list) above the markdown content.
+5. **Stripping:** Pass only the markdown body (without front matter) to the existing `MarkdownRenderer.render()` pipeline.
+
+**Regex pattern:**
+```swift
+// Match front matter block at start of document
+// ^---\n captures opening delimiter
+// ([\s\S]*?) captures content (non-greedy)
+// \n---$ captures closing delimiter
+let pattern = "\\A---\\n([\\s\\S]*?)\\n---\\n"
+```
+
+**What this means for the stack:**
+- No new SPM dependency
+- One new preprocessing step before the existing markdown pipeline
+- One new rendering component for the front matter display block
+- Integration point: Add to `PreviewViewController.preparePreviewOfFile()` before calling `MarkdownRenderer.render()`
+
+**About Yams (if needed later):**
+- Latest version: 6.2.1 (released February 5, 2026)
+- Swift 5.7+ / Xcode 14+ required
+- Codable-based API: `YAMLDecoder().decode(FrontMatter.self, from: yamlString)`
+- Platform support: macOS, iOS, Linux
+- Source: [github.com/jpsim/Yams](https://github.com/jpsim/Yams)
+
+**Confidence:** HIGH for regex approach (standard Swift string processing). LOW for knowing all edge cases of YAML front matter in the wild (nested values, multiline strings, TOML front matter variants).
+
+### Feature 5: GFM Task List Checkboxes
+
+**No new dependencies required.** Uses existing swift-markdown `ListItem.checkbox` API.
+
+| API / Component | Source | Purpose | Integration Point |
+|----------------|--------|---------|-------------------|
+| **ListItem.checkbox** | swift-markdown (already a dependency) | Detect checked/unchecked state | Extend `TableExtractor` pattern (MarkupVisitor) |
+| **Checkbox enum** | swift-markdown (`.checked`, `.unchecked`) | State representation | Map to visual checkbox characters |
+| **NSTextAttachment** | AppKit (built-in) | Render checkbox icons | Use SF Symbols for checkbox appearance |
+| **SF Symbols** | Built-in (macOS 11+) | Checkbox icons | `checkmark.square` and `square` system images |
+
+**How swift-markdown handles task lists (verified from source code):**
+- The cmark-gfm parser always attaches the `tasklist` extension (line 626 of CommonMarkConverter.swift)
+- When parsing `- [x] item`, it creates a `ListItem` node with `.checkbox = .checked`
+- When parsing `- [ ] item`, it creates a `ListItem` node with `.checkbox = .unchecked`
+- Regular list items have `.checkbox = nil`
+- No special parse options are required -- task list support is enabled by default
+
+**Critical detail -- two parsing paths:**
+The current codebase has TWO markdown parsing paths:
+
+1. **`AttributedString(markdown:)`** -- Used for the primary rendering pipeline. This is Apple's Foundation-level parser. It does NOT expose checkbox state through `PresentationIntent`. When it encounters `- [ ] text`, it likely strips the checkbox markers and treats the item as a regular list item. This parser does not support GFM task lists.
+
+2. **`Document(parsing:)`** from swift-markdown -- Used currently only for table detection in `hasGFMTables()` and `renderWithTables()`. This parser DOES support task lists via `ListItem.checkbox`.
+
+**Implementation approach:**
+Since `AttributedString(markdown:)` does not expose task list state, the implementation must detect task lists via the swift-markdown `Document` parser and handle them in the rendering pipeline. Two options:
+
+**Option A (Recommended): Preprocessing approach**
+1. Parse with `Document(parsing:)` to find list items with checkboxes
+2. Replace `- [ ]` / `- [x]` markers in the raw markdown with visual Unicode characters before passing to `AttributedString(markdown:)`
+3. Use checkbox characters: unchecked = "\u{2610}" (ballot box), checked = "\u{2611}" (ballot box with check)
+4. These survive the `AttributedString(markdown:)` pipeline as regular text in list items
+
+**Option B: Post-processing approach**
+1. After `AttributedString(markdown:)` renders, scan the output for residual `[ ]` / `[x]` text patterns
+2. Replace with styled checkboxes (NSTextAttachment with SF Symbols)
+3. Risk: `AttributedString(markdown:)` may mangle the checkbox syntax unpredictably
+
+**Option C: Full hybrid rendering (like tables)**
+1. Detect task lists via `Document(parsing:)` and split the document
+2. Render task list sections separately with custom checkbox rendering
+3. Most complex, but most control over appearance
+
+**Recommendation:** Option A (preprocessing) because:
+- Minimal code change (one preprocessing function, similar to existing `preprocessImages()`)
+- Works with the existing `AttributedString(markdown:)` pipeline
+- Unicode ballot box characters render correctly in NSTextView
+- Can be enhanced later with SF Symbol attachments if Unicode rendering is insufficient
+
+**What this means for the stack:**
+- No new SPM dependency
+- Leverages existing swift-markdown dependency (already used for table extraction)
+- One new preprocessing function in `MarkdownRenderer`
+- Uses `Document(parsing:)` which is already imported and used
+
+**Confidence:** HIGH -- `ListItem.checkbox` API verified directly from swift-markdown source code in the project's own build cache. The `tasklist` cmark extension is always enabled. Unicode ballot box characters are well-supported in macOS text rendering.
+
+---
+
+## v1.2 Stack Summary: What to Add, What NOT to Add
+
+### Add Nothing to Dependencies
+
+All five v1.2 features can be implemented with **zero new dependencies**. The existing stack (Swift, AppKit, swift-markdown) provides everything needed:
+
+| Feature | Stack Required | New Dependencies |
+|---------|---------------|-----------------|
+| Window sizing | NSViewController.preferredContentSize | None |
+| Preview pane | view.bounds.size.width check | None |
+| Table improvements | NSTextTable percentage widths, automatic layout | None |
+| YAML front matter | Swift String/Regex processing | None |
+| Task list checkboxes | swift-markdown ListItem.checkbox + Unicode | None |
+
+### What NOT to Add and Why
+
+| Library/Tool | Why Tempting | Why NOT to Add |
+|-------------|-------------|----------------|
+| **Yams** (YAML parser) | Full YAML parsing for front matter | Overkill for display-only key-value extraction. Adds LibYAML C dependency. Defer unless structured parsing is needed. |
+| **swift-markdown-ui** (gonzalezreal) | Full GFM rendering including task lists | Targets SwiftUI Text, not NSAttributedString. Incompatible with existing NSTextView rendering pipeline. Now in maintenance mode. |
+| **MarkdownToAttributedString** (madebywindmill) | Claims task list support | Would replace the existing rendering pipeline. Too invasive for a polish milestone. |
+| **WKWebView** | Easy responsive tables via HTML/CSS | Documented Quick Look issues on Sequoia. Heavy memory footprint. Contradicts existing NSAttributedString architecture. |
+| **SwiftUI for extension** | Modern layout for responsive content | Quick Look preview extensions use NSViewController, not SwiftUI views. Would require NSHostingView bridge. Current NSTextView approach is more performant for text-heavy content. |
+
+---
+
 ## Extension Target Configuration
 
 ### Info.plist Requirements
@@ -154,17 +356,11 @@ Start with manual keyword highlighting for common languages (JavaScript, Python,
 Use Swift Package Manager (SPM). Add to Package.swift or via Xcode:
 
 ```bash
-# swift-markdown (official Apple library)
+# swift-markdown (official Apple library) -- ONLY dependency for extension
 .package(url: "https://github.com/swiftlang/swift-markdown.git", from: "0.3.0")
-
-# Alternative: Down (if performance testing shows need)
-.package(url: "https://github.com/johnxnguyen/Down.git", from: "0.11.0")
 ```
 
-**Xcode 16 considerations:**
-- SPM integration is stable; no issues reported with Quick Look extensions
-- Can mix Swift Package dependencies with Objective-C C libraries if needed (e.g., cmark)
-- Build performance: Minimal impact for markdown parsing libraries
+**v1.2 note:** No additional package dependencies needed. All five features use built-in AppKit APIs and the existing swift-markdown dependency.
 
 ## Installation & Setup
 
@@ -191,153 +387,9 @@ create-dmg --version   # Should show create-dmg version
 
 **Xcode:** Already installed (required for project). Verify Xcode 14+ for notarytool support.
 
-### Project Structure
+### v1.2 Setup
 
-```
-md-quick-look/
-├── md-quick-look/                    # Main app (installer)
-│   ├── Assets.xcassets/
-│   │   └── AppIcon.appiconset/        # v1.1: App icon from Icon Composer
-│   ├── ContentView.swift              # v1.1: Status indicator UI
-│   ├── AboutView.swift                # v1.1: Custom About window
-│   ├── SettingsView.swift             # v1.1: Preferences window
-│   └── App.swift                      # v1.1: SwiftUI App with Settings + Window scenes
-├── MarkdownPreviewExtension/          # Quick Look extension target
-│   ├── PreviewProvider.swift          # QLPreviewProvider subclass
-│   ├── MarkdownRenderer.swift         # swift-markdown parsing → NSAttributedString
-│   ├── SyntaxHighlighter.swift        # Code block highlighting
-│   └── Info.plist                     # Extension configuration
-└── Shared/                            # Code shared between app and extension
-    └── MarkdownParser.swift           # Isolated parsing logic
-```
-
-### SwiftUI App Structure (v1.1)
-
-**App.swift:** Main app entry point with Settings and custom About window
-
-```swift
-import SwiftUI
-
-@main
-struct MDQuickLookApp: App {
-    var body: some Scene {
-        // Main window with status indicator
-        WindowGroup {
-            ContentView()
-        }
-
-        // Settings window (Preferences)
-        Settings {
-            SettingsView()
-        }
-
-        // Custom About window
-        Window("About MD Quick Look", id: "about") {
-            AboutView()
-        }
-        .windowResizability(.contentSize)
-        .windowBackgroundDragBehavior(.enabled)
-        .commands {
-            // Replace default About menu item
-            CommandGroup(replacing: .appInfo) {
-                Button("About MD Quick Look") {
-                    NSApplication.shared.activate(ignoringOtherApps: true)
-                    if let url = URL(string: "mdquicklook://about") {
-                        NSWorkspace.shared.open(url)
-                    }
-                }
-            }
-        }
-    }
-}
-```
-
-**SettingsView.swift:** Preferences window with TabView
-
-```swift
-import SwiftUI
-
-struct SettingsView: View {
-    var body: some View {
-        TabView {
-            GeneralSettingsView()
-                .tabItem {
-                    Label("General", systemImage: "gearshape")
-                }
-
-            AboutSettingsView()
-                .tabItem {
-                    Label("About", systemImage: "info.circle")
-                }
-        }
-        .frame(width: 450, height: 250)
-    }
-}
-
-struct GeneralSettingsView: View {
-    @AppStorage("showFileSize") private var showFileSize = true
-    @AppStorage("truncateLimit") private var truncateLimit = 500.0
-
-    var body: some View {
-        Form {
-            Toggle("Show file size in preview", isOn: $showFileSize)
-
-            VStack(alignment: .leading) {
-                Text("Truncate files larger than:")
-                Slider(value: $truncateLimit, in: 100...1000, step: 100)
-                Text("\(Int(truncateLimit)) KB")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding()
-    }
-}
-```
-
-**AboutView.swift:** Custom About window
-
-```swift
-import SwiftUI
-
-struct AboutView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            // App icon
-            Image(nsImage: NSApplication.shared.applicationIconImage)
-                .resizable()
-                .frame(width: 128, height: 128)
-
-            // App name and version
-            Text("MD Quick Look")
-                .font(.title)
-                .fontWeight(.bold)
-
-            Text("Version 1.1.0")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-
-            // Description
-            Text("Quick Look extension for markdown files")
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-
-            // GitHub link
-            Link("View on GitHub", destination: URL(string: "https://github.com/yourusername/md-quick-look")!)
-                .font(.body)
-
-            // Credits
-            Text("Created with ❤️ by Your Name")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.top, 8)
-        }
-        .frame(width: 400, height: 400)
-        .padding()
-    }
-}
-```
+No additional tools or installations required. All APIs are available in the existing development environment.
 
 ## What NOT to Use (Anti-Stack)
 
@@ -355,6 +407,8 @@ struct AboutView: View {
 | **GitHub Actions (v1.1)** | For first-time releaser, CI/CD setup adds complexity. Manual gh CLI workflow is simpler to understand and debug. | Longer setup time, harder to troubleshoot first release |
 | **release-it / semantic-release** | Node.js automation tools designed for npm packages. Overkill for macOS app with manual versioning. Complex config. | Setup overhead, npm ecosystem assumptions don't fit macOS apps |
 | **manual DMG creation (hdiutil)** | Requires extensive scripting for background images, icon positioning, window sizing. Error-prone, time-consuming. | Brittle, hard to maintain, inconsistent results |
+| **Yams for v1.2** | Full YAML parser is overkill for front matter display. Adds C library dependency. | Bundle size increase, dependency maintenance, unnecessary complexity |
+| **swift-markdown-ui** | Maintenance mode. Targets SwiftUI, not NSTextView. Would require rewriting the renderer. | Architecture mismatch, maintenance risk |
 
 ## Code Signing & Notarization Workflow
 
@@ -415,135 +469,6 @@ gh release create v1.0.0 "YourApp 1.0.0.dmg" \
   --notes "First public release of MD Quick Look"
 ```
 
-### Troubleshooting
-
-**Notarization fails:**
-```bash
-# Get detailed status
-xcrun notarytool log <submission-id> --keychain-profile "notary-profile"
-
-# Common issues:
-# - Missing code signature: Re-export from Xcode with "Developer ID" distribution
-# - Invalid entitlements: Check both app and extension have matching entitlements
-# - Hardened runtime not enabled: Enable in Build Settings > Hardened Runtime
-```
-
-**Stapling fails:**
-```bash
-# Stapling requires successful notarization
-# Check notarization status first:
-xcrun notarytool info <submission-id> --keychain-profile "notary-profile"
-
-# Status must be "Accepted" before stapling
-```
-
-## Icon Design & Integration Workflow
-
-### 1. Design Phase
-
-**Using Figma template:**
-
-1. Open [macOS Icon Design Template](https://www.figma.com/community/file/1203739127660048027/macos-icon-design-template) in Figma
-2. Design on 1024x1024 canvas
-3. Follow Apple HIG:
-   - Rounded square shape (system applies rounding)
-   - No text (icon should be recognizable at small sizes)
-   - Simple, bold design
-   - 2-3 colors max
-   - Avoid gradients (they can look muddy at small sizes)
-
-**Design tips for markdown app:**
-- Use "M" letterform or markdown symbol (#, *, etc.)
-- Consider document metaphor (folded corner, page)
-- Test at 32x32 to verify recognizability
-
-### 2. Export Phase
-
-**From Figma:**
-- File > Export
-- Format: PNG
-- Size: 1024w × 1024h
-- Quality: Best
-
-### 3. Icon Composer Import
-
-1. Open Icon Composer
-2. Drag 1024x1024 PNG to Icon Composer
-3. Adjust Liquid Glass properties:
-   - Specular: 0.5 (subtle shine)
-   - Translucency: 0.2 (slight depth)
-   - Blur: 0.1 (soft edges)
-4. Preview in different sizes and backgrounds
-5. File > Export > Save as AppIcon.icns
-
-### 4. Xcode Integration
-
-1. Open Xcode project
-2. Navigate to Assets.xcassets
-3. Select AppIcon
-4. Drag AppIcon.icns to all size categories, OR:
-5. Click AppIcon > Attributes Inspector > Single Size
-6. Drag 1024x1024 PNG (Xcode generates all sizes)
-
-**Verify:** Build and check Dock for icon appearance
-
-### Fallback: Image2icon
-
-If Icon Composer unavailable:
-
-1. Download Image2icon from img2icnsapp.com
-2. Drag 1024x1024 PNG to Image2icon
-3. Click "Export" > Save as .icns
-4. Add to Xcode Assets.xcassets (same as above)
-
-### Fallback: No design skills
-
-**Placeholder approach for v1.0:**
-- Single letter "M" on gradient background
-- Use Icon Composer's text template feature
-- Ship with simple icon, commission designer for v1.1
-
-**Free design resources:**
-- macosicons.com - Free icon inspiration
-- SF Symbols app - Browse system icons for ideas (but don't use directly as app icon)
-
-## Distribution Checklist
-
-### Pre-release (one-time)
-
-- [ ] Apple Developer Program membership ($99/year) enrolled
-- [ ] Developer ID certificate downloaded in Xcode
-- [ ] notarytool credentials stored (`xcrun notarytool store-credentials`)
-- [ ] gh CLI installed and authenticated (`brew install gh && gh auth login`)
-- [ ] create-dmg installed (`npm install -g create-dmg`)
-- [ ] Node.js 20+ installed (`brew install node`)
-- [ ] App icon designed and added to Xcode project
-
-### Per Release
-
-- [ ] Version number updated in Xcode (MARKETING_VERSION)
-- [ ] Build number incremented (CURRENT_PROJECT_VERSION)
-- [ ] Changelog/release notes drafted
-- [ ] Archive built (Product > Archive)
-- [ ] App exported with Developer ID distribution
-- [ ] App zipped and submitted for notarization
-- [ ] Notarization succeeded (wait for "Accepted" status)
-- [ ] Notarization ticket stapled to app
-- [ ] App validated with stapler and spctl
-- [ ] DMG created from notarized app (`create-dmg YourApp.app`)
-- [ ] Git tag created (`git tag v1.0.0`)
-- [ ] Tags pushed to GitHub (`git push --tags`)
-- [ ] GitHub release created (`gh release create v1.0.0 YourApp.dmg`)
-- [ ] Release notes added to GitHub release
-- [ ] README updated with installation instructions
-
-### Post-release
-
-- [ ] Test DMG download and installation on clean Mac
-- [ ] Verify Quick Look extension loads after installation
-- [ ] Check Gatekeeper doesn't block app (notarization working)
-- [ ] Monitor GitHub issues for installation problems
-
 ## Performance Targets
 
 For instant rendering (Quick Look requirement):
@@ -554,7 +479,11 @@ For instant rendering (Quick Look requirement):
 | 50KB markdown file | <500ms | Parse on background thread, render to Main |
 | 500KB markdown file | <2s | Consider pagination or truncation |
 
-**Key optimization:** Avoid parsing entire file if > 100KB. Implement truncation with "file too large" message. Quick Look previews should feel instant.
+**v1.2 performance considerations:**
+- YAML front matter stripping adds negligible overhead (single regex match at file start)
+- Task list checkbox preprocessing adds one `Document(parsing:)` call -- already done for table detection, can be combined
+- Table percentage-width calculation is simpler than current absolute measurement (less string size computation)
+- Preview pane width detection is a single property read, zero cost
 
 ## Known Issues & Workarounds
 
@@ -587,6 +516,17 @@ For instant rendering (Quick Look requirement):
 **Issue:** Hardened Runtime required for notarization
 **Prevention:** Enable in Build Settings > Signing & Capabilities > Hardened Runtime (automatically enabled for Developer ID builds in Xcode 14+)
 
+### v1.2 Specific
+
+**Issue:** `preferredContentSize` behavior is not well-documented for Quick Look extensions
+**Mitigation:** Test on macOS 14, 15, and 26. The property is advisory; the host controls the actual window size. Do not assume a specific initial size.
+
+**Issue:** `AttributedString(markdown:)` does not support GFM task list checkboxes
+**Mitigation:** Use preprocessing to replace `- [ ]`/`- [x]` with Unicode ballot box characters before passing to `AttributedString(markdown:)`. Verify that `AttributedString(markdown:)` does not strip or mangle these characters.
+
+**Issue:** NSTextTable percentage widths with automatic layout may behave differently than fixed layout
+**Mitigation:** Test with both layout algorithms. Keep fixed layout as fallback for spacebar Quick Look (wide view) and use automatic/percentage for narrow preview pane.
+
 ## Alternatives Considered
 
 ### SwiftUI Settings vs AppKit NSPreferencePane
@@ -599,49 +539,38 @@ For instant rendering (Quick Look requirement):
 - Automatic menu item and keyboard shortcut
 - Less code, better maintainability
 
-**When to use AppKit:**
-- Never for new projects
-- Only if targeting macOS 10.15 or earlier (not this project)
+### YAML Parsing: Regex vs Yams
 
-### Icon Composer vs Image2icon vs IconGenerator
+**Recommendation:** Regex for v1.2, Yams if requirements grow
 
-**Recommendation:** Icon Composer (if available) > Image2icon > IconGenerator
+| Criterion | Regex | Yams |
+|-----------|-------|------|
+| Complexity | Low | Medium |
+| Dependencies | None | jpsim/Yams 6.2.1 (LibYAML) |
+| Handles nested YAML | No | Yes |
+| Handles multiline values | Partial | Yes |
+| Sufficient for display | Yes (95%+ of real files) | Yes (100%) |
+| Bundle size impact | None | ~500KB |
 
-**Why:**
-- Icon Composer: Apple's official tool, best quality, Liquid Glass effects
-- Image2icon: Simpler, $9.99 pro features, good fallback
-- IconGenerator: Free, open-source, basic functionality
+**When to switch to Yams:**
+- If users report front matter display issues with nested/complex YAML
+- If the project needs to conditionally render based on metadata values
+- If front matter parsing becomes a feature differentiator
 
-**When to use alternatives:**
-- Image2icon: If Icon Composer unavailable (requires macOS 15.3+)
-- IconGenerator: If budget constraint or prefer open-source
+### Task List Rendering: Preprocessing vs Post-processing vs Hybrid
 
-### gh CLI vs GitHub Actions
+**Recommendation:** Preprocessing (Option A)
 
-**Recommendation:** gh CLI for first release, GitHub Actions for mature automation
+| Approach | Complexity | Risk | Visual Quality |
+|----------|-----------|------|---------------|
+| Preprocessing (Unicode chars) | Low | Low | Good (standard ballot boxes) |
+| Post-processing (scan output) | Medium | Medium (fragile) | Better (SF Symbol attachments) |
+| Hybrid rendering (like tables) | High | Low | Best (full control) |
 
-**Why:**
-- gh CLI: Simple, manual control, easier to debug, no YAML config
-- GitHub Actions: Automated, runs on every tag push, better for frequent releases
-
-**When to use GitHub Actions:**
-- After 3-5 successful manual releases
-- When release frequency increases (weekly+)
-- When notarization workflow is proven stable
-
-### create-dmg (Node.js) vs create-dmg (Shell Script)
-
-**Recommendation:** Node.js version (sindresorhus/create-dmg)
-
-**Why:**
-- Better defaults, simpler CLI
-- Active maintenance, larger community
-- Easier installation via npm
-
-**When to use shell script version:**
-- Node.js unavailable or unwanted dependency
-- Need more granular control over DMG layout
-- Prefer bash over Node.js ecosystem
+**When to upgrade to hybrid:**
+- If Unicode ballot boxes look inconsistent across font sizes
+- If users want styled (colored) checkboxes
+- If task list nesting becomes a requirement
 
 ## Version Compatibility Matrix
 
@@ -656,6 +585,7 @@ For instant rendering (Quick Look requirement):
 | Node.js | 20+ | Latest | Required for create-dmg. Check with `node --version`. |
 | gh CLI | Any recent | Latest | Works on all modern macOS. No compatibility concerns. |
 | notarytool | Xcode 14+ | Xcode 16 | Ships with Xcode. altool deprecated Nov 2023. |
+| swift-markdown | 0.3+ | main branch | Task list checkbox support verified in source. No version bump needed. |
 
 **Deployment target:** macOS 14.0 (Sonoma)
 **App runs on:** macOS 14.0+
@@ -679,6 +609,13 @@ For instant rendering (Quick Look requirement):
 - [Notarizing macOS Software](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution) - Notarization guide
 - [Signing Mac Software with Developer ID](https://developer.apple.com/developer-id/) - Code signing overview
 
+**v1.2 (Rendering Polish):**
+- [NSViewController.preferredContentSize](https://developer.apple.com/documentation/appkit/nsviewcontroller/preferredcontentsize) - Window sizing
+- [NSTextTable](https://developer.apple.com/documentation/appkit/nstexttable) - Table layout
+- [NSTextTable.LayoutAlgorithm](https://developer.apple.com/documentation/appkit/nstexttable/layoutalgorithm) - Layout algorithm options
+- [NSTextBlock.setContentWidth(_:type:)](https://developer.apple.com/documentation/appkit/nstextblock/setcontentwidth(_:type:)) - Width types (absolute/percentage)
+- [Using Text Tables](https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/TextLayout/Articles/TextTables.html) - Apple archive guide
+
 ### Community References
 
 **v1.0 (Quick Look Extension):**
@@ -691,14 +628,12 @@ For instant rendering (Quick Look requirement):
 - [Presenting Preferences Window](https://serialcoder.dev/text-tutorials/macos-tutorials/presenting-the-preferences-window-on-macos-using-swiftui/) - Settings scene tutorial
 - [SwiftUI on macOS: Settings and About](https://eclecticlight.co/2024/04/30/swiftui-on-macos-settings-defaults-and-about/) - Comprehensive guide
 - [create-dmg by sindresorhus](https://github.com/sindresorhus/create-dmg) - DMG creation tool
-- [Image2icon](https://img2icnsapp.com/) - Icon converter tool
-- [IconGenerator](https://github.com/onmyway133/IconGenerator) - Open-source icon generator
 
-### Figma Resources
-
-- [macOS Icon Design Template](https://www.figma.com/community/file/1203739127660048027/macos-icon-design-template) - Community icon template
-- [Official macOS App Icon Template](https://www.figma.com/community/file/1040708197994685442/official-macos-app-icon-template) - Apple-style template
-- [macOS 26 UI Kit](https://www.figma.com/community/file/1543337041090580818/macos-26) - Official macOS 26 components
+**v1.2 (Rendering Polish):**
+- [swift-markdown ListItem.checkbox source](https://github.com/swiftlang/swift-markdown/blob/main/Sources/Markdown/Block%20Nodes/Block%20Container%20Blocks/ListItem.swift) - Task list API
+- [YAML Front Matter in swift-markdown (Issue #73)](https://github.com/swiftlang/swift-markdown/issues/73) - Confirmed not supported; DIY recommended
+- [Yams YAML Parser](https://github.com/jpsim/Yams) - If full YAML parsing needed later (v6.2.1)
+- [Setting preferredContentSize in QL extension](https://developer.apple.com/forums/thread/673369) - Known Catalina bug (fixed in Big Sur+)
 
 ## Sources
 
@@ -710,13 +645,6 @@ For instant rendering (Quick Look requirement):
 - [Down - Markdown/CommonMark rendering in Swift - GitHub](https://github.com/johnxnguyen/Down)
 - [Sequoia No Longer Supports QuickLook Generator Plug-ins](https://mjtsai.com/blog/2024/11/05/sequoia-no-longer-supports-quicklook-generator-plug-ins/)
 - [How Sequoia has changed QuickLook and its thumbnails - The Eclectic Light Company](https://eclecticlight.co/2024/10/31/how-sequoia-has-changed-quicklook-and-its-thumbnails/)
-- [QLMarkdown - Quick Look extension for Markdown on GitHub](https://github.com/sbarex/QLMarkdown)
-- [PreviewMarkdown - Quick Look Markdown preview on GitHub](https://github.com/smittytone/PreviewMarkdown)
-- [SourceCodeSyntaxHighlight - Quick Look extension on GitHub](https://github.com/sbarex/SourceCodeSyntaxHighlight)
-- [Adding Swift package dependencies in Xcode - Hacking with Swift](https://www.hackingwithswift.com/books/ios-swiftui/adding-swift-package-dependencies-in-xcode)
-- [Swift Markdown UI - GitHub](https://github.com/gonzalezreal/swift-markdown-ui)
-- [Using QuickLook in SwiftUI - Daniel Saidi](https://danielsaidi.com/blog/2022/06/27/using-quicklook-with-swiftui)
-- [Splash - Swift syntax highlighter - GitHub](https://github.com/JohnSundell/Splash)
 
 ### v1.1 Sources (App Polish & GitHub Release)
 
@@ -724,21 +652,31 @@ For instant rendering (Quick Look requirement):
 - [Icon Composer - Apple Developer](https://developer.apple.com/icon-composer/)
 - [Custom About Window in SwiftUI](https://nilcoalescing.com/blog/FullyCustomAboutWindowForAMacAppInSwiftUI/)
 - [Presenting Preferences Window in SwiftUI](https://serialcoder.dev/text-tutorials/macos-tutorials/presenting-the-preferences-window-on-macos-using-swiftui/)
-- [SwiftUI on macOS: Settings, Defaults and About](https://eclecticlight.co/2024/04/30/swiftui-on-macos-settings-defaults-and-about/)
 - [gh release create - GitHub CLI Manual](https://cli.github.com/manual/gh_release_create)
-- [gh release upload - GitHub CLI Manual](https://cli.github.com/manual/gh_release_upload)
 
 **MEDIUM Confidence:**
 - [create-dmg by sindresorhus - GitHub](https://github.com/sindresorhus/create-dmg)
-- [Image2icon - macOS Icon Converter](https://img2icnsapp.com/)
-- [IconGenerator - GitHub](https://github.com/onmyway133/IconGenerator)
 - [Figma macOS Icon Design Template](https://www.figma.com/community/file/1203739127660048027/macos-icon-design-template)
-- [Official macOS App Icon Template (Figma)](https://www.figma.com/community/file/1040708197994685442/official-macos-app-icon-template)
-- [Notarization Process for macOS Installers](https://apptimized.com/en/news/mac-notarization-process/)
-- [GitHub Actions for macOS Universal Binary](https://github.com/marketplace/actions/macos-universal-binary-action)
+
+### v1.2 Sources (Rendering Polish)
+
+**HIGH Confidence (verified from source code):**
+- swift-markdown `ListItem.checkbox` API -- verified in local build cache (`build/SourcePackages/checkouts/swift-markdown/Sources/Markdown/Block Nodes/Block Container Blocks/ListItem.swift`)
+- swift-markdown `tasklist` cmark extension always enabled -- verified in `CommonMarkConverter.swift` line 626
+- `Checkbox` enum with `.checked` / `.unchecked` cases -- verified in source
+- NSTextTable layout algorithms and percentage width types -- stable AppKit APIs since macOS 10.4
+
+**MEDIUM Confidence (documented but not Quick Look-specific):**
+- `NSViewController.preferredContentSize` -- documented for NSViewController, behavior in Quick Look host not fully documented
+- NSTextTable `.automaticLayoutAlgorithm` vs `.fixedLayoutAlgorithm` -- documented but specific behavior differences not well explained in Apple docs
+
+**LOW Confidence (needs validation during implementation):**
+- `AttributedString(markdown:)` handling of `- [ ]` / `- [x]` syntax -- not documented whether it strips, passes through, or mangles checkbox markers. Needs empirical testing.
+- Preview pane width thresholds -- no documentation on typical Finder preview pane widths. Needs testing on different screen sizes and Finder configurations.
 
 ---
 
-*Last updated: 2026-02-02*
+*Last updated: 2026-02-05*
 *v1.0 stack: Quick Look extension rendering (Jan 2026)*
 *v1.1 additions: App polish + GitHub release automation (Feb 2026)*
+*v1.2 additions: Rendering polish + new markdown features (Feb 2026)*
