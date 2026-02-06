@@ -81,34 +81,34 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LAYOUT-01 | TBD | Pending |
-| LAYOUT-02 | TBD | Pending |
-| LAYOUT-03 | TBD | Pending |
-| LAYOUT-04 | TBD | Pending |
-| LAYOUT-05 | TBD | Pending |
-| TABLE-01 | TBD | Pending |
-| TABLE-02 | TBD | Pending |
-| TABLE-03 | TBD | Pending |
-| TABLE-04 | TBD | Pending |
-| TABLE-05 | TBD | Pending |
-| YAML-01 | TBD | Pending |
-| YAML-02 | TBD | Pending |
-| YAML-03 | TBD | Pending |
-| YAML-04 | TBD | Pending |
-| YAML-05 | TBD | Pending |
-| YAML-06 | TBD | Pending |
-| TASK-01 | TBD | Pending |
-| TASK-02 | TBD | Pending |
-| TASK-03 | TBD | Pending |
-| TASK-04 | TBD | Pending |
-| TASK-05 | TBD | Pending |
-| TASK-06 | TBD | Pending |
+| YAML-01 | Phase 11 | Pending |
+| YAML-02 | Phase 11 | Pending |
+| YAML-03 | Phase 11 | Pending |
+| YAML-04 | Phase 11 | Pending |
+| YAML-05 | Phase 11 | Pending |
+| YAML-06 | Phase 11 | Pending |
+| LAYOUT-01 | Phase 12 | Pending |
+| LAYOUT-02 | Phase 12 | Pending |
+| LAYOUT-03 | Phase 12 | Pending |
+| LAYOUT-04 | Phase 12 | Pending |
+| TABLE-01 | Phase 13 | Pending |
+| TABLE-02 | Phase 13 | Pending |
+| TABLE-03 | Phase 13 | Pending |
+| TABLE-04 | Phase 13 | Pending |
+| TABLE-05 | Phase 13 | Pending |
+| TASK-01 | Phase 14 | Pending |
+| TASK-02 | Phase 14 | Pending |
+| TASK-03 | Phase 14 | Pending |
+| TASK-04 | Phase 14 | Pending |
+| TASK-05 | Phase 14 | Pending |
+| TASK-06 | Phase 14 | Pending |
+| LAYOUT-05 | Phase 15 | Pending |
 
 **Coverage:**
-- v1.2 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18
+- v1.2 requirements: 22 total
+- Mapped to phases: 22
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-05 after initial definition*
+*Last updated: 2026-02-05 after roadmap creation*

@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements for v1.2
+Phase: 11 of 15 (YAML Front Matter)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
 Progress: [░░░░░░░░░░] 0%
 
-Last activity: 2026-02-05 — Milestone v1.2 started
+Last activity: 2026-02-05 — Roadmap created for v1.2 milestone (Phases 11-15)
 
 ## Performance Metrics
 
@@ -30,7 +30,7 @@ Last activity: 2026-02-05 — Milestone v1.2 started
 
 **Combined:**
 - Total plans: 44 across 10 phases
-- Timeline: 18 days (2026-01-19 → 2026-02-05)
+- Timeline: 18 days (2026-01-19 -> 2026-02-05)
 
 ## Accumulated Context
 
@@ -49,10 +49,10 @@ None
 ## Session Continuity
 
 Last session: 2026-02-05
-Stopped at: Milestone v1.2 started — entering research
-Resume action: /gsd:new-milestone (continue research → requirements → roadmap)
-Resume file: .planning/PROJECT.md
-Notes: v1.2 scope: window sizing, preview pane, table small spaces, YAML front matter, task list checkboxes.
+Stopped at: Roadmap created for v1.2 — 5 phases (11-15), 22 requirements mapped
+Resume action: /gsd:plan-phase 11
+Resume file: .planning/ROADMAP.md
+Notes: Phase 11 (YAML Front Matter) is first because front matter stripping affects all downstream source ranges. Phase 12 (Layout) must precede Phase 13 (Tables) because tables need availableWidth.
 
 ---
 
