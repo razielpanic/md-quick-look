@@ -850,6 +850,17 @@ class MarkdownRenderer {
 
         let result = NSMutableAttributedString()
 
+        // Add top spacer inside the front matter content for visual padding
+        let spacerStyle = NSMutableParagraphStyle()
+        spacerStyle.paragraphSpacing = 0
+        spacerStyle.paragraphSpacingBefore = 0
+        spacerStyle.minimumLineHeight = 8
+        spacerStyle.maximumLineHeight = 8
+        result.append(NSAttributedString(string: "\n", attributes: [
+            .font: NSFont.systemFont(ofSize: 1),
+            .paragraphStyle: spacerStyle
+        ]))
+
         // Key styling: bold, 12pt, primary label color
         let keyFont = NSFont.boldSystemFont(ofSize: 12)
         let keyAttributes: [NSAttributedString.Key: Any] = [
@@ -871,6 +882,7 @@ class MarkdownRenderer {
         paragraphStyle.tailIndent = -20
         paragraphStyle.paragraphSpacing = 4
         paragraphStyle.paragraphSpacingBefore = 4
+        paragraphStyle.lineBreakMode = .byTruncatingTail
 
         // Multi-column layout for 4+ pairs
         let useMultiColumn = frontMatter.count >= 4
@@ -930,7 +942,7 @@ class MarkdownRenderer {
         let fullRange = NSRange(location: 0, length: result.length)
         result.addAttribute(.paragraphStyle, value: paragraphStyle, range: fullRange)
 
-        // Apply front matter marker for background drawing
+        // Apply front matter marker for background drawing (including spacer)
         result.addAttribute(.frontMatterMarker, value: true, range: fullRange)
 
         // Add separator newline after front matter

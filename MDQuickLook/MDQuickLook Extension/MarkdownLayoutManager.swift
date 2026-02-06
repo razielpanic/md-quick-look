@@ -173,7 +173,7 @@ class MarkdownLayoutManager: NSLayoutManager {
             guard !unionRect.isNull else { return }
 
             // Draw rounded background with insets and vertical padding
-            let verticalPadding: CGFloat = 6
+            let verticalPadding: CGFloat = 12
             let bgRect = NSRect(x: origin.x + 6,
                                y: origin.y + unionRect.minY - verticalPadding,
                                width: textContainer.containerSize.width - 12,
