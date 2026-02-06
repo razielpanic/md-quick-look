@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 12 of 15 (Layout & Sizing)
-Plan: Not started
-Status: Ready to plan
+Plan: 01 of 02 in phase
+Status: In progress
 Progress: [██░░░░░░░░] 20%
 
-Last activity: 2026-02-06 — Phase 11 (YAML Front Matter) complete, verified 5/5 must-haves
+Last activity: 2026-02-06 — Completed 12-01-PLAN.md (width-tier aware rendering)
 
 ## Performance Metrics
 
@@ -51,10 +51,10 @@ None
 ## Session Continuity
 
 Last session: 2026-02-06
-Stopped at: Phase 11 complete, ready for Phase 12
-Resume action: Plan Phase 12 (Layout & Sizing)
+Stopped at: Completed 12-01-PLAN.md
+Resume action: Continue to 12-02 (View Controller Integration)
 Resume file: None
-Notes: YAML front matter fully verified and shipped. Dark mode color consistency captured as todo.
+Notes: Width-tier aware rendering complete. MarkdownRenderer and TableRenderer now accept widthTier parameter and produce tier-specific output. Ready for view controller wiring.
 
 ---
 
