@@ -63,11 +63,11 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-02-07 (roadmap creation)
-Stopped at: v1.3 roadmap created, ready for Phase 16 planning
+Last session: 2026-02-07T23:13:29Z
+Stopped at: v1.3 milestone initialized — roadmap approved, no phase work started
 Resume action: `/gsd:plan-phase 16`
 Resume file: None
-Notes: Phase numbering continues from 16.
+Notes: v1.2 completed and archived. v1.3 has 2 phases (16: rendering polish, 17: about window). Remote is now SSH (switched from broken HTTPS). All commits pushed to GitHub including v1.2 tag.
 
 ---
 
