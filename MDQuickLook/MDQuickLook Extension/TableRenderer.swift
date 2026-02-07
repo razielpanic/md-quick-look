@@ -62,7 +62,7 @@ class TableRenderer {
 
         os_log("TableRenderer: Rendering table with %d columns (measured widths: %@, total: %.1fpt)", log: .tableRenderer, type: .debug, columnCount, columnWidths.map { String(format: "%.1f", $0) }.joined(separator: ", "), totalWidth)
 
-        // Render header row (row 0)
+        // Render header row (row 0) - headers always truncate
         for (colIndex, headerContent) in table.headerCells.enumerated() {
             let alignment = table.columnAlignments[safe: colIndex] ?? nil
             let cellString = renderCell(
@@ -72,13 +72,17 @@ class TableRenderer {
                 content: headerContent,
                 isHeader: true,
                 alignment: alignment,
-                columnWidths: columnWidths
+                columnWidths: columnWidths,
+                shouldWrap: false
             )
             result.append(cellString)
         }
 
-        // Render body rows starting at row 1
+        // Render body rows starting at row 1 with smart wrap/truncate decision per row
         for (rowIndex, rowCells) in table.bodyRows.enumerated() {
+            let rowFont = NSFont.systemFont(ofSize: bodyFontSize)
+            let wrap = shouldWrapRow(cells: rowCells, columnWidths: columnWidths, font: rowFont)
+
             for (colIndex, cellContent) in rowCells.enumerated() {
                 let alignment = table.columnAlignments[safe: colIndex] ?? nil
                 let cellString = renderCell(
@@ -88,7 +92,8 @@ class TableRenderer {
                     content: cellContent,
                     isHeader: false,
                     alignment: alignment,
-                    columnWidths: columnWidths
+                    columnWidths: columnWidths,
+                    shouldWrap: wrap
                 )
                 result.append(cellString)
             }
@@ -101,6 +106,41 @@ class TableRenderer {
     }
 
     // MARK: - Private Helpers
+
+    /// Determines if a row should use wrapping instead of truncation.
+    /// Wrapping activates only when >50% of cells in the row would overflow their column width.
+    private func shouldWrapRow(cells: [String], columnWidths: [CGFloat], font: NSFont) -> Bool {
+        guard cells.count > 1 else { return false }
+
+        var overflowCount = 0
+        for (index, content) in cells.enumerated() {
+            guard index < columnWidths.count else { continue }
+            let cellWidth = columnWidths[index]
+            let padding = widthTier == .narrow ? 4.0 : 12.0
+            let availableTextWidth = cellWidth - padding
+
+            let textWidth = (content as NSString).size(withAttributes: [.font: font]).width
+            if textWidth > availableTextWidth {
+                overflowCount += 1
+            }
+        }
+
+        let shouldWrap = Double(overflowCount) / Double(cells.count) > 0.5
+        os_log("TableRenderer: Row wrap decision: %{public}s (%d/%d cells overflow)", log: .tableRenderer, type: .debug, shouldWrap ? "wrap" : "truncate", overflowCount, cells.count)
+        return shouldWrap
+    }
+
+    /// Checks if a string is likely an unbreakable token (URL, file path, long identifier).
+    private func isUnbreakableString(_ content: String) -> Bool {
+        let trimmed = content.trimmingCharacters(in: .whitespaces)
+        if trimmed.contains("://") || trimmed.hasPrefix("/") || trimmed.hasPrefix("~") {
+            return true
+        }
+        if trimmed.count > 20 && !trimmed.contains(" ") {
+            return true
+        }
+        return false
+    }
 
     /// Measures actual rendered text widths for each column
     /// - Parameters:
@@ -236,7 +276,8 @@ class TableRenderer {
         content: String,
         isHeader: Bool,
         alignment: Table.ColumnAlignment?,
-        columnWidths: [CGFloat]
+        columnWidths: [CGFloat],
+        shouldWrap: Bool = false
     ) -> NSAttributedString {
         // Create NSTextTableBlock for this cell
         let block = NSTextTableBlock(
@@ -278,12 +319,16 @@ class TableRenderer {
             paragraphStyle.alignment = .right
         }
 
-        // Use truncation with ellipsis for long content
-        // Content-based column widths prevent huge tables while ellipsis handles overflow
-        paragraphStyle.lineBreakMode = .byTruncatingTail
+        // Smart wrap/truncate decision
+        // Headers always truncate, unbreakable strings always truncate, otherwise use row-level decision
+        if isHeader || !shouldWrap || isUnbreakableString(content) {
+            paragraphStyle.lineBreakMode = .byTruncatingTail
+        } else {
+            paragraphStyle.lineBreakMode = .byWordWrapping
+        }
 
         // Handle empty cells: show middot indicator with subtle color, no background
-        let displayText: String
+        var displayText: String
         let foregroundColor: NSColor
 
         if content.isEmpty {
@@ -292,6 +337,20 @@ class TableRenderer {
         } else {
             displayText = content
             foregroundColor = NSColor.labelColor
+        }
+
+        // Apply 3-line cap for wrapped cells
+        // Manual content truncation ensures no cell exceeds 3 lines
+        if shouldWrap && !isHeader && !isUnbreakableString(content) && !content.isEmpty {
+            let availableTextWidth = (columnWidths[safe: column] ?? 100) - (widthTier == .narrow ? 4.0 : 12.0)
+            let font = isHeader ? NSFont.boldSystemFont(ofSize: bodyFontSize) : NSFont.systemFont(ofSize: bodyFontSize)
+            let avgCharWidth = ("M" as NSString).size(withAttributes: [.font: font]).width
+            let charsPerLine = max(1, Int(availableTextWidth / avgCharWidth))
+            let maxChars = charsPerLine * 3
+
+            if content.count > maxChars {
+                displayText = String(content.prefix(maxChars)) + "\u{2026}"
+            }
         }
 
         // Build attributes
