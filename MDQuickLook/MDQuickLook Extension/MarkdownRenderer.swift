@@ -123,11 +123,14 @@ class MarkdownRenderer {
         // Apply block-level styles by examining PresentationIntent
         applyBlockStyles(from: withNewlines, to: nsAttributedString)
 
-        // Insert list prefixes (bullets and numbers)
-        insertListPrefixes(from: withNewlines, to: nsAttributedString)
-
-        // Apply inline styles
+        // Apply inline styles BEFORE list prefixes (insertListPrefixes shifts character
+        // positions, which would invalidate the ranges from the original AttributedString)
         applyInlineStyles(from: withNewlines, to: nsAttributedString)
+
+        // Insert list prefixes (bullets and numbers) — must come after applyInlineStyles
+        // because it inserts characters, and NSMutableAttributedString shifts existing
+        // attributes correctly when characters are inserted
+        insertListPrefixes(from: withNewlines, to: nsAttributedString)
 
         // Apply link styling
         applyLinkStyles(to: nsAttributedString)
@@ -358,8 +361,8 @@ class MarkdownRenderer {
         let nsAttributedString = NSMutableAttributedString(withNewlines)
 
         applyBlockStyles(from: withNewlines, to: nsAttributedString)
-        insertListPrefixes(from: withNewlines, to: nsAttributedString)
         applyInlineStyles(from: withNewlines, to: nsAttributedString)
+        insertListPrefixes(from: withNewlines, to: nsAttributedString)
         applyLinkStyles(to: nsAttributedString)
         applyImagePlaceholderStyles(to: nsAttributedString)
         applyBaseStyles(to: nsAttributedString)
@@ -974,13 +977,11 @@ class MarkdownRenderer {
 
         if useMultiColumn {
             // Two-column layout with tab stops:
-            // Tab 1 (120pt): first column value
-            // Tab 2 (280pt): second column key
-            // Tab 3 (400pt): second column value
+            // Tightened to maximize value space — widest key ~85pt at 12pt bold
             paragraphStyle.tabStops = [
-                NSTextTab(textAlignment: .left, location: 120),  // First value column
-                NSTextTab(textAlignment: .left, location: 280),  // Second key column
-                NSTextTab(textAlignment: .left, location: 400)   // Second value column
+                NSTextTab(textAlignment: .left, location: 95),   // First value column
+                NSTextTab(textAlignment: .left, location: 235),  // Second key column
+                NSTextTab(textAlignment: .left, location: 330)   // Second value column
             ]
 
             // Process pairs two at a time
@@ -1009,7 +1010,7 @@ class MarkdownRenderer {
             }
         } else {
             // Single-column layout (tier-aware tab stop)
-            let tabLocation: CGFloat = widthTier == .narrow ? 80 : 120
+            let tabLocation: CGFloat = widthTier == .narrow ? 80 : 95
             paragraphStyle.tabStops = [
                 NSTextTab(textAlignment: .left, location: tabLocation)  // Value column
             ]
