@@ -55,7 +55,10 @@ Plans:
   2. Column min/max widths scale proportionally so narrow contexts show balanced columns, not one giant column and one crushed column
   3. A compact table mode activates at very narrow widths with smaller font and reduced padding to maximize data visibility
   4. Tables in the Finder preview pane are readable -- all cell content visible, no silent clipping of text
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 13-01-PLAN.md -- Available-width pipeline, content-proportional column sizing, compact mode
+- [ ] 13-02-PLAN.md -- Smart wrap/truncate hybrid, table spacing, build verification
 
 ### Phase 14: Task List Checkboxes
 **Goal**: GFM task list items render as visual checkboxes that match native macOS appearance
