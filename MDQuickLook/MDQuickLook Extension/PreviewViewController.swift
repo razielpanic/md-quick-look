@@ -17,6 +17,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
     private var textView: NSTextView?
     private var textStorage: NSTextStorage?
     private var mdLayoutManager: MarkdownLayoutManager?
+    private var availableContentWidth: CGFloat = 640
 
     override func loadView() {
         // Create a simple view to hold the text view
@@ -79,23 +80,12 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             // Store markdown content for re-rendering
             self.markdownContent = markdownContent
 
-            // Render markdown with custom MarkdownRenderer and initial tier
-            let renderer = MarkdownRenderer()
-            let styledContent = renderer.render(markdown: markdownContent, widthTier: initialTier)
-            os_log("MarkdownRenderer completed styling with %{public}s tier", log: .quicklook, type: .info,
-                   initialTier == .narrow ? "narrow" : "normal")
-
-            // Create scroll view
+            // Create scroll view first to calculate available content width
             let scrollView = NSScrollView(frame: view.bounds)
             scrollView.autoresizingMask = [.width, .height]
             scrollView.hasVerticalScroller = true
             scrollView.hasHorizontalScroller = false
             scrollView.borderType = .noBorder
-
-            // Create custom text stack for blockquote border rendering
-            let textStorage = NSTextStorage()
-            let layoutManager = MarkdownLayoutManager()  // Custom layout manager
-            layoutManager.widthTier = initialTier  // Set initial tier
 
             // Calculate initial inset width for text container
             let insetWidth: CGFloat = initialTier == .narrow ? 12 : 40
@@ -103,6 +93,22 @@ class PreviewViewController: NSViewController, QLPreviewingController {
                 width: scrollView.contentSize.width - insetWidth,
                 height: CGFloat.greatestFiniteMagnitude
             ))
+
+            // Calculate available content width for renderer
+            let calculatedAvailableWidth = textContainer.size.width
+            self.availableContentWidth = calculatedAvailableWidth
+
+            // Render markdown with custom MarkdownRenderer and initial tier
+            let renderer = MarkdownRenderer()
+            let styledContent = renderer.render(markdown: markdownContent, widthTier: initialTier, availableWidth: calculatedAvailableWidth)
+            os_log("MarkdownRenderer completed styling with %{public}s tier, availableWidth: %.1f", log: .quicklook, type: .info,
+                   initialTier == .narrow ? "narrow" : "normal", calculatedAvailableWidth)
+
+            // Create custom text stack for blockquote border rendering
+            let textStorage = NSTextStorage()
+            let layoutManager = MarkdownLayoutManager()  // Custom layout manager
+            layoutManager.widthTier = initialTier  // Set initial tier
+
             textContainer.widthTracksTextView = true
             textContainer.heightTracksTextView = false  // Allow infinite height for scrolling
 
@@ -227,9 +233,14 @@ class PreviewViewController: NSViewController, QLPreviewingController {
         // Update insets first
         updateInsetsForWidth(view.bounds.width, tier: tier)
 
-        // Re-render with new tier
+        // Recalculate available content width from current text view state
+        if let textContainer = textView.textContainer {
+            availableContentWidth = textContainer.size.width
+        }
+
+        // Re-render with new tier and available width
         let renderer = MarkdownRenderer()
-        let styledContent = renderer.render(markdown: markdownContent, widthTier: tier)
+        let styledContent = renderer.render(markdown: markdownContent, widthTier: tier, availableWidth: availableContentWidth)
         textStorage.setAttributedString(styledContent)
 
         // Force layout
@@ -237,7 +248,7 @@ class PreviewViewController: NSViewController, QLPreviewingController {
             layoutManager.ensureLayout(forCharacterRange: NSRange(location: 0, length: textStorage.length))
         }
 
-        os_log("Content regenerated for %{public}s tier", log: .quicklook, type: .info,
-               tier == .narrow ? "narrow" : "normal")
+        os_log("Content regenerated for %{public}s tier, availableWidth: %.1f", log: .quicklook, type: .info,
+               tier == .narrow ? "narrow" : "normal", availableContentWidth)
     }
 }

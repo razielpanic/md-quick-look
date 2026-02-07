@@ -41,6 +41,7 @@ class MarkdownRenderer {
     // MARK: - Width Tier Awareness
 
     private var widthTier: WidthTier = .normal
+    private var availableWidth: CGFloat = 640
 
     private var currentHeadingSizes: [Int: CGFloat] {
         switch widthTier {
@@ -74,10 +75,12 @@ class MarkdownRenderer {
     /// - Parameters:
     ///   - markdown: The markdown content to render
     ///   - widthTier: The width tier for adaptive rendering (default: .normal)
+    ///   - availableWidth: The available container width in points (default: 640)
     /// - Returns: NSAttributedString with visual styling applied
-    func render(markdown: String, widthTier: WidthTier = .normal) -> NSAttributedString {
+    func render(markdown: String, widthTier: WidthTier = .normal, availableWidth: CGFloat = 640) -> NSAttributedString {
         self.widthTier = widthTier
-        os_log("MarkdownRenderer: Starting render, input length: %d", log: .renderer, type: .info, markdown.count)
+        self.availableWidth = availableWidth
+        os_log("MarkdownRenderer: Starting render, input length: %d, availableWidth: %.1f", log: .renderer, type: .info, markdown.count, availableWidth)
 
         // Extract YAML front matter FIRST (before any other preprocessing)
         let (frontMatter, bodyMarkdown) = extractYAMLFrontMatter(from: markdown)
@@ -220,7 +223,7 @@ class MarkdownRenderer {
         let lines = markdown.split(separator: "\n", omittingEmptySubsequences: false)
         var currentLine = 1
 
-        let tableRenderer = TableRenderer(widthTier: widthTier)
+        let tableRenderer = TableRenderer(widthTier: widthTier, availableWidth: availableWidth)
 
         for table in tables {
             guard let sourceRange = table.sourceRange else { continue }
@@ -302,7 +305,7 @@ class MarkdownRenderer {
 
         // Replace placeholders with rendered tables
         let result = NSMutableAttributedString(attributedString: renderedWithPlaceholders)
-        let tableRenderer = TableRenderer(widthTier: widthTier)
+        let tableRenderer = TableRenderer(widthTier: widthTier, availableWidth: availableWidth)
 
         for (placeholder, table) in placeholderMap {
             let fullRange = NSRange(location: 0, length: result.length)

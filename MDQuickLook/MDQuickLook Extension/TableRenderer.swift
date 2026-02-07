@@ -11,15 +11,19 @@ extension OSLog {
 class TableRenderer {
 
     var widthTier: WidthTier = .normal
+    var availableWidth: CGFloat = 640
 
     private var bodyFontSize: CGFloat {
         widthTier == .narrow ? 12.0 : 14.0
     }
 
-    /// Initializes TableRenderer with width tier
-    /// - Parameter widthTier: The width tier for adaptive rendering (default: .normal)
-    init(widthTier: WidthTier = .normal) {
+    /// Initializes TableRenderer with width tier and available width
+    /// - Parameters:
+    ///   - widthTier: The width tier for adaptive rendering (default: .normal)
+    ///   - availableWidth: The available container width in points (default: 640)
+    init(widthTier: WidthTier = .normal, availableWidth: CGFloat = 640) {
         self.widthTier = widthTier
+        self.availableWidth = availableWidth
     }
 
     /// Renders an extracted table to NSAttributedString with proper cell structure and styling
