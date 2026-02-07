@@ -102,6 +102,15 @@ class TableRenderer {
         let totalCells = table.headerCells.count + table.bodyRows.flatMap { $0 }.count
         os_log("TableRenderer: Render complete, %d cells", log: .tableRenderer, type: .info, totalCells)
 
+        // Add spacing after table to separate from subsequent content
+        let spacingStyle = NSMutableParagraphStyle()
+        spacingStyle.paragraphSpacing = widthTier == .narrow ? 6 : 12
+        spacingStyle.paragraphSpacingBefore = 0
+        result.append(NSAttributedString(string: "\n", attributes: [
+            .paragraphStyle: spacingStyle,
+            .font: NSFont.systemFont(ofSize: 1)
+        ]))
+
         return result
     }
 
