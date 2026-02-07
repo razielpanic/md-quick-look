@@ -2,7 +2,7 @@
 
 **Status:** In Progress
 **Phases:** 11-15
-**Total Plans:** TBD
+**Total Plans:** 9
 
 ## Overview
 
@@ -82,7 +82,10 @@ Plans:
   2. The same file renders correctly in Finder column view preview pane (narrow context) with scaled fonts, responsive tables, and properly sized checkboxes
   3. The same file renders correctly in fullscreen Quick Look with appropriate use of available space
   4. Switching between contexts (e.g., spacebar then fullscreen) does not produce layout artifacts or stale rendering
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 15-01-PLAN.md -- Snapshot test infrastructure, test target setup, comprehensive test file
+- [ ] 15-02-PLAN.md -- Record baselines, visual defect review, rendering fixes, verification
 
 ## Progress
 
@@ -94,4 +97,4 @@ Plans:
 | 12. Layout & Sizing | v1.2 | 2/2 | Complete | 2026-02-06 |
 | 13. Table Rendering | v1.2 | 2/2 | Complete | 2026-02-07 |
 | 14. Task List Checkboxes | v1.2 | 1/1 | Complete | 2026-02-07 |
-| 15. Cross-Context Integration | v1.2 | 0/TBD | Not started | - |
+| 15. Cross-Context Integration | v1.2 | 0/2 | Not started | - |
