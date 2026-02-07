@@ -65,18 +65,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DARK-01 | - | Pending |
-| TYPO-01 | - | Pending |
-| TYPO-02 | - | Pending |
-| VIS-01 | - | Pending |
-| ABOUT-01 | - | Pending |
-| ABOUT-02 | - | Pending |
+| DARK-01 | Phase 16 | Pending |
+| TYPO-01 | Phase 16 | Pending |
+| TYPO-02 | Phase 16 | Pending |
+| VIS-01 | Phase 16 | Pending |
+| ABOUT-01 | Phase 17 | Pending |
+| ABOUT-02 | Phase 17 | Pending |
 
 **Coverage:**
 - v1.3 requirements: 6 total
-- Mapped to phases: 0
-- Unmapped: 6
+- Mapped to phases: 6
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-07*
-*Last updated: 2026-02-07 after initial definition*
+*Last updated: 2026-02-07 after roadmap creation*
