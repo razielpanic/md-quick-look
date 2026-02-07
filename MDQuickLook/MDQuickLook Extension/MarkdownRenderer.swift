@@ -440,8 +440,9 @@ class MarkdownRenderer {
                 // Only insert newline if it's truly a different block
                 // If both runs have the same list item ordinal, they're part of the same item
                 if currentListItemOrdinal != nil && previousListItemOrdinal != nil {
-                    // Both are list items - only insert if different ordinal
-                    if differentListItem {
+                    // Both are list items - insert if different ordinal OR different block identity
+                    // (different identity catches nesting transitions where ordinals can match)
+                    if differentListItem || differentIdentity {
                         insertionOffsets.append(run.range.lowerBound)
                     }
                 } else {
@@ -532,25 +533,40 @@ class MarkdownRenderer {
         }
 
         var listItems: [ListItemInfo] = []
-        var lastProcessedOrdinal: Int?
+        var lastProcessedKey: String?
 
         // Scan for list items
         for run in attributedString.runs {
             guard let intent = run.presentationIntent else { continue }
 
             // Check if this run contains a list item
+            // Only capture the FIRST (innermost) ordinal and list identity
+            // Components are ordered innermost-to-outermost, so outer list
+            // values would overwrite inner ones if we don't guard
             var isOrderedList = false
             var isUnorderedList = false
             var ordinal: Int?
+            var listIdentity: Int = 0
+            var foundList = false
 
             for component in intent.components {
                 switch component.kind {
                 case .orderedList:
-                    isOrderedList = true
+                    if !foundList {
+                        isOrderedList = true
+                        listIdentity = component.identity
+                        foundList = true
+                    }
                 case .unorderedList:
-                    isUnorderedList = true
+                    if !foundList {
+                        isUnorderedList = true
+                        listIdentity = component.identity
+                        foundList = true
+                    }
                 case .listItem(ordinal: let itemOrdinal):
-                    ordinal = itemOrdinal
+                    if ordinal == nil {
+                        ordinal = itemOrdinal
+                    }
                 default:
                     break
                 }
@@ -558,9 +574,11 @@ class MarkdownRenderer {
 
             // If we found a list item, determine the prefix
             // Only insert prefix for FIRST run of each list item
-            // Subsequent runs with same ordinal are inline formatting within the item
+            // Use list identity + ordinal as key to distinguish nested lists
+            // (nested items can share ordinals with parent items)
             if let ordinal = ordinal {
-                if ordinal != lastProcessedOrdinal {
+                let key = "\(listIdentity)-\(ordinal)"
+                if key != lastProcessedKey {
                     let nsRange = NSRange(run.range, in: attributedString)
                     let prefix: String
 
@@ -574,7 +592,7 @@ class MarkdownRenderer {
                     }
 
                     listItems.append(ListItemInfo(range: nsRange, prefix: prefix))
-                    lastProcessedOrdinal = ordinal
+                    lastProcessedKey = key
 
                     os_log("MarkdownRenderer: Found list item (ordinal: %d, ordered: %d, prefix: %{public}s)",
                            log: .renderer, type: .debug, ordinal, isOrderedList ? 1 : 0, prefix)
@@ -1274,33 +1292,41 @@ class MarkdownRenderer {
             let attachment = checkboxAttachment(checked: isChecked, fontSize: currentBodyFontSize)
             let checkboxString = NSMutableAttributedString(attachment: attachment)
 
-            // Add tight gap (2-3pt) after checkbox using kern
+            // Build adjusted paragraph style for task items
+            // Wider headIndent accounts for checkbox width + gap so wrapped text aligns with text start
             let gap: CGFloat = widthTier == .narrow ? 2 : 3
-            let gapString = NSAttributedString(string: " ", attributes: [
-                .kern: gap
-            ])
-            checkboxString.append(gapString)
-
-            // Get the range containing the placeholder to extract current paragraph style
-            var effectiveRange = NSRange()
-            if let currentParagraphStyle = nsAttributedString.attribute(.paragraphStyle, at: match.range.location, effectiveRange: &effectiveRange) as? NSParagraphStyle {
-                // Create a mutable copy and adjust headIndent for task items
-                let adjustedParagraphStyle = (currentParagraphStyle.mutableCopy() as? NSMutableParagraphStyle) ?? NSMutableParagraphStyle()
-
-                // Task items need wider headIndent to account for checkbox width + gap
-                if widthTier == .narrow {
-                    adjustedParagraphStyle.headIndent = 10 + currentBodyFontSize + gap
-                } else {
-                    adjustedParagraphStyle.headIndent = 20 + currentBodyFontSize + gap
-                }
-
-                // Apply the adjusted paragraph style to the entire list item range
-                // The effectiveRange gives us the range where the current paragraph style applies
-                nsAttributedString.addAttribute(.paragraphStyle, value: adjustedParagraphStyle, range: effectiveRange)
+            let adjustedParagraphStyle = NSMutableParagraphStyle()
+            if widthTier == .narrow {
+                adjustedParagraphStyle.firstLineHeadIndent = 10
+                adjustedParagraphStyle.headIndent = 10 + currentBodyFontSize + gap
+                adjustedParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 10 + currentBodyFontSize + gap)]
+                adjustedParagraphStyle.paragraphSpacing = 0
+                adjustedParagraphStyle.lineSpacing = 1
+            } else {
+                adjustedParagraphStyle.firstLineHeadIndent = 20
+                adjustedParagraphStyle.headIndent = 20 + currentBodyFontSize + gap
+                adjustedParagraphStyle.tabStops = [NSTextTab(textAlignment: .left, location: 20 + currentBodyFontSize + gap)]
+                adjustedParagraphStyle.paragraphSpacing = 0
+                adjustedParagraphStyle.lineSpacing = 2
             }
+
+            // Add gap as kern on the attachment character itself (no space character —
+            // a space has its own width that would make headIndent calculation inaccurate)
+            checkboxString.addAttribute(.kern, value: gap,
+                                        range: NSRange(location: 0, length: checkboxString.length))
+
+            // Set paragraph style on the checkbox string so the first character
+            // of the paragraph carries the correct headIndent (NSAttributedString uses
+            // the paragraph style of the first character for the whole paragraph)
+            checkboxString.addAttribute(.paragraphStyle, value: adjustedParagraphStyle,
+                                        range: NSRange(location: 0, length: checkboxString.length))
 
             // Replace the placeholder with checkbox + gap
             nsAttributedString.replaceCharacters(in: match.range, with: checkboxString)
+
+            // Also apply to the full paragraph range for complete coverage
+            let paragraphRange = (nsAttributedString.string as NSString).paragraphRange(for: NSRange(location: match.range.location, length: 1))
+            nsAttributedString.addAttribute(.paragraphStyle, value: adjustedParagraphStyle, range: paragraphRange)
 
             os_log("MarkdownRenderer: Replaced task checkbox placeholder (checked: %d)", log: .renderer, type: .debug, isChecked ? 1 : 0)
         }
