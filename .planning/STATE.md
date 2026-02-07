@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 13 of 15 (Table Rendering)
-Plan: 1 of 1 (complete)
+Plan: 2 of 2 (complete)
 Status: Phase 13 complete
 Progress: [█████░░░░░] 50%
 
-Last activity: 2026-02-07 — Completed 13-01-PLAN.md: Width-aware table rendering with content-proportional columns and compact mode
+Last activity: 2026-02-07 — Completed 13-02-PLAN.md: Smart cell overflow with row-level wrap/truncate hybrid and 3-line cap
 
 ## Performance Metrics
 
@@ -51,10 +51,10 @@ None
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: Completed 13-01-PLAN.md
+Stopped at: Completed 13-02-PLAN.md
 Resume action: Plan Phase 14 (next phase)
 Resume file: None
-Notes: Width-aware table rendering complete. Available container width threaded from PreviewViewController through MarkdownRenderer to TableRenderer. Content-proportional column sizing with 7-step algorithm: measure, add padding, apply constraints, handle high column count, calculate max table width, content-fitted or proportional scaling. Compact mode (narrow tier) uses 11pt font, 2pt padding, 1pt header border for max data density.
+Notes: Table rendering phase complete. Plan 13-01: Width-aware rendering with content-proportional columns. Plan 13-02: Smart cell overflow with row-level wrap/truncate (>50% threshold), 3-line cap, unbreakable string protection (URLs, paths), tier-aware table spacing. Tables now fully adaptive across narrow/normal contexts with intelligent content handling.
 
 ---
 
