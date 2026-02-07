@@ -13,7 +13,7 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
 - [x] **Phase 11: YAML Front Matter** - Detect, extract, and display YAML metadata blocks before markdown parsing
 - [x] **Phase 12: Layout & Sizing** - Detect available width and adapt fonts, padding, and text layout to context
 - [x] **Phase 13: Table Rendering** - Scale table widths, columns, and padding to fit available container space
-- [ ] **Phase 14: Task List Checkboxes** - Render GFM task list items with SF Symbol checkboxes
+- [x] **Phase 14: Task List Checkboxes** - Render GFM task list items with SF Symbol checkboxes
 - [ ] **Phase 15: Cross-Context Integration** - Verify all features render correctly across all Quick Look contexts
 
 ## Phase Details
@@ -71,7 +71,7 @@ Plans:
   4. Task list syntax inside code blocks is NOT converted to checkboxes (rendered as literal text)
 **Plans:** 1 plan
 Plans:
-- [ ] 14-01-PLAN.md -- Task list preprocessing, SF Symbol checkbox rendering, visual verification
+- [x] 14-01-PLAN.md -- Task list preprocessing, SF Symbol checkbox rendering, visual verification
 
 ### Phase 15: Cross-Context Integration
 **Goal**: All v1.2 features work together correctly across every Quick Look presentation context
@@ -93,5 +93,5 @@ Plans:
 | 11. YAML Front Matter | v1.2 | 1/1 | Complete | 2026-02-06 |
 | 12. Layout & Sizing | v1.2 | 2/2 | Complete | 2026-02-06 |
 | 13. Table Rendering | v1.2 | 2/2 | Complete | 2026-02-07 |
-| 14. Task List Checkboxes | v1.2 | 0/1 | Not started | - |
+| 14. Task List Checkboxes | v1.2 | 1/1 | Complete | 2026-02-07 |
 | 15. Cross-Context Integration | v1.2 | 0/TBD | Not started | - |

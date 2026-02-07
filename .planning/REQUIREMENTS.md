@@ -34,12 +34,12 @@ Requirements for v1.2 Rendering Polish & Features milestone. Each maps to roadma
 
 ### Task List Checkboxes
 
-- [ ] **TASK-01**: `- [ ]` renders with SF Symbol empty checkbox (square)
-- [ ] **TASK-02**: `- [x]` renders with SF Symbol filled checkbox (checkmark.square.fill)
-- [ ] **TASK-03**: Checkboxes colored for visual contrast
-- [ ] **TASK-04**: Checkbox vertically aligned with list item text baseline
-- [ ] **TASK-05**: Mixed lists (regular items + task items) render correctly
-- [ ] **TASK-06**: Task list items in code blocks are not converted to checkboxes
+- [x] **TASK-01**: `- [ ]` renders with SF Symbol empty checkbox (circle)
+- [x] **TASK-02**: `- [x]` renders with SF Symbol filled checkbox (checkmark.circle.fill)
+- [x] **TASK-03**: Checkboxes colored with system accent blue via hierarchicalColor
+- [x] **TASK-04**: Checkbox vertically aligned with list item text baseline
+- [x] **TASK-05**: Mixed lists (regular items + task items) render correctly
+- [x] **TASK-06**: Task list items in code blocks are not converted to checkboxes
 
 ## Future Requirements
 
@@ -96,12 +96,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TABLE-03 | Phase 13 | Complete |
 | TABLE-04 | Phase 13 | Complete |
 | TABLE-05 | Phase 13 | Complete |
-| TASK-01 | Phase 14 | Pending |
-| TASK-02 | Phase 14 | Pending |
-| TASK-03 | Phase 14 | Pending |
-| TASK-04 | Phase 14 | Pending |
-| TASK-05 | Phase 14 | Pending |
-| TASK-06 | Phase 14 | Pending |
+| TASK-01 | Phase 14 | Complete |
+| TASK-02 | Phase 14 | Complete |
+| TASK-03 | Phase 14 | Complete |
+| TASK-04 | Phase 14 | Complete |
+| TASK-05 | Phase 14 | Complete |
+| TASK-06 | Phase 14 | Complete |
 | LAYOUT-05 | Phase 15 | Pending |
 
 **Coverage:**
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-07 after Phase 13 completion*
+*Last updated: 2026-02-07 after Phase 14 completion*
