@@ -85,8 +85,8 @@ class MarkdownRenderer {
         // Extract YAML front matter FIRST (before any other preprocessing)
         let (frontMatter, bodyMarkdown) = extractYAMLFrontMatter(from: markdown)
 
-        // Pre-process body markdown to handle images (convert to placeholders)
-        let preprocessedMarkdown = preprocessBlockquoteSoftBreaks(in: preprocessImages(in: bodyMarkdown))
+        // Pre-process body markdown to handle images and task lists (convert to placeholders)
+        let preprocessedMarkdown = preprocessTaskLists(in: preprocessBlockquoteSoftBreaks(in: preprocessImages(in: bodyMarkdown)))
 
         // Check if document contains GFM tables
         if hasGFMTables(in: preprocessedMarkdown) {
@@ -143,6 +143,9 @@ class MarkdownRenderer {
 
         // Set base styling
         applyBaseStyles(to: nsAttributedString)
+
+        // Apply task checkbox styles (must be after base styles for font size)
+        applyTaskCheckboxStyles(to: nsAttributedString)
 
         os_log("MarkdownRenderer: Render complete, output length: %d", log: .renderer, type: .info, nsAttributedString.length)
 
@@ -351,8 +354,11 @@ class MarkdownRenderer {
             return NSAttributedString(string: "")
         }
 
+        // Preprocess task lists in the segment
+        let preprocessed = preprocessTaskLists(in: trimmed)
+
         // Parse with AttributedString
-        guard let attributedString = try? AttributedString(markdown: trimmed) else {
+        guard let attributedString = try? AttributedString(markdown: preprocessed) else {
             os_log("MarkdownRenderer: Failed to parse non-table segment", log: .renderer, type: .error)
             return NSAttributedString(string: trimmed)
         }
@@ -369,6 +375,7 @@ class MarkdownRenderer {
         applyLinkStyles(to: nsAttributedString)
         applyImagePlaceholderStyles(to: nsAttributedString)
         applyBaseStyles(to: nsAttributedString)
+        applyTaskCheckboxStyles(to: nsAttributedString)
 
         return nsAttributedString
     }
@@ -593,6 +600,14 @@ class MarkdownRenderer {
 
         // Insert prefixes in reverse order to maintain indices
         for item in listItems.reversed() {
+            // Check if this is a task list item (text starts with TASK placeholder)
+            let textAtLocation = (nsAttributedString.string as NSString).substring(from: item.range.location)
+            if textAtLocation.hasPrefix("TASKUNCHECKEDPLACEHOLDER") || textAtLocation.hasPrefix("TASKCHECKEDPLACEHOLDER") {
+                // Skip inserting bullet prefix for task items - the placeholder IS the prefix
+                os_log("MarkdownRenderer: Skipped list prefix for task item at location %d", log: .renderer, type: .debug, item.range.location)
+                continue
+            }
+
             let prefixString = NSAttributedString(
                 string: item.prefix,
                 attributes: [
@@ -1078,6 +1093,71 @@ class MarkdownRenderer {
         return result
     }
 
+    // MARK: - Task List Preprocessing
+
+    /// Preprocesses task list markers by converting them to placeholders
+    /// - Parameter markdown: The markdown content to process
+    /// - Returns: Markdown with task list markers replaced by placeholders
+    private func preprocessTaskLists(in markdown: String) -> String {
+        // Split into lines to track code fence state
+        let lines = markdown.components(separatedBy: "\n")
+        var result: [String] = []
+        var inCodeFence = false
+
+        for line in lines {
+            // Check for code fence delimiters
+            let trimmedLine = line.trimmingCharacters(in: .whitespaces)
+            if trimmedLine.hasPrefix("```") || trimmedLine.hasPrefix("~~~") {
+                inCodeFence.toggle()
+                result.append(line)
+                continue
+            }
+
+            // Skip replacement if inside code fence
+            if inCodeFence {
+                result.append(line)
+                continue
+            }
+
+            // Replace task list markers with placeholders
+            var processedLine = line
+
+            // Pattern for unchecked: ^(\s*)-\s*\[\s*\]\s+
+            // Matches: optional whitespace, dash, optional space, open bracket, optional space, close bracket, one or more spaces
+            let uncheckedPattern = "^(\\s*)-\\s*\\[\\s*\\]\\s+"
+            if let uncheckedRegex = try? NSRegularExpression(pattern: uncheckedPattern) {
+                let nsString = processedLine as NSString
+                let range = NSRange(location: 0, length: nsString.length)
+                processedLine = uncheckedRegex.stringByReplacingMatches(
+                    in: processedLine,
+                    options: [],
+                    range: range,
+                    withTemplate: "$1- TASKUNCHECKEDPLACEHOLDER "
+                )
+            }
+
+            // Pattern for checked: ^(\s*)-\s*\[[xX]\]\s+
+            // Matches: optional whitespace, dash, optional space, open bracket, x or X, close bracket, one or more spaces
+            let checkedPattern = "^(\\s*)-\\s*\\[[xX]\\]\\s+"
+            if let checkedRegex = try? NSRegularExpression(pattern: checkedPattern) {
+                let nsString = processedLine as NSString
+                let range = NSRange(location: 0, length: nsString.length)
+                processedLine = checkedRegex.stringByReplacingMatches(
+                    in: processedLine,
+                    options: [],
+                    range: range,
+                    withTemplate: "$1- TASKCHECKEDPLACEHOLDER "
+                )
+            }
+
+            result.append(processedLine)
+        }
+
+        let preprocessed = result.joined(separator: "\n")
+        os_log("MarkdownRenderer: Preprocessed task lists", log: .renderer, type: .debug)
+        return preprocessed
+    }
+
     // MARK: - Link Styling
 
     private func applyLinkStyles(to nsAttributedString: NSMutableAttributedString) {
@@ -1140,6 +1220,89 @@ class MarkdownRenderer {
             nsAttributedString.replaceCharacters(in: match.range, with: styledString)
 
             os_log("MarkdownRenderer: Replaced image placeholder for %{public}s", log: .renderer, type: .debug, filename)
+        }
+    }
+
+    // MARK: - Task List Checkbox Styling
+
+    /// Creates an NSTextAttachment with SF Symbol checkbox icon
+    /// - Parameters:
+    ///   - checked: True for checked state, false for unchecked
+    ///   - fontSize: Font size to match checkbox size
+    /// - Returns: NSTextAttachment with configured SF Symbol
+    private func checkboxAttachment(checked: Bool, fontSize: CGFloat) -> NSTextAttachment {
+        let attachment = NSTextAttachment()
+
+        // Choose SF Symbol based on checkbox state
+        let symbolName = checked ? "checkmark.circle.fill" : "circle"
+        let accessibilityDescription = checked ? "Completed task" : "Incomplete task"
+
+        // Configure symbol with system accent color and font-matched size
+        let config = NSImage.SymbolConfiguration(pointSize: fontSize, weight: .regular)
+            .applying(.init(hierarchicalColor: .controlAccentColor))
+
+        if let symbolImage = NSImage(systemSymbolName: symbolName, accessibilityDescription: accessibilityDescription) {
+            attachment.image = symbolImage.withSymbolConfiguration(config)
+        }
+
+        // Baseline alignment: negative y offset moves symbol down to sit on baseline
+        let yOffset = fontSize * 0.15
+        attachment.bounds = CGRect(x: 0, y: -yOffset, width: fontSize, height: fontSize)
+
+        return attachment
+    }
+
+    /// Applies task checkbox styling by replacing placeholders with SF Symbol attachments
+    /// - Parameter nsAttributedString: The NSMutableAttributedString to modify
+    private func applyTaskCheckboxStyles(to nsAttributedString: NSMutableAttributedString) {
+        // Find TASKUNCHECKEDPLACEHOLDER and TASKCHECKEDPLACEHOLDER patterns
+        let pattern = "TASK(UN)?CHECKEDPLACEHOLDER"
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return }
+
+        let fullRange = NSRange(location: 0, length: nsAttributedString.length)
+        let matches = regex.matches(in: nsAttributedString.string, options: [], range: fullRange)
+
+        // Process in reverse order to maintain indices
+        for match in matches.reversed() {
+            guard match.range.location != NSNotFound else { continue }
+
+            // Determine if checked or unchecked
+            let matchText = (nsAttributedString.string as NSString).substring(with: match.range)
+            let isChecked = matchText == "TASKCHECKEDPLACEHOLDER"
+
+            // Create checkbox attachment
+            let attachment = checkboxAttachment(checked: isChecked, fontSize: currentBodyFontSize)
+            let checkboxString = NSMutableAttributedString(attachment: attachment)
+
+            // Add tight gap (2-3pt) after checkbox using kern
+            let gap: CGFloat = widthTier == .narrow ? 2 : 3
+            let gapString = NSAttributedString(string: " ", attributes: [
+                .kern: gap
+            ])
+            checkboxString.append(gapString)
+
+            // Get the range containing the placeholder to extract current paragraph style
+            var effectiveRange = NSRange()
+            if let currentParagraphStyle = nsAttributedString.attribute(.paragraphStyle, at: match.range.location, effectiveRange: &effectiveRange) as? NSParagraphStyle {
+                // Create a mutable copy and adjust headIndent for task items
+                let adjustedParagraphStyle = (currentParagraphStyle.mutableCopy() as? NSMutableParagraphStyle) ?? NSMutableParagraphStyle()
+
+                // Task items need wider headIndent to account for checkbox width + gap
+                if widthTier == .narrow {
+                    adjustedParagraphStyle.headIndent = 10 + currentBodyFontSize + gap
+                } else {
+                    adjustedParagraphStyle.headIndent = 20 + currentBodyFontSize + gap
+                }
+
+                // Apply the adjusted paragraph style to the entire list item range
+                // The effectiveRange gives us the range where the current paragraph style applies
+                nsAttributedString.addAttribute(.paragraphStyle, value: adjustedParagraphStyle, range: effectiveRange)
+            }
+
+            // Replace the placeholder with checkbox + gap
+            nsAttributedString.replaceCharacters(in: match.range, with: checkboxString)
+
+            os_log("MarkdownRenderer: Replaced task checkbox placeholder (checked: %d)", log: .renderer, type: .debug, isChecked ? 1 : 0)
         }
     }
 }
