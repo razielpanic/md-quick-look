@@ -65,11 +65,13 @@ Plans:
 **Depends on**: Phase 11 (clean markdown for AST parsing), Phase 12 (width-aware rendering context)
 **Requirements**: TASK-01, TASK-02, TASK-03, TASK-04, TASK-05, TASK-06
 **Success Criteria** (what must be TRUE):
-  1. `- [ ]` items display an empty checkbox (SF Symbol square) and `- [x]` items display a filled checkbox (SF Symbol checkmark.square.fill)
-  2. Checkboxes are colored for visual contrast and vertically aligned with the text baseline of their list item
+  1. `- [ ]` items display an empty checkbox (SF Symbol circle) and `- [x]` items display a filled checkbox (SF Symbol checkmark.circle.fill)
+  2. Checkboxes are colored with system accent blue and vertically aligned with the text baseline of their list item
   3. Mixed lists containing both regular bullet items and task list items render correctly -- bullets for regular items, checkboxes for task items
   4. Task list syntax inside code blocks is NOT converted to checkboxes (rendered as literal text)
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 14-01-PLAN.md -- Task list preprocessing, SF Symbol checkbox rendering, visual verification
 
 ### Phase 15: Cross-Context Integration
 **Goal**: All v1.2 features work together correctly across every Quick Look presentation context
@@ -91,5 +93,5 @@ Plans:
 | 11. YAML Front Matter | v1.2 | 1/1 | Complete | 2026-02-06 |
 | 12. Layout & Sizing | v1.2 | 2/2 | Complete | 2026-02-06 |
 | 13. Table Rendering | v1.2 | 2/2 | Complete | 2026-02-07 |
-| 14. Task List Checkboxes | v1.2 | 0/TBD | Not started | - |
+| 14. Task List Checkboxes | v1.2 | 0/1 | Not started | - |
 | 15. Cross-Context Integration | v1.2 | 0/TBD | Not started | - |
