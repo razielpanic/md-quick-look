@@ -17,11 +17,11 @@ Requirements for v1.2 Rendering Polish & Features milestone. Each maps to roadma
 
 ### Table Rendering
 
-- [ ] **TABLE-01**: Table maxTableWidth scales to match available container width
-- [ ] **TABLE-02**: Column min/max widths scale proportionally for narrow contexts
-- [ ] **TABLE-03**: Cell padding reduces in narrow contexts
-- [ ] **TABLE-04**: Compact table mode (smaller font + reduced padding) activates at very narrow widths
-- [ ] **TABLE-05**: Tables remain readable and not clipped in Finder preview pane
+- [x] **TABLE-01**: Table maxTableWidth scales to match available container width
+- [x] **TABLE-02**: Column min/max widths scale proportionally for narrow contexts
+- [x] **TABLE-03**: Cell padding reduces in narrow contexts
+- [x] **TABLE-04**: Compact table mode (smaller font + reduced padding) activates at very narrow widths
+- [x] **TABLE-05**: Tables remain readable and not clipped in Finder preview pane
 
 ### YAML Front Matter
 
@@ -91,11 +91,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAYOUT-02 | Phase 12 | Complete |
 | LAYOUT-03 | Phase 12 | Complete |
 | LAYOUT-04 | Phase 12 | Complete |
-| TABLE-01 | Phase 13 | Pending |
-| TABLE-02 | Phase 13 | Pending |
-| TABLE-03 | Phase 13 | Pending |
-| TABLE-04 | Phase 13 | Pending |
-| TABLE-05 | Phase 13 | Pending |
+| TABLE-01 | Phase 13 | Complete |
+| TABLE-02 | Phase 13 | Complete |
+| TABLE-03 | Phase 13 | Complete |
+| TABLE-04 | Phase 13 | Complete |
+| TABLE-05 | Phase 13 | Complete |
 | TASK-01 | Phase 14 | Pending |
 | TASK-02 | Phase 14 | Pending |
 | TASK-03 | Phase 14 | Pending |
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-06 after Phase 12 completion*
+*Last updated: 2026-02-07 after Phase 13 completion*
