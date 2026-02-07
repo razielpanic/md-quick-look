@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 13 of 15 (Table Rendering)
-Plan: Not started
-Status: Ready to plan
-Progress: [████░░░░░░] 40%
+Plan: 1 of 1 (complete)
+Status: Phase 13 complete
+Progress: [█████░░░░░] 50%
 
-Last activity: 2026-02-06 — Phase 12 (Layout & Sizing) complete, verified 19/19 must-haves
+Last activity: 2026-02-07 — Completed 13-01-PLAN.md: Width-aware table rendering with content-proportional columns and compact mode
 
 ## Performance Metrics
 
@@ -50,11 +50,11 @@ None
 
 ## Session Continuity
 
-Last session: 2026-02-06
-Stopped at: Phase 12 complete, ready for Phase 13
-Resume action: Plan Phase 13 (Table Rendering)
+Last session: 2026-02-07
+Stopped at: Completed 13-01-PLAN.md
+Resume action: Plan Phase 14 (next phase)
 Resume file: None
-Notes: Width-adaptive rendering fully implemented and verified. WidthTier enum, tier-aware fonts/spacing, viewDidLayout detection, max content width cap. Fixed inline code range offset bug and tightened YAML tab stops during verification.
+Notes: Width-aware table rendering complete. Available container width threaded from PreviewViewController through MarkdownRenderer to TableRenderer. Content-proportional column sizing with 7-step algorithm: measure, add padding, apply constraints, handle high column count, calculate max table width, content-fitted or proportional scaling. Compact mode (narrow tier) uses 11pt font, 2pt padding, 1pt header border for max data density.
 
 ---
 
