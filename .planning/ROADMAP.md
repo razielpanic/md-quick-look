@@ -1,6 +1,6 @@
 # Milestone v1.2: Rendering Polish & Features
 
-**Status:** In Progress
+**Status:** Complete
 **Phases:** 11-15
 **Total Plans:** 9
 
@@ -14,7 +14,7 @@ v1.2 enhances the Quick Look extension's rendering pipeline to handle real-world
 - [x] **Phase 12: Layout & Sizing** - Detect available width and adapt fonts, padding, and text layout to context
 - [x] **Phase 13: Table Rendering** - Scale table widths, columns, and padding to fit available container space
 - [x] **Phase 14: Task List Checkboxes** - Render GFM task list items with SF Symbol checkboxes
-- [ ] **Phase 15: Cross-Context Integration** - Verify all features render correctly across all Quick Look contexts
+- [x] **Phase 15: Cross-Context Integration** - Verify all features render correctly across all Quick Look contexts
 
 ## Phase Details
 
@@ -84,8 +84,8 @@ Plans:
   4. Switching between contexts (e.g., spacebar then fullscreen) does not produce layout artifacts or stale rendering
 **Plans:** 2 plans
 Plans:
-- [ ] 15-01-PLAN.md -- Snapshot test infrastructure, test target setup, comprehensive test file
-- [ ] 15-02-PLAN.md -- Record baselines, visual defect review, rendering fixes, verification
+- [x] 15-01-PLAN.md -- Snapshot test infrastructure, test target setup, comprehensive test file
+- [x] 15-02-PLAN.md -- Record baselines, visual defect review, rendering fixes, verification
 
 ## Progress
 
@@ -97,4 +97,4 @@ Plans:
 | 12. Layout & Sizing | v1.2 | 2/2 | Complete | 2026-02-06 |
 | 13. Table Rendering | v1.2 | 2/2 | Complete | 2026-02-07 |
 | 14. Task List Checkboxes | v1.2 | 1/1 | Complete | 2026-02-07 |
-| 15. Cross-Context Integration | v1.2 | 0/2 | Not started | - |
+| 15. Cross-Context Integration | v1.2 | 2/2 | Complete | 2026-02-07 |

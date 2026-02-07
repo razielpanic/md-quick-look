@@ -13,7 +13,7 @@ Requirements for v1.2 Rendering Polish & Features milestone. Each maps to roadma
 - [x] **LAYOUT-02**: Extension detects narrow context via view.bounds.width and passes available width to renderer
 - [x] **LAYOUT-03**: All font sizes scale proportionally in narrow contexts (headings, body, code, etc.)
 - [x] **LAYOUT-04**: Text container insets and padding adapt to available width
-- [ ] **LAYOUT-05**: Rendering works correctly in spacebar popup, Finder preview pane, and fullscreen Quick Look
+- [x] **LAYOUT-05**: Rendering works correctly in spacebar popup, Finder preview pane, and fullscreen Quick Look
 
 ### Table Rendering
 
