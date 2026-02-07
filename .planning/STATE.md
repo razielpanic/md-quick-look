@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-07)
 
 **Core value:** Instant, effortless context about markdown file content without leaving Finder or opening an editor.
-**Current focus:** Planning next milestone
+**Current focus:** v1.3 Visual Polish
 
 ## Current Position
 
-Phase: 15 of 15 (all complete)
-Plan: N/A
-Status: v1.2 milestone shipped — ready for next milestone
-Last activity: 2026-02-07 — v1.2 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-07 — Milestone v1.3 started
 
-Progress: [██████████] 100% (v1.2 complete)
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -45,9 +45,7 @@ See PROJECT.md Key Decisions table for full log.
 
 ### Pending Todos
 
-1. **Ensure MIT license attribution in app UI** (area: ui) — verify About window and app surfaces include proper MIT attribution
-2. **Add Preferences toggle for YAML front matter display** (area: ui) — show/hide machine-targeted metadata via Settings, requires App Group for host<>extension sharing
-3. **Fix dark mode background color inconsistency across sections** (area: rendering) — YAML, blockquote, code block fills don't harmonize in dark mode
+1. **Add Preferences toggle for YAML front matter display** (area: ui) — deferred, requires App Group for host↔extension sharing
 
 ### Blockers/Concerns
 
@@ -56,10 +54,10 @@ None
 ## Session Continuity
 
 Last session: 2026-02-07
-Stopped at: v1.2 milestone complete
-Resume action: Start next milestone with `/gsd:new-milestone`
+Stopped at: Milestone v1.3 started — defining requirements
+Resume action: Continue requirements definition and roadmap creation
 Resume file: None
-Notes: All v1.2 artifacts archived to `.planning/milestones/`. ROADMAP.md and REQUIREMENTS.md deleted (fresh for next milestone). Phase numbering continues from 16.
+Notes: Phase numbering continues from 16.
 
 ---
 

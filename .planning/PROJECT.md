@@ -85,9 +85,13 @@ All v1.0 + v1.1 + v1.2 requirements shipped and validated:
 - ✓ Mixed lists (regular + task items) render correctly — v1.2
 - ✓ Task list syntax in code blocks not converted — v1.2
 
-### Active
+### Active — v1.3 Visual Polish
 
-(None — no active milestone. Start next milestone with `/gsd:new-milestone`)
+- [ ] Dark mode background color harmonization across shaded sections
+- [ ] MIT license attribution in About window
+- [ ] Developer credit in About window
+- [ ] Improved padding and leading throughout rendered content
+- [ ] Rounded corners on all shaded background blocks
 
 ### Future (candidates)
 
@@ -167,4 +171,4 @@ All v1.0 + v1.1 + v1.2 requirements shipped and validated:
 | Extension sources in test target (Option C) | Workaround for SPM C module transitive dependency limitation | ⚠️ Revisit - When Xcode/SPM fix lands |
 
 ---
-*Last updated: 2026-02-07 after v1.2 milestone*
+*Last updated: 2026-02-07 after v1.3 milestone started*
