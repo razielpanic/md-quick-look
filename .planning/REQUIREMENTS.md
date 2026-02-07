@@ -9,10 +9,10 @@ Requirements for v1.2 Rendering Polish & Features milestone. Each maps to roadma
 
 ### Layout & Sizing
 
-- [ ] **LAYOUT-01**: Quick Look window uses system-managed sizing with proper autoresizing (no preferredContentSize)
-- [ ] **LAYOUT-02**: Extension detects narrow context via view.bounds.width and passes available width to renderer
-- [ ] **LAYOUT-03**: All font sizes scale proportionally in narrow contexts (headings, body, code, etc.)
-- [ ] **LAYOUT-04**: Text container insets and padding adapt to available width
+- [x] **LAYOUT-01**: Quick Look window uses system-managed sizing with proper autoresizing (no preferredContentSize)
+- [x] **LAYOUT-02**: Extension detects narrow context via view.bounds.width and passes available width to renderer
+- [x] **LAYOUT-03**: All font sizes scale proportionally in narrow contexts (headings, body, code, etc.)
+- [x] **LAYOUT-04**: Text container insets and padding adapt to available width
 - [ ] **LAYOUT-05**: Rendering works correctly in spacebar popup, Finder preview pane, and fullscreen Quick Look
 
 ### Table Rendering
@@ -87,10 +87,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | YAML-04 | Phase 11 | Complete |
 | YAML-05 | Phase 11 | Complete |
 | YAML-06 | Phase 11 | Complete |
-| LAYOUT-01 | Phase 12 | Pending |
-| LAYOUT-02 | Phase 12 | Pending |
-| LAYOUT-03 | Phase 12 | Pending |
-| LAYOUT-04 | Phase 12 | Pending |
+| LAYOUT-01 | Phase 12 | Complete |
+| LAYOUT-02 | Phase 12 | Complete |
+| LAYOUT-03 | Phase 12 | Complete |
+| LAYOUT-04 | Phase 12 | Complete |
 | TABLE-01 | Phase 13 | Pending |
 | TABLE-02 | Phase 13 | Pending |
 | TABLE-03 | Phase 13 | Pending |
@@ -111,4 +111,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-05*
-*Last updated: 2026-02-06 after Phase 11 completion*
+*Last updated: 2026-02-06 after Phase 12 completion*
