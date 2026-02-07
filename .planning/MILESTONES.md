@@ -1,5 +1,32 @@
 # Project Milestones: md-quick-look
 
+## v1.2 Rendering Polish & Features (Shipped: 2026-02-07)
+
+**Delivered:** Width-adaptive rendering with YAML front matter display, responsive tables, task list checkboxes, and cross-context snapshot testing.
+
+**Phases completed:** 11-15 (8 plans total)
+
+**Key accomplishments:**
+
+- YAML front matter extraction and styled two-column rendering with field capping in narrow contexts
+- Width-tier adaptive layout system — two-tier responsive rendering with scaled fonts, spacing, and 640pt max content width
+- Content-proportional table sizing with smart wrap/truncate hybrid and compact mode for narrow contexts
+- GFM task list checkbox rendering with SF Symbol circle icons and system accent blue
+- Snapshot-based cross-context integration testing — 6 baselines covering 3 widths x 2 appearances
+
+**Stats:**
+
+- 56 files modified
+- 352 lines of Swift (codebase total)
+- 5 phases, 8 plans, 22 requirements
+- 2 days (2026-02-06 → 2026-02-07)
+
+**Git range:** `feat(11-01)` → `docs(v1.2)`
+
+**What's next:** Code signing and notarization, syntax highlighting, or image rendering
+
+---
+
 ## v1.1 Public Release (GitHub) (Shipped: 2026-02-05)
 
 **Delivered:** Polished, publicly distributable macOS app with professional UI, app icon, unsigned DMG on GitHub Releases, and comprehensive documentation.
