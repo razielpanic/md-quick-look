@@ -14,7 +14,7 @@ class TableRenderer {
     var availableWidth: CGFloat = 640
 
     private var bodyFontSize: CGFloat {
-        widthTier == .narrow ? 12.0 : 14.0
+        widthTier == .narrow ? 11.0 : 14.0  // Compact mode: 11pt for max data density
     }
 
     /// Initializes TableRenderer with width tier and available width
@@ -54,9 +54,11 @@ class TableRenderer {
         nsTable.hidesEmptyCells = false
         nsTable.layoutAlgorithm = .fixedLayoutAlgorithm
 
-        // Set total table width based on measured column widths
+        // Set total table width based on measured column widths, capped to max table width
         let totalWidth = columnWidths.reduce(0, +)
-        nsTable.setContentWidth(totalWidth, type: .absoluteValueType)
+        let maxTableWidth = widthTier == .narrow ? availableWidth : min(availableWidth, 640.0)
+        let cappedWidth = min(totalWidth, maxTableWidth)
+        nsTable.setContentWidth(cappedWidth, type: .absoluteValueType)
 
         os_log("TableRenderer: Rendering table with %d columns (measured widths: %@, total: %.1fpt)", log: .tableRenderer, type: .debug, columnCount, columnWidths.map { String(format: "%.1f", $0) }.joined(separator: ", "), totalWidth)
 
@@ -115,6 +117,7 @@ class TableRenderer {
             .font: NSFont.systemFont(ofSize: bodyFontSize)
         ]
 
+        // STEP 1: Measure raw content width per column
         // Measure header cells
         for (colIndex, headerContent) in table.headerCells.enumerated() {
             let text = headerContent.isEmpty ? "\u{00B7}" : headerContent
@@ -132,38 +135,98 @@ class TableRenderer {
             }
         }
 
-        // Add padding plus breathing room (tier-aware)
-        // Apply min/max constraints (tier-aware)
-        let (minColumnWidth, maxColumnWidth, breathingRoom): (CGFloat, CGFloat, CGFloat)
+        // STEP 2: Add padding and breathing room (tier-aware compact mode)
+        let cellPadding: CGFloat
+        let breathingRoom: CGFloat
         if widthTier == .narrow {
-            minColumnWidth = 40.0
-            maxColumnWidth = 150.0
-            breathingRoom = 10.0
+            cellPadding = 4.0   // 2pt each side (compact mode)
+            breathingRoom = 6.0
         } else {
-            minColumnWidth = 60.0
-            maxColumnWidth = 300.0
-            breathingRoom = 20.0
+            cellPadding = 12.0  // 6pt each side (normal mode)
+            breathingRoom = 16.0
         }
-
-        let cellPadding: CGFloat = widthTier == .narrow ? 6.0 : 12.0  // 3pt or 6pt each side
 
         for i in 0..<columnCount {
             columnWidths[i] += cellPadding + breathingRoom
+        }
+
+        // STEP 3: Apply min/max column constraints (tier-aware compact mode)
+        let minColumnWidth: CGFloat
+        var maxColumnWidth: CGFloat
+        if widthTier == .narrow {
+            minColumnWidth = 30.0   // Compact mode minimum
+            maxColumnWidth = 120.0  // Compact mode maximum
+        } else {
+            minColumnWidth = 50.0   // Normal mode minimum
+            maxColumnWidth = 280.0  // Normal mode maximum
+        }
+
+        // STEP 4: High column count handling (5+ columns)
+        if columnCount >= 5 {
+            // Reduce max column width to prevent any single column from dominating
+            // Max column can be at most 1.5x the equal-share width
+            let maxTableWidth = widthTier == .narrow ? availableWidth : min(availableWidth, 640.0)
+            let equalShare = maxTableWidth / CGFloat(columnCount)
+            maxColumnWidth = min(maxColumnWidth, equalShare * 1.5)
+        }
+
+        for i in 0..<columnCount {
             columnWidths[i] = min(max(columnWidths[i], minColumnWidth), maxColumnWidth)
         }
 
-        // Cap total table width (tier-aware)
-        let maxTableWidth: CGFloat = widthTier == .narrow ? 400.0 : 800.0
-        let totalWidth = columnWidths.reduce(0, +)
-        if totalWidth > maxTableWidth {
-            // Scale all columns proportionally to fit
-            let scale = maxTableWidth / totalWidth
+        // STEP 5: Determine max table width
+        // Normal mode: cap at 640pt (body content max width)
+        // Narrow mode: use full available width (already constrained)
+        let maxTableWidth: CGFloat = widthTier == .narrow ? availableWidth : min(availableWidth, 640.0)
+
+        // STEP 6: Calculate total measured width
+        let totalMeasuredWidth = columnWidths.reduce(0, +)
+
+        // STEP 7: Content-fitted logic
+        if totalMeasuredWidth <= maxTableWidth {
+            // Table fits comfortably - use measured widths as-is (content-fitted)
+            os_log("TableRenderer: Content-fitted table (%.1fpt of %.1fpt available)", log: .tableRenderer, type: .debug, totalMeasuredWidth, maxTableWidth)
+            return columnWidths
+        } else {
+            // Table exceeds max width - scale proportionally
+            os_log("TableRenderer: Scaling table from %.1fpt to %.1fpt", log: .tableRenderer, type: .debug, totalMeasuredWidth, maxTableWidth)
+
+            let scale = maxTableWidth / totalMeasuredWidth
             for i in 0..<columnCount {
                 columnWidths[i] *= scale
             }
-        }
 
-        return columnWidths
+            // Re-enforce minimum column width after scaling
+            var needsRedistribution = false
+            for i in 0..<columnCount {
+                if columnWidths[i] < minColumnWidth {
+                    columnWidths[i] = minColumnWidth
+                    needsRedistribution = true
+                }
+            }
+
+            // If any column fell below minimum, redistribute remaining space
+            if needsRedistribution {
+                let usedWidth = columnWidths.reduce(0, +)
+                let remainingWidth = maxTableWidth - usedWidth
+
+                if remainingWidth > 0 {
+                    // Count columns that are above minimum (can absorb extra space)
+                    let flexibleColumns = columnWidths.filter { $0 > minColumnWidth }.count
+
+                    if flexibleColumns > 0 {
+                        let extraPerColumn = remainingWidth / CGFloat(flexibleColumns)
+                        for i in 0..<columnCount {
+                            if columnWidths[i] > minColumnWidth {
+                                columnWidths[i] += extraPerColumn
+                            }
+                        }
+                    }
+                }
+            }
+
+            return columnWidths
+        }
     }
 
     private func renderCell(
@@ -188,15 +251,16 @@ class TableRenderer {
         let columnWidth = columnWidths[safe: column] ?? 100.0
         block.setContentWidth(columnWidth, type: .absoluteValueType)
 
-        // Configure padding (tier-aware): 3pt in narrow mode, 6pt in normal mode
-        let cellPadding: CGFloat = widthTier == .narrow ? 3.0 : 6.0
+        // Configure padding (tier-aware compact mode): 2pt in narrow mode, 6pt in normal mode
+        let cellPadding: CGFloat = widthTier == .narrow ? 2.0 : 6.0
         for edge: NSRectEdge in [.minX, .minY, .maxX, .maxY] {
             block.setWidth(cellPadding, type: .absoluteValueType, for: .padding, edge: edge)
         }
 
-        // Header separator: bottom border on header cells only
+        // Header separator: bottom border on header cells only (tier-aware thickness)
         if isHeader {
-            block.setWidth(2.0, type: .absoluteValueType, for: .border, edge: .maxY)
+            let headerBorderWidth: CGFloat = widthTier == .narrow ? 1.0 : 2.0
+            block.setWidth(headerBorderWidth, type: .absoluteValueType, for: .border, edge: .maxY)
             block.setBorderColor(NSColor.separatorColor, for: .maxY)
         }
 
