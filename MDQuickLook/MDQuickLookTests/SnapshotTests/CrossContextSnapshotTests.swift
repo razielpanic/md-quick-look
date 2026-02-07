@@ -47,7 +47,6 @@ final class CrossContextSnapshotTests: XCTestCase {
                 let name = "\(width.name)-\(appearance.name)"
                 verifySnapshot(
                     width: width.width,
-                    height: 800,
                     appearance: appearance.appearance,
                     named: name
                 )
@@ -57,16 +56,17 @@ final class CrossContextSnapshotTests: XCTestCase {
 
     // MARK: - Private Helpers
 
-    /// Verifies a snapshot at the specified width, height, and appearance
+    /// Verifies a snapshot at the specified width and appearance
+    ///
+    /// Uses a tall height (3000px) to ensure all markdown features are captured
+    /// regardless of document length.
     ///
     /// - Parameters:
     ///   - width: View width in points
-    ///   - height: View height in points
     ///   - appearance: NSAppearance for light/dark mode
     ///   - name: Snapshot name for identification
     private func verifySnapshot(
         width: CGFloat,
-        height: CGFloat,
         appearance: NSAppearance.Name,
         named name: String
     ) {
@@ -74,8 +74,9 @@ final class CrossContextSnapshotTests: XCTestCase {
         let vc = PreviewViewController()
         vc.loadView()
 
-        // Set frame BEFORE loading content
-        vc.view.frame = CGRect(x: 0, y: 0, width: width, height: height)
+        // Use tall height to capture full document content including:
+        // YAML front matter, headings, lists, task lists, tables, code blocks, blockquotes, etc.
+        vc.view.frame = CGRect(x: 0, y: 0, width: width, height: 3000)
 
         // Set appearance BEFORE loading content (ensures semantic colors resolve correctly)
         vc.view.appearance = NSAppearance(named: appearance)
