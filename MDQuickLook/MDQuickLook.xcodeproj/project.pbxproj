@@ -24,6 +24,12 @@
 		C10101010101010101010101 /* CrossContextSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11111111111111111111111 /* CrossContextSnapshotTests.swift */; };
 		C10202020202020202020202 /* comprehensive-v1.2.md in Resources */ = {isa = PBXBuildFile; fileRef = C12222222222222222222222 /* comprehensive-v1.2.md */; };
 		C10303030303030303030303 /* SnapshotTesting in Frameworks */ = {isa = PBXBuildFile; productRef = C13333333333333333333333 /* SnapshotTesting */; };
+		C10404040404040404040404 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1B /* PreviewViewController.swift */; };
+		C10505050505050505050505 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1C /* MarkdownRenderer.swift */; };
+		C10606060606060606060606 /* MarkdownLayoutManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B1F /* MarkdownLayoutManager.swift */; };
+		C10707070707070707070707 /* TableExtractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B2E /* TableExtractor.swift */; };
+		C10808080808080808080808 /* TableRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B1B1B1B1B1B1B1B1B1B1B2F /* TableRenderer.swift */; };
+		C10909090909090909090909 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = C1AAAAAAAAAAAAAAAAAAAA11 /* Markdown */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,13 +39,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 5A1A1A1A1A1A1A1A1A1A1A19;
 			remoteInfo = MDQuickLook;
-		};
-		C14444444444444444444444 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 1A1A1A1A1A1A1A1A1A1A1A1A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 5A1A1A1A1A1A1A1A1A1A1A19;
-			remoteInfo = "MDQuickLook Extension";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -102,6 +101,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C10303030303030303030303 /* SnapshotTesting in Frameworks */,
+				C10909090909090909090909 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,11 +260,11 @@
 			buildRules = (
 			);
 			dependencies = (
-				C1EEEEEEEEEEEEEEEEEEEEEE /* PBXTargetDependency */,
 			);
 			name = MDQuickLookTests;
 			packageProductDependencies = (
 				C13333333333333333333333 /* SnapshotTesting */,
+				C1AAAAAAAAAAAAAAAAAAAA11 /* Markdown */,
 			);
 			productName = MDQuickLookTests;
 			productReference = C15555555555555555555555 /* MDQuickLookTests.xctest */;
@@ -369,6 +369,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				C10101010101010101010101 /* CrossContextSnapshotTests.swift in Sources */,
+				C10404040404040404040404 /* PreviewViewController.swift in Sources */,
+				C10505050505050505050505 /* MarkdownRenderer.swift in Sources */,
+				C10606060606060606060606 /* MarkdownLayoutManager.swift in Sources */,
+				C10707070707070707070707 /* TableExtractor.swift in Sources */,
+				C10808080808080808080808 /* TableRenderer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,11 +384,6 @@
 			isa = PBXTargetDependency;
 			target = 5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook Extension */;
 			targetProxy = 4B1B1B1B1B1B1B1B1B1B1B1B /* PBXContainerItemProxy */;
-		};
-		C1EEEEEEEEEEEEEEEEEEEEEE /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 5A1A1A1A1A1A1A1A1A1A1A19 /* MDQuickLook Extension */;
-			targetProxy = C14444444444444444444444 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -734,6 +734,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C1FFFFFFFFFFFFFFFFFFFF /* XCRemoteSwiftPackageReference "swift-snapshot-testing" */;
 			productName = SnapshotTesting;
+		};
+		C1AAAAAAAAAAAAAAAAAAAA11 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6A1A1A1A1A1A1A1A1A1A1A1B /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

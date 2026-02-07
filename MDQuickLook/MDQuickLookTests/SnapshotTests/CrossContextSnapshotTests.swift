@@ -1,6 +1,5 @@
 import XCTest
 import SnapshotTesting
-@testable import MDQuickLook_Extension
 
 /// Cross-context snapshot tests for MD Quick Look Extension
 ///
@@ -25,7 +24,7 @@ final class CrossContextSnapshotTests: XCTestCase {
 
     /// Set to true to regenerate all baseline snapshots
     /// WARNING: NEVER commit with this set to true
-    private let shouldRecordSnapshots = false
+    private let shouldRecordSnapshots = true
 
     // MARK: - Recording Mode Control
 
