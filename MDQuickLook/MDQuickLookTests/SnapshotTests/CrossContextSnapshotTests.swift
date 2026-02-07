@@ -24,7 +24,7 @@ final class CrossContextSnapshotTests: XCTestCase {
 
     /// Set to true to regenerate all baseline snapshots
     /// WARNING: NEVER commit with this set to true
-    private let shouldRecordSnapshots = true
+    private let shouldRecordSnapshots = false
 
     // MARK: - Recording Mode Control
 
