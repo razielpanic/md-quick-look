@@ -5,5 +5,16 @@
     "depth": "standard",
     "parallelization": true,
     "commit_docs": true
+  },
+  "release": {
+    "enabled": true,
+    "version_files": [
+      "MDQuickLook/MDQuickLook/Info.plist",
+      "MDQuickLook/MDQuickLook Extension/Info.plist",
+      "MDQuickLook/MDQuickLook.xcodeproj/project.pbxproj"
+    ],
+    "build_command": "make build",
+    "package_command": "create-dmg 'build/Build/Products/Release/MD Quick Look.app' --overwrite",
+    "artifact_glob": "*.dmg"
   }
 }
