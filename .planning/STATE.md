@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 Phase: 16 of 17 (Rendering Polish)
 Plan: Not yet planned
 Status: Ready to plan
-Last activity: 2026-02-08 - Completed quick task 002: Investigate why v1.2 tag didn't get a GitHub release
+Last activity: 2026-02-08 - Updated quick task 002 with correct root cause (release config missing, not human error)
 
 Progress: [████████████████████████████░░] 92% (52 of 56 plans complete across v1.0-v1.2)
 
@@ -65,7 +65,7 @@ Recent decisions affecting current work:
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
-| 002 | Investigate why v1.2 tag didn't get a GitHub release | 2026-02-08 | (investigation) | [002-investigate-v1-2-missing-release](./quick/002-investigate-v1-2-missing-release/) |
+| 002 | Investigate v1.2 missing GitHub release — no release config in config.json at completion time | 2026-02-08 | (investigation) | [002-investigate-v1-2-missing-release](./quick/002-investigate-v1-2-missing-release/) |
 
 ## Session Continuity
 
