@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-07)
 Phase: 16 of 17 (Rendering Polish)
 Plan: Not yet planned
 Status: Ready to plan
-Last activity: 2026-02-07 — v1.3 roadmap created with 2 phases
+Last activity: 2026-02-08 - Completed quick task 002: Investigate why v1.2 tag didn't get a GitHub release
 
 Progress: [████████████████████████████░░] 92% (52 of 56 plans complete across v1.0-v1.2)
 
@@ -60,6 +60,12 @@ Recent decisions affecting current work:
 
 **Known issue from v1.2:**
 - Dark mode background color inconsistency across YAML/blockquote/code sections (DARK-01 addresses this in Phase 16)
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 002 | Investigate why v1.2 tag didn't get a GitHub release | 2026-02-08 | (investigation) | [002-investigate-v1-2-missing-release](./quick/002-investigate-v1-2-missing-release/) |
 
 ## Session Continuity
 
